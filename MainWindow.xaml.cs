@@ -207,7 +207,7 @@ public partial class MainWindow : Window
         };
     }
 
-    private void BtnFixCpuSensors_Click(object sender, RoutedEventArgs e)
+    private async void BtnFixCpuSensors_Click(object sender, RoutedEventArgs e)
     {
         var p = _monitor.DiagnoseCpuSensors();
         string why = SensorMonitor.Explain(p);
@@ -217,25 +217,33 @@ public partial class MainWindow : Window
             return;
         }
 
-        // winget vem com o Windows 11 e com o Windows 10 atualizado (App Installer).
-        string winget = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                                               @"Microsoft\WindowsApps\winget.exe");
-        if (!System.IO.File.Exists(winget))
-        {
-            MessageBox.Show(why + "\n\nO instalador de pacotes do Windows (winget) não foi encontrado neste PC. " +
-                            "Atualize o \"Instalador de Aplicativo\" pela Microsoft Store e use o botão de novo, " +
-                            "ou instale o PawnIO (autor: namazso) manualmente.",
-                            "RESET EXPLODE", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
-
-        var r = MessageBox.Show(why + "\n\nInstalar o PawnIO agora? Vai abrir uma janela com o instalador do Windows (winget). " +
+        bool needWinget = !AppInstaller.WingetAvailable;
+        var r = MessageBox.Show(why + (needWinget
+                                    ? "\n\nO instalador de pacotes do Windows (winget) também não foi encontrado neste PC; o RESET EXPLODE vai instalá-lo primeiro. "
+                                    : "\n\n") +
+                                "Instalar o PawnIO agora? Vai abrir uma janela com o instalador. " +
                                 "Quando terminar, feche o RESET EXPLODE e abra de novo.",
                                 "RESET EXPLODE", MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (r != MessageBoxResult.Yes) return;
+
+        if (needWinget)
+        {
+            CpuSensorWarnText.Text = "Instalando o winget…";
+            var (ok, msg) = await AppInstaller.InstallWingetAsync(CancellationToken.None);
+            UpdateCpuSensorWarning();
+            if (!ok)
+            {
+                MessageBox.Show(msg + "\n\nAtualize o \"Instalador de Aplicativo\" pela Microsoft Store e tente de novo, " +
+                                "ou instale o PawnIO (autor: namazso) manualmente.",
+                                "RESET EXPLODE", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+        }
+
+        // Caminho completo: o cmd elevado nem sempre enxerga o winget pelo PATH.
         System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("cmd.exe",
-            "/k winget install --id namazso.PawnIO -e --accept-package-agreements --accept-source-agreements" +
-            " && echo. && echo Pronto! Feche esta janela e reabra o RESET EXPLODE.")
+            $"/k \"\"{AppInstaller.WingetPath}\" install --id namazso.PawnIO -e --accept-package-agreements --accept-source-agreements" +
+            " && echo. && echo Pronto! Feche esta janela e reabra o RESET EXPLODE.\"")
         { UseShellExecute = true });
     }
 

@@ -56,10 +56,76 @@ public static class AppInstaller
         new() { Name = "VLC", Description = "Player de vídeo e música que abre qualquer formato.", WingetId = "VideoLAN.VLC", DisplayPrefix = "VLC media player" },
     };
 
-    public static string WingetPath =>
+    private static string AliasPath =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"Microsoft\WindowsApps\winget.exe");
 
+    /// <summary>
+    /// Caminho completo do winget.exe: o alias do usuário, o PATH e, por último, a pasta do pacote "Instalador de
+    /// Aplicativo" (útil quando o programa roda como administrador de outra conta, onde o alias não existe).
+    /// </summary>
+    public static string WingetPath
+    {
+        get
+        {
+            if (File.Exists(AliasPath)) return AliasPath;
+            foreach (var dir in (Environment.GetEnvironmentVariable("PATH") ?? "").Split(';', StringSplitOptions.RemoveEmptyEntries))
+            {
+                try { var f = Path.Combine(dir.Trim(), "winget.exe"); if (File.Exists(f)) return f; } catch { }
+            }
+            try
+            {
+                var root = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "WindowsApps");
+                var pkg = Directory.GetDirectories(root, "Microsoft.DesktopAppInstaller_*_8wekyb3d8bbwe")
+                                   .Select(d => Path.Combine(d, "winget.exe")).Where(File.Exists)
+                                   .OrderByDescending(f => f, StringComparer.OrdinalIgnoreCase).FirstOrDefault();
+                if (pkg != null) return pkg;
+            }
+            catch { }
+            return AliasPath;
+        }
+    }
+
     public static bool WingetAvailable => File.Exists(WingetPath);
+
+    /// <summary>
+    /// Instala o winget (Instalador de Aplicativo) sem depender da Microsoft Store: primeiro registra o pacote que já
+    /// vem no Windows e, se não existir, baixa o instalador oficial (aka.ms/getwinget) e suas dependências.
+    /// </summary>
+    public static async Task<(bool Ok, string Message)> InstallWingetAsync(CancellationToken ct)
+    {
+        if (WingetAvailable) return (true, "O winget já está instalado.");
+        const string script = @"
+$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue'
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+try { Add-AppxPackage -RegisterByFamilyName -MainPackage Microsoft.DesktopAppInstaller_8wekyb3d8bbwe } catch { }
+if (-not (Get-AppxPackage -Name Microsoft.DesktopAppInstaller -ErrorAction SilentlyContinue | Where-Object { $_.InstallLocation -and (Test-Path (Join-Path $_.InstallLocation 'winget.exe')) })) {
+    $tmp = Join-Path $env:TEMP 'reset-winget'; New-Item -ItemType Directory -Force $tmp | Out-Null
+    $deps = @()
+    foreach ($u in 'https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx',
+                   'https://github.com/microsoft/microsoft-ui-xaml/releases/download/v2.8.6/Microsoft.UI.Xaml.2.8.x64.appx') {
+        $f = Join-Path $tmp ([IO.Path]::GetFileName($u)); Invoke-WebRequest -UseBasicParsing $u -OutFile $f; $deps += $f
+    }
+    $bundle = Join-Path $tmp 'winget.msixbundle'
+    Invoke-WebRequest -UseBasicParsing 'https://aka.ms/getwinget' -OutFile $bundle
+    Add-AppxPackage -Path $bundle -DependencyPath $deps
+}
+";
+        var psi = new ProcessStartInfo("powershell.exe",
+            "-NoProfile -ExecutionPolicy Bypass -EncodedCommand " + Convert.ToBase64String(Encoding.Unicode.GetBytes(script)))
+        {
+            UseShellExecute = false, CreateNoWindow = true,
+            RedirectStandardOutput = true, RedirectStandardError = true,
+        };
+        using var p = Process.Start(psi) ?? throw new InvalidOperationException("Não foi possível iniciar o PowerShell.");
+        var outTask = p.StandardOutput.ReadToEndAsync(ct);
+        var errTask = p.StandardError.ReadToEndAsync(ct);
+        try { await p.WaitForExitAsync(ct); }
+        catch (OperationCanceledException) { try { p.Kill(true); } catch { } throw; }
+        string output = await outTask + await errTask;
+
+        if (WingetAvailable) return (true, "winget instalado.");
+        return (false, $"Não foi possível instalar o winget. {LastLine(output)}".Trim());
+    }
 
     /// <summary>Nomes em "Aplicativos instalados" (máquina 64/32 bits e usuário atual).</summary>
     public static HashSet<string> InstalledNames()
