@@ -278,6 +278,18 @@
                                     <TextBlock Text="Otimização" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
+                            <RadioButton x:Name="NavClean" Style="{StaticResource NavItem}" Tag="PageClean" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Limpeza" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavTech" Style="{StaticResource NavItem}" Tag="PageTech" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE90F;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Técnico" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
                             <RadioButton x:Name="NavStartup" Style="{StaticResource NavItem}" Tag="PageStartup" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE823;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
@@ -2236,6 +2248,161 @@
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                                 <TextBlock x:Name="StartupResult" TextWrapping="Wrap" Margin="0,10,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- ===== LIMPEZA (temporários, Windows Update, lixeira...) ===== -->
+                <ScrollViewer x:Name="PageClean" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <Grid Margin="0,0,0,20">
+                            <StackPanel Margin="0,0,330,0">
+                                <TextBlock Text="LIMPEZA" Style="{StaticResource H1}"/>
+                                <TextBlock Text="Temporários, cache do Windows Update, lixeira e outros arquivos descartáveis · analisa antes de apagar" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                                <Button x:Name="BtnCleanAnalyze" Style="{StaticResource OutlineButton}" Content="ANALISAR" Padding="18,9" Margin="0,0,10,0" Click="BtnCleanAnalyze_Click"/>
+                                <Button x:Name="BtnCleanRun" Style="{StaticResource PrimaryButton}" Content="LIMPAR SELECIONADOS" Padding="20,9" Click="BtnCleanRun_Click"/>
+                            </StackPanel>
+                        </Grid>
+                        <Grid Height="3" Margin="0,0,0,8" Background="{DynamicResource Line}">
+                            <Border Background="{DynamicResource Fg}" RenderTransformOrigin="0,0.5">
+                                <Border.RenderTransform><ScaleTransform x:Name="CleanProgress" ScaleX="0"/></Border.RenderTransform>
+                            </Border>
+                        </Grid>
+                        <TextBlock x:Name="CleanStatus" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,16"/>
+
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,6">
+                                    <TextBlock Text="O QUE LIMPAR" Style="{StaticResource Label}"/>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                                        <TextBlock Text="SELECIONADO  " Foreground="{DynamicResource Muted}" FontSize="11" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="CleanTotal" Text="—" FontWeight="Bold" FontSize="16" FontFamily="{StaticResource Mono}"/>
+                                    </StackPanel>
+                                </Grid>
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10">
+                                    Só apaga o que está dentro das pastas listadas, sem seguir atalhos ou junções. Arquivos abertos por algum
+                                    programa são pulados. Os itens desmarcados são seguros, mas têm um custo (explicado em cada um).
+                                </TextBlock>
+                                <ItemsControl x:Name="CleanList">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0" Padding="0,10">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <CheckBox IsChecked="{Binding Selected}" Click="CleanItem_Click" VerticalAlignment="Top" Margin="0,1,12,0"/>
+                                                    <StackPanel Grid.Column="1">
+                                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+                                                        <TextBlock Text="{Binding Description}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                                                        <TextBlock Text="{Binding Status}" FontSize="11" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Column="2" Text="{Binding SizeText}" FontFamily="{StaticResource Mono}" FontWeight="SemiBold"
+                                                               VerticalAlignment="Top" Margin="14,0,0,0"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <TextBlock Text="LIMPEZA PROFUNDA DO WINDOWS" Style="{StaticResource Label}" Margin="0,0,0,6"/>
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10">
+                                    A Limpeza de Disco do Windows remove o Windows.old (sobra de uma atualização de versão) e instaladores antigos;
+                                    clique em "Limpar arquivos do sistema" dentro dela. A limpeza de componentes encolhe a pasta WinSxS.
+                                </TextBlock>
+                                <WrapPanel>
+                                    <Button Style="{StaticResource OutlineButton}" Content="LIMPEZA DE DISCO DO WINDOWS" Padding="14,7" Margin="0,0,10,0" Click="BtnCleanMgr_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="LIMPAR COMPONENTES (WINSXS)" Padding="14,7" Click="BtnCleanComponents_Click"/>
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- ===== TÉCNICO (reparo do Windows, rede, impressão, atalhos) ===== -->
+                <ScrollViewer x:Name="PageTech" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="36,30,36,30">
+                        <StackPanel Margin="0,0,0,20">
+                            <TextBlock Text="TÉCNICO" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Reparos e atalhos do dia a dia de suporte · os reparos longos abrem num console para acompanhar" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <TextBlock x:Name="TechStatus" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,12"/>
+
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+                            <StackPanel>
+                                <TextBlock Text="REPARO DO WINDOWS" Style="{StaticResource Label}" Margin="0,0,0,6"/>
+                                <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10">
+                                    Ordem recomendada para Windows instável: DISM (repara a imagem) e depois SFC (repara os arquivos).
+                                    O REPARO COMPLETO faz os dois em sequência. CHKDSK verifica o disco na próxima reinicialização.
+                                </TextBlock>
+                                <WrapPanel>
+                                    <Button Style="{StaticResource PrimaryButton}" Content="REPARO COMPLETO" Padding="14,7" Margin="0,0,10,8" Click="BtnTechRepairAll_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="SFC /SCANNOW" Padding="14,7" Margin="0,0,10,8" Click="BtnTechSfc_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="DISM RESTOREHEALTH" Padding="14,7" Margin="0,0,10,8" Click="BtnTechDism_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="CHKDSK (AO REINICIAR)" Padding="14,7" Margin="0,0,10,8" Click="BtnTechChkdsk_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="CRIAR PONTO DE RESTAURAÇÃO" Padding="14,7" Margin="0,0,10,8" Click="BtnTechRestorePoint_Click"/>
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+                            <StackPanel>
+                                <TextBlock Text="REDE, IMPRESSÃO E WINDOWS UPDATE" Style="{StaticResource Label}" Margin="0,0,0,10"/>
+                                <WrapPanel>
+                                    <Button Style="{StaticResource OutlineButton}" Content="LIMPAR CACHE DE DNS" Padding="14,7" Margin="0,0,10,8" Click="BtnTechFlushDns_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="RENOVAR IP" Padding="14,7" Margin="0,0,10,8" Click="BtnTechRenewIp_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="RESETAR REDE" Padding="14,7" Margin="0,0,10,8" Click="BtnTechResetNet_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="DESTRAVAR FILA DE IMPRESSÃO" Padding="14,7" Margin="0,0,10,8" Click="BtnTechSpooler_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="RESETAR WINDOWS UPDATE" Padding="14,7" Margin="0,0,10,8" Click="BtnTechWuReset_Click"/>
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+                            <StackPanel>
+                                <TextBlock Text="INFORMAÇÕES" Style="{StaticResource Label}" Margin="0,0,0,10"/>
+                                <WrapPanel>
+                                    <Button Style="{StaticResource OutlineButton}" Content="LICENÇA E CHAVE DO WINDOWS" Padding="14,7" Margin="0,0,10,8" Click="BtnTechLicense_Click"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="EXPORTAR PROGRAMAS INSTALADOS" Padding="14,7" Margin="0,0,10,8" Click="BtnTechPrograms_Click"/>
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,6">
+                                    <TextBlock Text="RESULTADO" Style="{StaticResource Label}"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="LIMPAR" Padding="10,4" FontSize="11"
+                                            HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnTechClearLog_Click"/>
+                                </Grid>
+                                <TextBox x:Name="TechOutput" IsReadOnly="True" FontFamily="{StaticResource Mono}" FontSize="11" TextWrapping="Wrap"
+                                         MinHeight="90" MaxHeight="320" VerticalScrollBarVisibility="Auto" AcceptsReturn="True"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <TextBlock Text="FERRAMENTAS DO WINDOWS" Style="{StaticResource Label}" Margin="0,0,0,10"/>
+                                <ItemsControl x:Name="TechShortcuts">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Style="{StaticResource OutlineButton}" Content="{Binding Name}" Tag="{Binding}" ToolTip="{Binding Exe}"
+                                                    Padding="12,6" FontSize="11" Margin="0,0,8,8" Click="TechShortcut_Click"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </StackPanel>
                         </Border>
                     </StackPanel>

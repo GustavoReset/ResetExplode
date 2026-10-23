@@ -1,3 +1,19 @@
+## Novidades da v0.17
+
+**Nova página · RESET FERRAMENTAS › Limpeza**
+- Analisa antes de apagar e mostra quanto cada item ocupa: temporários de todos os usuários (%TEMP%), temporários do Windows,
+  cache do Windows Update, Otimização de Entrega, lixeira, relatórios de erro, cache de miniaturas, logs antigos,
+  despejos de memória (tela azul), cache dos navegadores e cache de shaders.
+- Seguro: pula arquivos em uso e os temporários usados nas últimas 2 horas, nunca segue atalhos ou junções e para/religa
+  o Windows Update sozinho. Itens com algum custo (lixeira, dumps, navegadores, shaders) começam desmarcados.
+- Atalhos para a Limpeza de Disco do Windows (Windows.old) e para a limpeza de componentes (WinSxS) pelo DISM.
+
+**Nova página · RESET FERRAMENTAS › Técnico**
+- Reparo do Windows: SFC, DISM RestoreHealth, reparo completo (DISM + SFC), CHKDSK na próxima reinicialização e ponto de restauração.
+- Rede, impressão e Windows Update: limpar DNS, renovar IP, resetar rede (Winsock/TCP-IP), destravar fila de impressão e resetar o Windows Update.
+- Informações: edição e ativação do Windows com a chave OEM gravada na BIOS, e exportação da lista de programas instalados (CSV para Excel).
+- Atalhos para 22 ferramentas do Windows (Gerenciador de Dispositivos, Serviços, Eventos, Registro, msconfig, Gerenciamento de Disco...).
+
 ## Novidades da v0.16
 
 **Nova página · RESET FERRAMENTAS › Inicialização**
