@@ -1,0 +1,82 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ResetExplode.MainWindow"
+        Title="RESET EXPLODE (Linux)" Width="1100" Height="720" MinWidth="800" MinHeight="500">
+  <TabControl x:Name="Tabs" Margin="6">
+    <TabItem Header="Sistema">
+      <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,4">
+          <Button x:Name="BtnRefresh" Content="Atualizar" />
+          <Button x:Name="BtnReport" Content="Salvar relatório (.txt)" />
+          <TextBlock x:Name="TxtReport" VerticalAlignment="Center" />
+        </StackPanel>
+        <TreeView x:Name="InfoTree" />
+      </DockPanel>
+    </TabItem>
+    <TabItem Header="Sensores">
+      <DataGrid x:Name="SensorGrid" IsReadOnly="True" AutoGenerateColumns="False" GridLinesVisibility="Horizontal">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Hardware" Binding="{Binding Hardware}" />
+          <DataGridTextColumn Header="Tipo" Binding="{Binding Category}" />
+          <DataGridTextColumn Header="Sensor" Binding="{Binding Name}" Width="*" />
+          <DataGridTextColumn Header="Valor" Binding="{Binding Value}" />
+          <DataGridTextColumn Header="Mín" Binding="{Binding Min}" />
+          <DataGridTextColumn Header="Máx" Binding="{Binding Max}" />
+        </DataGrid.Columns>
+      </DataGrid>
+    </TabItem>
+    <TabItem Header="Stress">
+      <StackPanel Spacing="10" Margin="12" MaxWidth="640" HorizontalAlignment="Left">
+        <CheckBox x:Name="ChkCpu" Content="Carga de CPU (todos os threads)" IsChecked="True" />
+        <CheckBox x:Name="ChkRam" Content="Teste de RAM (grava e verifica padrões)" />
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <TextBlock Text="Parar ao atingir (°C):" VerticalAlignment="Center" />
+          <NumericUpDown x:Name="NumTemp" Minimum="50" Maximum="110" Value="95" Width="120" />
+          <TextBlock Text="Duração (min):" VerticalAlignment="Center" />
+          <NumericUpDown x:Name="NumMin" Minimum="1" Maximum="720" Value="10" Width="120" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Button x:Name="BtnStress" Content="Iniciar" />
+        </StackPanel>
+        <TextBox x:Name="StressLog" IsReadOnly="True" Height="320" FontFamily="monospace" />
+      </StackPanel>
+    </TabItem>
+    <TabItem Header="Discos">
+      <DockPanel>
+        <Button DockPanel.Dock="Top" x:Name="BtnDisks" Content="Ler S.M.A.R.T. (use sudo para dados completos)" Margin="0,4" />
+        <TextBox x:Name="DisksBox" IsReadOnly="True" FontFamily="monospace" />
+      </DockPanel>
+    </TabItem>
+    <TabItem Header="Rede">
+      <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,4">
+          <Button x:Name="BtnNet" Content="Testar rede" />
+          <ProgressBar x:Name="NetProg" Width="220" Maximum="1" />
+          <TextBlock x:Name="NetStatus" VerticalAlignment="Center" />
+        </StackPanel>
+        <TextBox x:Name="NetBox" IsReadOnly="True" FontFamily="monospace" />
+      </DockPanel>
+    </TabItem>
+    <TabItem Header="Energia">
+      <TextBox x:Name="PowerBox" IsReadOnly="True" FontFamily="monospace" />
+    </TabItem>
+    <TabItem Header="Jogos (Steam)">
+      <DockPanel>
+        <Button DockPanel.Dock="Top" x:Name="BtnLaunch" Content="Iniciar jogo selecionado" Margin="0,4" />
+        <ListBox x:Name="GamesList" />
+      </DockPanel>
+    </TabItem>
+    <TabItem Header="Ferramentas">
+      <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,4">
+          <Button x:Name="BtnToggleAuto" Content="Ativar/desativar item de inicialização selecionado" />
+        </StackPanel>
+        <Grid RowDefinitions="*,*" ColumnDefinitions="*,*">
+          <ListBox x:Name="AutoList" Grid.Row="0" Grid.ColumnSpan="2" />
+          <TextBox x:Name="SerialBox" Grid.Row="1" IsReadOnly="True" FontFamily="monospace" />
+          <TextBox x:Name="TweakBox" Grid.Row="1" Grid.Column="1" IsReadOnly="True" FontFamily="monospace" />
+        </Grid>
+      </DockPanel>
+    </TabItem>
+  </TabControl>
+</Window>
