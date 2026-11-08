@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 public sealed record MemoryResult(double LatencyNs, double ReadGBs, double CopyGBs);
 public sealed record LoadResult(double SeqReadMBs, double SmallFilesMBs, double FilesPerSec, double MapLoadSeconds, string Drive);
@@ -96,7 +96,7 @@ public static class MemoryBench
     /// </summary>
     public static LoadResult MeasureLoading(Action<string, double> progress, CancellationToken ct)
     {
-        string dir = Path.Combine(Path.GetTempPath(), "ResetExplodeBench");
+        string dir = Path.Combine(Path.GetTempPath(), "FortKnoxBench");
         string drive = Path.GetPathRoot(dir) ?? "";
         try
         {

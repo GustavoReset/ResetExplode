@@ -1,7 +1,7 @@
-<Window x:Class="ResetExplode.OverlayWindow"
+<Window x:Class="FortKnox.OverlayWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="RESET EXPLODE overlay" WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        Title="Fort Knox overlay" WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         Topmost="True" ShowInTaskbar="False" ShowActivated="False" ResizeMode="NoResize" Focusable="False"
         SizeToContent="WidthAndHeight" UseLayoutRounding="True" TextOptions.TextFormattingMode="Display">
     <Border x:Name="Box" Background="#C8000000" BorderBrush="#33FFFFFF" BorderThickness="1" CornerRadius="4" Padding="12,9">

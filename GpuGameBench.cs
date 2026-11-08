@@ -7,7 +7,7 @@ using Vortice.Direct3D11;
 using Vortice.DXGI;
 using Vortice.Mathematics;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 public sealed record GpuGameResult(double AvgFps, double Low1Fps, int Frames, double Seconds, int Width, int Height, string Adapter)
 {
@@ -338,7 +338,7 @@ float4 PostPS(FsOut i) : SV_TARGET
         var oldPriority = Thread.CurrentThread.Priority;
         Thread.CurrentThread.Priority = ThreadPriority.Highest; // medição de frametime precisa de pontualidade
         IntPtr hwnd = IntPtr.Zero;
-        string cls = "ResetExplodeGameBench" + Environment.TickCount64;
+        string cls = "FortKnoxGameBench" + Environment.TickCount64;
         IntPtr hInst = GetModuleHandleW(null);
         var keep = new List<IDisposable>();
         T K<T>(T d) where T : IDisposable { keep.Add(d); return d; }

@@ -1,8 +1,8 @@
-<Window x:Class="ResetExplode.MainWindow"
+<Window x:Class="FortKnox.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:ResetExplode"
-        Title="RESET EXPLODE" Icon="Assets/app.ico" Width="1320" Height="840" MinWidth="1120" MinHeight="660"
+        xmlns:local="clr-namespace:FortKnox"
+        Title="Fort Knox" Icon="Assets/app.ico" Width="1320" Height="840" MinWidth="1120" MinHeight="660"
         WindowStartupLocation="CenterScreen" WindowStyle="None" ResizeMode="CanResize"
         Background="{DynamicResource Bg}" Foreground="{DynamicResource Fg}"
         FontFamily="Segoe UI Variable Text, Segoe UI" FontSize="13"
@@ -183,7 +183,7 @@
                                     <TextBlock Text="Visão geral" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
-                            <ToggleButton x:Name="GrpExplode" Style="{StaticResource NavGroup}" Content="RESET EXPLODE"/>
+                            <ToggleButton x:Name="GrpExplode" Style="{StaticResource NavGroup}" Content="Fort Knox"/>
                             <StackPanel x:Name="GrpExplodeItems" Margin="10,0,0,4" Visibility="{Binding IsChecked, ElementName=GrpExplode, Converter={StaticResource BoolVis}}">
                             <RadioButton x:Name="NavSystem" Style="{StaticResource NavItem}" Tag="PageSystem" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
@@ -300,6 +300,12 @@
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE790;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
                                     <TextBlock Text="Integração" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavVault" Style="{StaticResource NavItem}" Tag="PageVault" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE72E;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Vault de senhas" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
                             </StackPanel>
@@ -853,7 +859,7 @@
                             <StackPanel>
                                 <TextBlock Text="BACKUP DOS DRIVERS" Style="{StaticResource Label}"/>
                                 <TextBlock Margin="0,10,0,0" TextWrapping="Wrap" Foreground="{DynamicResource Muted}"
-                                           Text="Exporta todos os drivers de terceiros para Documentos\ResetExplode-Drivers. Útil antes de formatar ou de trocar um driver."/>
+                                           Text="Exporta todos os drivers de terceiros para Documentos\FortKnox-Drivers. Útil antes de formatar ou de trocar um driver."/>
                                 <Button x:Name="BtnDrvBackup" Style="{StaticResource OutlineButton}" Content="FAZER BACKUP" Padding="18,8" Margin="0,14,0,0"
                                         HorizontalAlignment="Left" Click="BtnDrvBackup_Click"/>
                             </StackPanel>
@@ -2314,6 +2320,9 @@
                     </StackPanel>
                 </ScrollViewer>
 
+                <!-- ===== VAULT DE SENHAS (UserControl em Modules\Vault) ===== -->
+                <local:VaultView x:Name="PageVault" Visibility="Collapsed"/>
+
                 <!-- ===== RESET MAKER · Portas COM (fantasmas e números COM presos) ===== -->
                 <ScrollViewer x:Name="PageMakerPorts" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
@@ -2454,7 +2463,7 @@
                                             HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnMakerBundleAll_Click"/>
                                 </Grid>
                                 <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10">
-                                    Drivers oficiais de cada fabricante que já vêm dentro do RESET EXPLODE: instalam sem internet, ideal logo depois
+                                    Drivers oficiais de cada fabricante que já vêm dentro do Fort Knox: instalam sem internet, ideal logo depois
                                     de formatar. Pode instalar com a placa desconectada; o Windows usa o driver quando ela for plugada.
                                     Os drivers Arduino são assinados pela Arduino (não pela Microsoft): o Windows pode pedir confirmação.
                                 </TextBlock>

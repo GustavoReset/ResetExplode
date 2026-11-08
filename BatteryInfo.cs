@@ -1,7 +1,7 @@
-﻿using System.Management;
+using System.Management;
 using LibreHardwareMonitor.Hardware;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 /// <summary>
 /// Bateria (desgaste, ciclos, carga) e energia (fonte, plano, consumo dos sensores). Lê o WMI do Windows; nada é alterado.

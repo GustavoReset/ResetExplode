@@ -1,8 +1,8 @@
-﻿using System.IO;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 /// <summary>Dispositivo Corsair exposto pelo iCUE (inclui iCUE LINK: hub, ventoinhas, bombas, tiras...).</summary>
 public sealed class CorsairDevice
@@ -30,7 +30,7 @@ public sealed class CorsairDevice
 
 /// <summary>
 /// Ponte com o iCUE SDK v4 da Corsair (iCUESDK.x64_2019.dll). A DLL não vem junto: é carregada em tempo de execução
-/// da pasta do programa ou de %AppData%\ResetExplode. O iCUE precisa estar aberto, com o SDK habilitado nas configurações.
+/// da pasta do programa ou de %AppData%\FortKnox. O iCUE precisa estar aberto, com o SDK habilitado nas configurações.
 /// Nada é gravado no hardware: as cores valem enquanto o controle estiver ativo e voltam ao iCUE ao liberar.
 /// </summary>
 public sealed unsafe class CorsairSdk : IDisposable
@@ -91,7 +91,7 @@ public sealed unsafe class CorsairSdk : IDisposable
                 if (File.Exists(p) && NativeLibrary.TryLoad(p, out _lib)) { LoadedFrom = p; goto loaded; }
             }
         if (NativeLibrary.TryLoad(DllFile, out _lib)) { LoadedFrom = DllFile; goto loaded; }
-        return $"Não encontrei o {DllFile}. Use o botão BAIXAR O SDK DA CORSAIR (ou copie a DLL para a pasta do ResetExplode.exe ou para {AppSettings.Folder}).";
+        return $"Não encontrei o {DllFile}. Use o botão BAIXAR O SDK DA CORSAIR (ou copie a DLL para a pasta do FortKnox.exe ou para {AppSettings.Folder}).";
 
     loaded:
         try

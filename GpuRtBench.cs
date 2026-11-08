@@ -6,7 +6,7 @@ using Vortice.Direct3D12;
 using Vortice.Dxc;
 using Vortice.DXGI;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 /// <summary>Uma passada medida do teste de ray tracing.</summary>
 public sealed record RtPass(double AvgFps, double Low1Fps, int Frames);
@@ -424,7 +424,7 @@ void Main(uint3 id : SV_DispatchThreadID)
         var oldPriority = Thread.CurrentThread.Priority;
         Thread.CurrentThread.Priority = ThreadPriority.Highest;
         IntPtr hwnd = IntPtr.Zero;
-        string cls = "ResetExplodeRtBench" + Environment.TickCount64;
+        string cls = "FortKnoxRtBench" + Environment.TickCount64;
         IntPtr hInst = GetModuleHandleW(null);
         var keep = new List<IDisposable>();
         T K<T>(T d) where T : IDisposable { keep.Add(d); return d; }

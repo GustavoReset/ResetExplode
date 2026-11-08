@@ -3,7 +3,7 @@ using System.Management;
 using System.Text.RegularExpressions;
 using Microsoft.Win32;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 /// <summary>Uma placa de vídeo com os dados no estilo da aba "Graphics Card" do GPU-Z.</summary>
 public sealed class GpuInfo

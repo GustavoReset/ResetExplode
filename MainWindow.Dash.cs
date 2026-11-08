@@ -4,7 +4,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using LibreHardwareMonitor.Hardware;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 /// <summary>
 /// Visão geral: painel de blocos com gráfico de área (CPU × GPU), desempenho, tabela de componentes, anéis de

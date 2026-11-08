@@ -1,15 +1,15 @@
-﻿using System.IO;
+using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 /// <summary>
 /// Baixa o SDK oficial da Corsair (github.com/CorsairOfficial/cue-sdk, última release) e extrai SOMENTE o iCUESDK.x64_2019.dll
-/// para %AppData%\ResetExplode. Só roda quando o usuário confirma. A assinatura digital da DLL é verificada pelo Windows:
+/// para %AppData%\FortKnox. Só roda quando o usuário confirma. A assinatura digital da DLL é verificada pelo Windows:
 /// assinatura inválida ou de outro fabricante apaga o arquivo e cancela; sem assinatura gera só um aviso.
 /// </summary>
 public static class CorsairSdkInstaller
@@ -24,7 +24,7 @@ public static class CorsairSdkInstaller
     private static HttpClient CreateClient()
     {
         var c = new HttpClient { Timeout = TimeSpan.FromMinutes(5) };
-        c.DefaultRequestHeaders.UserAgent.ParseAdd("ResetExplode");
+        c.DefaultRequestHeaders.UserAgent.ParseAdd("FortKnox");
         c.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
         return c;
     }
@@ -51,7 +51,7 @@ public static class CorsairSdkInstaller
             urls.Add(("código-fonte " + tag, zip));
         if (urls.Count == 0) throw new InvalidOperationException("A release não tem nenhum arquivo .zip para baixar.");
 
-        string tmpDir = Path.Combine(Path.GetTempPath(), "ResetExplode-cue-" + Guid.NewGuid().ToString("N"));
+        string tmpDir = Path.Combine(Path.GetTempPath(), "FortKnox-cue-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(tmpDir);
         try
         {

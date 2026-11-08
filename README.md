@@ -1,6 +1,6 @@
-# RESET EXPLODE — v0.16
+# Fort Knox — v0.16
 
-> **Download oficial:** apenas em [github.com/GustavoReset/ResetExplode/releases](https://github.com/GustavoReset/ResetExplode/releases).
+> **Download oficial:** apenas em [github.com/GustavoReset/FortKnox/releases](https://github.com/GustavoReset/FortKnox/releases).
 > O app roda como administrador; não use versões baixadas de outros lugares.
 >
 > **Contribuições:** este projeto não aceita pull requests. Fique à vontade para fazer um *fork* e modificar a sua própria cópia
@@ -36,7 +36,7 @@ App WPF (.NET 8) com:
   Medido numa RTX 5070 (1080p, 4x MSAA, Alta): ~99% de uso e 220–232 W de 250 W.
 - **Jogos**: FPS esperado em 32 jogos populares para a sua GPU + CPU, por resolução (1080p/1440p/4K), gráficos e upscaling (DLSS/FSR).
   Com chave da [HowManyFPS API](https://howmanyfps.com/developer-api) (pedida em info@howmanyfps.com) mostra FPS médio e 1% low medidos em sessões reais;
-  sem chave, usa uma estimativa local aproximada (`GameCatalog.cs`). A chave fica cifrada com DPAPI em `%AppData%\ResetExplode` e as respostas em cache por 7 dias.
+  sem chave, usa uma estimativa local aproximada (`GameCatalog.cs`). A chave fica cifrada com DPAPI em `%AppData%\FortKnox` e as respostas em cache por 7 dias.
 - **Detector de gargalo**: equilíbrio teórico GPU × CPU; leitura ao vivo (carga da GPU, CPU total, núcleo mais ocupado, VRAM, RAM,
   temperaturas, limitador térmico) com veredito; e análise de sessão (1/3/5 min) com % do tempo limitado por GPU, CPU, VRAM, RAM,
   temperatura ou trava de FPS, mais recomendações (`BottleneckAnalyzer.cs`).
@@ -85,7 +85,7 @@ App WPF (.NET 8) com:
     fechar programas que prendem a porta (monitor serial, PuTTY, Cura...) e limpar o cache de índices quando a IDE trava em "Downloading index".
 - **Inicialização** (`StartupManager.cs`, `MainWindow.Startup.cs`): lista os programas que abrem com o Windows (chaves Run do usuário e
   de todos os usuários, 32 e 64 bits, e pastas Inicializar) com descrição e fabricante. Interruptor para ativar/desativar igual ao
-  Gerenciador de Tarefas (chaves StartupApproved) e botão REMOVER, com cópia em `%AppData%\ResetExplode` para "Restaurar removidos".
+  Gerenciador de Tarefas (chaves StartupApproved) e botão REMOVER, com cópia em `%AppData%\FortKnox` para "Restaurar removidos".
 - **Instalar apps** (`AppInstaller.cs`, `MainWindow.Apps.cs`): instala os essenciais pós-formatação (Steam, Google Chrome, Discord,
   Lightshot, 7-Zip, WinRAR, VLC) pelo **winget**, em silêncio e um de cada vez, mostrando o resultado de cada um. Detecta o que já está
   instalado (Aplicativos instalados do Windows). Para incluir outro app, acrescente uma linha em `AppInstaller.Catalog()` com o ID do winget.
@@ -120,7 +120,7 @@ App WPF (.NET 8) com:
   com *Visão geral* no topo e categorias **RESET** recolhíveis (começam fechadas; clique para ver as sub-abas):
   - *Visão geral* (`MainWindow.Dash.cs`): gráfico de área CPU × GPU (temperatura, carga ou consumo; 1/5/15 min),
     desempenho do RESET BENCH, tabela de componentes, anéis de RAM/VRAM/disco, eventos recentes e saúde do PC.
-  - **RESET EXPLODE** · Sistema, Sensores, Placa de vídeo, Discos, Energia, Rede.
+  - **Fort Knox** · Sistema, Sensores, Placa de vídeo, Discos, Energia, Rede.
   - **RESET JOGOS** · Biblioteca, FPS estimado, Gargalo, Overlay.
   - **RESET DESEMPENHO** · Benchmark, Stress test, Overclock.
   - **RESET FERRAMENTAS** · Otimização, Inicialização, Instalar apps, Drivers, Integração.
@@ -144,15 +144,15 @@ App WPF (.NET 8) com:
 
 ## Como rodar
 ```
-cd ResetExplode
+cd FortKnox
 dotnet run
 ```
 O app pede privilégio de administrador (necessário para sensores de baixo nível).
-Para levar a outro PC: dê dois cliques em `publicar.bat`. Ele gera `..\ResetExplode-dist\ResetExplode.exe` (arquivo único, com o .NET embutido,
+Para levar a outro PC: dê dois cliques em `publicar.bat`. Ele gera `..\FortKnox-dist\FortKnox.exe` (arquivo único, com o .NET embutido,
 sem caminhos do seu usuário) + `LEIA-ME.txt`. No outro PC só é preciso instalar o PawnIO. Rode de novo após cada alteração no código.
 
 ### Baixar a versão mais recente
-A cada push na `main`, o GitHub Actions (`.github/workflows/publicar.yml`) gera o `ResetExplode.exe` e atualiza a release
+A cada push na `main`, o GitHub Actions (`.github/workflows/publicar.yml`) gera o `FortKnox.exe` e atualiza a release
 **latest** (aba *Releases* do repositório), com o `.exe` e um `.zip`. É só baixar de lá, sem compilar.
 Ao criar uma tag (`git tag v0.12` e `git push --tags`), também sai uma release fixa dessa versão.
 

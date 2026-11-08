@@ -1,6 +1,6 @@
-﻿using System.Text;
+using System.Text;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 /// <summary>Nó de um arquivo VDF/ACF da Valve (formato de texto da Steam). Mantém a ordem original das chaves.</summary>
 public sealed class VdfNode

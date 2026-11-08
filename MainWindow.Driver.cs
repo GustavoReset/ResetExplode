@@ -1,7 +1,7 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Windows;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 /// <summary>Aba RESET DRIVER: inventário, NVIDIA (verifica e instala), AMD/placa-mãe (página oficial), Windows Update e backup.</summary>
 public partial class MainWindow

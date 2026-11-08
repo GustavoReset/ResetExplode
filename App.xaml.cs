@@ -2,11 +2,11 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 public partial class App : Application
 {
-    // Uma única instância: abrir o RESET EXPLODE de novo só traz a janela que já está aberta para a frente.
+    // Uma única instância: abrir o Fort Knox de novo só traz a janela que já está aberta para a frente.
     private static Mutex? _single;
 
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern IntPtr FindWindow(string? cls, string title);
@@ -17,12 +17,12 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         bool first;
-        try { _single = new Mutex(true, @"Local\ResetExplode.SingleInstance", out first); }
+        try { _single = new Mutex(true, @"Local\FortKnox.SingleInstance", out first); }
         catch (UnauthorizedAccessException) { first = false; } // criado por outra instância com outro nível de permissão
 
         if (!first)
         {
-            IntPtr h = FindWindow(null, "RESET EXPLODE");
+            IntPtr h = FindWindow(null, "Fort Knox");
             if (h != IntPtr.Zero)
             {
                 if (IsIconic(h)) ShowWindow(h, 9); // SW_RESTORE

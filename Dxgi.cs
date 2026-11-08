@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 /// <summary>Enumera adaptadores via DXGI (VRAM real, sem o limite de 4 GB do WMI) e testa o feature level do Direct3D 12.</summary>
 internal static class Dxgi

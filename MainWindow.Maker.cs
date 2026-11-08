@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Windows;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 /// <summary>Aba RESET MAKER · Drivers seriais: CH340, CP210x, FTDI, Prolific, Arduino e Arduino IDE.</summary>
 public partial class MainWindow

@@ -1,8 +1,8 @@
-﻿using System.Net;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 public sealed record ReportNode(string Name, string? Value, List<ReportNode>? Children);
 public sealed record ReportSensor(string Hardware, string Category, string Name, string Value, string Min, string Max);
@@ -83,11 +83,11 @@ public static class ReportBuilder
     {
         var sb = new StringBuilder(64 * 1024);
         sb.Append("<!doctype html><html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">");
-        sb.Append($"<title>RESET EXPLODE · Relatório · {E(d.Machine)}</title><style>{Css}</style></head><body><div class=\"wrap\">");
+        sb.Append($"<title>Fort Knox · Relatório · {E(d.Machine)}</title><style>{Css}</style></head><body><div class=\"wrap\">");
 
         sb.Append("<header>");
         if (!string.IsNullOrEmpty(d.LogoBase64)) sb.Append($"<img class=\"logo\" alt=\"\" src=\"data:image/png;base64,{d.LogoBase64}\">");
-        sb.Append($"<div><h1>RESET EXPLODE</h1><p class=\"sub\">Relatório de hardware · {E(d.Machine)} · {d.Date:dd/MM/yyyy HH:mm}");
+        sb.Append($"<div><h1>Fort Knox</h1><p class=\"sub\">Relatório de hardware · {E(d.Machine)} · {d.Date:dd/MM/yyyy HH:mm}");
         if (d.AppVersion.Length > 0) sb.Append($" · v{E(d.AppVersion)}");
         sb.Append("</p></div></header>");
         sb.Append("<p class=\"note\">Números de série foram omitidos deste relatório.</p>");
@@ -133,7 +133,7 @@ public static class ReportBuilder
             sb.Append("</table></div></section>");
         }
 
-        sb.Append("<footer>Gerado pelo RESET EXPLODE. Dados lidos do Windows, do driver da placa de vídeo e dos sensores da placa-mãe; podem variar conforme o hardware.</footer>");
+        sb.Append("<footer>Gerado pelo Fort Knox. Dados lidos do Windows, do driver da placa de vídeo e dos sensores da placa-mãe; podem variar conforme o hardware.</footer>");
         sb.Append("</div></body></html>");
         return sb.ToString();
     }

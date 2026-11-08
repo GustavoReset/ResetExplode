@@ -1,7 +1,7 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Threading;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 /// <summary>Páginas Energia (bateria e fonte) e Rede (diagnóstico de lag).</summary>
 public partial class MainWindow

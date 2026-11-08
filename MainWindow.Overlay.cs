@@ -2,7 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using LibreHardwareMonitor.Hardware;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 /// <summary>Overlay: o que mostrar (escolhido na aba Overlay) e a montagem das linhas de sensores.</summary>
 public partial class MainWindow

@@ -7,7 +7,7 @@ using Vortice.Direct3D11;
 using Vortice.DXGI;
 using Vortice.Mathematics;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 public sealed class GpuBurnSettings
 {
@@ -129,7 +129,7 @@ float4 PS(PSIn i) : SV_TARGET
     private void Run(GpuBurnSettings s)
     {
         IntPtr hwnd = IntPtr.Zero;
-        string cls = "ResetExplodeGpuBurn" + Environment.TickCount64;
+        string cls = "FortKnoxGpuBurn" + Environment.TickCount64;
         IntPtr hInst = GetModuleHandleW(null);
         var disposables = new List<IDisposable>();
         T Keep<T>(T d) where T : IDisposable { disposables.Add(d); return d; }
@@ -173,7 +173,7 @@ float4 PS(PSIn i) : SV_TARGET
                 x = Math.Max(0, (GetSystemMetrics(0) - w) / 2);
                 y = Math.Max(0, (GetSystemMetrics(1) - h) / 2);
             }
-            hwnd = CreateWindowExW(0, cls, "RESET EXPLODE · GPU burn", style, x, y, w, h,
+            hwnd = CreateWindowExW(0, cls, "Fort Knox · GPU burn", style, x, y, w, h,
                                    IntPtr.Zero, IntPtr.Zero, hInst, IntPtr.Zero);
             if (hwnd == IntPtr.Zero) throw new InvalidOperationException("Não foi possível criar a janela de renderização.");
 
@@ -332,7 +332,7 @@ float4 PS(PSIn i) : SV_TARGET
                     long f = Frames;
                     Fps = (f - lastFrames) / (now - lastT);
                     lastT = now; lastFrames = f;
-                    SetWindowTextW(hwnd, $"RESET EXPLODE · GPU burn · {Fps:0} FPS · {cw}x{ch}" +
+                    SetWindowTextW(hwnd, $"Fort Knox · GPU burn · {Fps:0} FPS · {cw}x{ch}" +
                                          (msaa > 1 ? $" · MSAA {msaa}x" : "") + $" · {AdapterUsed}");
                 }
             }

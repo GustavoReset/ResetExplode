@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Numerics;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 public sealed record BenchResult(int Threads, double Seconds, long Samples, int Passes)
 {
