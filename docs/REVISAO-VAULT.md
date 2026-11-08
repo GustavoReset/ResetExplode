@@ -2,7 +2,15 @@
 
 Escopo: `Modules/Vault/*` e `MainWindow.Vault.cs`. PDF e Rede ainda não existem; o checklist deles está no fim.
 
-> **Limite desta revisão:** não havia SDK do .NET na máquina onde o código foi escrito, então **nada foi compilado nem executado**. Tudo abaixo é leitura de código. O primeiro passo é `dotnet build` e o roteiro de testes manuais da seção 5.
+> **Atualização (testado):** o código foi compilado e testado depois da primeira versão deste relatório.
+> - `tests/FortKnox.Tests/VaultTests.cs`: **23 testes automatizados** (CRUD, persistência, arquivo sem texto legível, busca, concorrência com 25 gravações simultâneas, `Lock`, arquivo ilegível/corrompido, `.bak`, backup `.fkvault` com senha certa/errada/arquivo adulterado, restauração sobre cofre ilegível, mesclagem, gerador de senhas). Todos passam.
+> - **Bug real achado pelos testes e corrigido:** arquivo corrompido (bits trocados) é rejeitado pelo DPAPI como "não consigo decifrar", e esse caso **não tentava o `.bak`**. Agora tenta nos dois casos e avisa na tela que abriu pela cópia anterior.
+> - **Teste de interface** (janela real do app, fora de elevação): abrir, criar, gerar senha, buscar, copiar, limpar a área de transferência sem apagar o que o usuário copiou depois, bloquear/desbloquear, navegar pelo menu e fechar o app. Tudo ok.
+> - **Windows Hello (testado):** o IID da `IAsyncOperation<UserConsentVerificationResult>` é calculado pelo algoritmo do WinRT e **bate com o valor conhecido** (`fd596ffd-2318-558f-9dbe-d21df43764a5`); a chamada COM real ao Windows responde (`DeviceNotPresent` neste PC). Testados também com portões falsos: cancelado (não lê o cofre e não oferece "abrir sem Hello"), verificado (abre), **sair da página com o diálogo aberto** (cofre não é carregado depois) e erro no portão (falha fechada). Execução **elevada** (como o app real): 0 falhas.
+> - **Mudança de requisito:** o app agora tem como alvo `net8.0-windows10.0.19041.0` (**Windows 10 versão 2004 ou mais nova**).
+> - **Não testado:** o diálogo do Hello com PIN/digital de verdade (este PC não tem Hello configurado) — precisa de teste manual numa máquina com Hello.
+> - **Não testado:** a limpeza automática aos 30 s (testei `ClearNow`, não esperei o relógio), Win+V (histórico de área de transferência) e DPAPI com senha do Windows realmente redefinida.
+> - **Ainda não testado** (continuam sendo o roteiro manual da seção 5): itens 5 e 8.
 
 ## 1. Assincronia
 
@@ -34,7 +42,8 @@ Escopo: `Modules/Vault/*` e `MainWindow.Vault.cs`. PDF e Rede ainda não existem
 
 | # | Severidade | Achado | Situação |
 |---|---|---|---|
-| S1 | Média | Quem já executa como o **mesmo usuário** do Windows (qualquer programa) pode ler o arquivo e chamar `Unprotect`. É a limitação do DPAPI `CurrentUser`; "bloquear" não é autenticação (reabrir a página desbloqueia sem pedir nada). A entropia fixa do app **não é segredo** e só atrapalha leitura "às cegas". | **Aberto.** Recomendado: Windows Hello (`UserConsentVerifier`, exige TFM `net8.0-windows10.0.19041.0`) ou senha mestra antes de abrir. Só decidir com você |
+| S1 | Média | Quem já executa como o **mesmo usuário** do Windows (qualquer programa) pode ler o arquivo e chamar `Unprotect`. É a limitação do DPAPI `CurrentUser`; a entropia fixa do app **não é segredo**. | **Mitigado na interface (decisão: Windows Hello).** Abrir o Vault exige PIN/digital/rosto (`HelloVerifier`, `UserConsentVerifier` com a janela do app como dona do diálogo); o arquivo só é lido **depois** de verificar. Tolerância de 60 s ao trocar de aba; BLOQUEAR zera a tolerância. **Limite que continua:** o Hello protege a *tela*; um programa malicioso rodando como o mesmo usuário ainda pode ler `vault.dat` e chamar o DPAPI sem passar por ela. Só uma senha mestra com chave própria (KDF) fecha isso. |
+| S1b | Média | **Este PC não tem Windows Hello configurado** (teste real: `DeviceNotPresent`). Falhar fechado trancaria o usuário para fora. | Quando o Hello não existe, o Vault **não abre** e explica como configurar o PIN (Configurações > Contas > Opções de entrada). Há o botão "ABRIR SEM WINDOWS HELLO (SÓ AGORA)": vale **uma abertura**, não é lembrado e a exigência volta na próxima vez. Esse botão **não aparece** quando o usuário cancela ou erra o Hello (só quando o Hello é indisponível). |
 | S2 | Baixa | `vault.dat.bak` guarda a versão anterior: uma senha **excluída** continua no `.bak` (cifrada) até a próxima gravação. | **Aberto.** Aceitável (mesma proteção DPAPI), mas deve constar na tela/README. Alternativa: apagar o `.bak` após gravação bem-sucedida e perder a recuperação por corrupção |
 | S3 | Baixa | Strings .NET não podem ser zeradas; senhas ficam na memória gerenciada até o GC enquanto a página está aberta. | Mitigado: `Lock()` solta tudo ao sair da página/fechar; buffers `byte[]` (JSON em claro, chave PBKDF2) são zerados com `CryptographicOperations.ZeroMemory` |
 | S4 | Média | Elevação por **outra conta de administrador** muda o `CurrentUser` e o `%AppData%`: o Vault parece vazio. | **Aberto**: documentado no plano; avisar na UI se for relevante |

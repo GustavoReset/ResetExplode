@@ -136,6 +136,8 @@ public partial class MainWindow : Window
             UnregisterHotKey(new System.Windows.Interop.WindowInteropHelper(this).Handle, HotkeyId);
             ShutdownInteg();
             ShutdownVault();
+            ShutdownPdf();
+            StopNetTools();
             _launchCts?.Cancel();
             _monitor.Dispose();
         };
@@ -254,6 +256,7 @@ public partial class MainWindow : Window
         string page = (string)item.Tag;
         ShowPage(page);
         if (page != "PageVault") LockVault(); // sair do Vault tira as senhas da memória
+        if (page != "PageNet") StopNetTools(); // sair da Rede para o monitor de consumo (sessão ETW) e o rastreio
 
         // Abre a categoria da página (ex.: quando o painel pula direto para o Benchmark)
         // e mostra "CATEGORIA · página" na barra de título.
@@ -283,12 +286,13 @@ public partial class MainWindow : Window
             case "PageMakerDrv": InitMakerDrivers(); break;
             case "PageOptimize": InitOptimize(); break;
             case "PageVault": InitVault(); break;
+            case "PagePdf": InitPdf(); break;
         }
     }
 
     private void ShowPage(string name)
     {
-        foreach (var p in new FrameworkElement[] { PageDash, PageSystem, PageSensors, PageGpu, PageGames, PageBottleneck, PageOverlay, PageBench, PageOptimize, PageOc, PageInteg, PageLauncher, PageDriver, PageStartup, PageApps, PageMakerPorts, PageMakerDrv, PageDisks, PageEnergy, PageNet, PageStress, PageVault })
+        foreach (var p in new FrameworkElement[] { PageDash, PageSystem, PageSensors, PageGpu, PageGames, PageBottleneck, PageOverlay, PageBench, PageOptimize, PageOc, PageInteg, PageLauncher, PageDriver, PageStartup, PageApps, PageMakerPorts, PageMakerDrv, PageDisks, PageEnergy, PageNet, PageStress, PageVault, PagePdf })
             p.Visibility = p.Name == name ? Visibility.Visible : Visibility.Collapsed;
     }
 

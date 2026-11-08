@@ -1,0 +1,106 @@
+<UserControl x:Class="FortKnox.NetToolsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <UserControl.Resources>
+        <Style x:Key="NtMuted" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Muted}"/>
+        </Style>
+        <Style x:Key="NtMono" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource Mono}"/>
+            <Setter Property="Foreground" Value="{DynamicResource Muted}"/>
+        </Style>
+    </UserControl.Resources>
+
+    <StackPanel>
+        <!-- ===== TRACEROUTE ===== -->
+        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,16">
+            <StackPanel>
+                <TextBlock Text="TRACEROUTE · O CAMINHO ATÉ UM SERVIDOR" Style="{StaticResource Label}"/>
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="NHost" Text="1.1.1.1" Tag="Endereço ou site (ex.: google.com)" MaxLength="253" KeyDown="NHost_KeyDown"/>
+                    <CheckBox x:Name="NResolve" Grid.Column="1" Content="Mostrar nomes" IsChecked="True" VerticalAlignment="Center" Margin="12,0,12,0"
+                              ToolTip="Procura o nome de cada roteador (DNS reverso). Desmarque para um rastreio mais rápido."/>
+                    <Button x:Name="NBtnTrace" Grid.Column="2" Style="{StaticResource PrimaryButton}" Content="RASTREAR" Padding="20,8" Click="NTrace_Click"/>
+                </Grid>
+                <TextBlock x:Name="NTraceStatus" Style="{StaticResource NtMuted}" TextWrapping="Wrap" Margin="0,0,0,10"
+                           Text="Mostra por quais roteadores seus pacotes passam e onde a latência aumenta. Leva alguns segundos."/>
+
+                <ItemsControl x:Name="NHops">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0" Padding="0,7">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="34"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="170"/>
+                                        <ColumnDefinition Width="80"/>
+                                        <ColumnDefinition Width="64"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Ttl}" Style="{StaticResource NtMono}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Name}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}" Margin="0,0,10,0"/>
+                                    <Border Grid.Column="2" Height="6" CornerRadius="3" Background="{DynamicResource Line}" HorizontalAlignment="Left" Width="160" VerticalAlignment="Center">
+                                        <Border Background="{DynamicResource Fg}" CornerRadius="3" HorizontalAlignment="Left" Width="{Binding BarWidth}"/>
+                                    </Border>
+                                    <TextBlock Grid.Column="3" Text="{Binding AvgText}" Style="{StaticResource NtMono}" HorizontalAlignment="Right"/>
+                                    <TextBlock Grid.Column="4" Text="{Binding LossText}" Style="{StaticResource NtMono}" HorizontalAlignment="Right"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <ItemsControl x:Name="NFindings" Margin="0,12,0,0">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Text}" TextWrapping="Wrap" Margin="0,0,0,6">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{DynamicResource Muted}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsProblem}" Value="True">
+                                                <Setter Property="Foreground" Value="{DynamicResource Fg}"/>
+                                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+
+        <!-- ===== CONSUMO POR PROCESSO ===== -->
+        <Border Style="{StaticResource CardBorder}">
+            <StackPanel>
+                <Grid Margin="0,0,0,6">
+                    <TextBlock Text="CONSUMO DE REDE POR PROGRAMA" Style="{StaticResource Label}"/>
+                    <Button x:Name="NBtnMonitor" Style="{StaticResource OutlineButton}" Content="INICIAR MONITORAMENTO" Padding="14,6" FontSize="11"
+                            HorizontalAlignment="Right" VerticalAlignment="Top" Click="NMonitor_Click"/>
+                </Grid>
+                <TextBlock x:Name="NMonitorStatus" Style="{StaticResource NtMuted}" TextWrapping="Wrap" Margin="0,0,0,10"
+                           Text="Descubra qual programa está usando a internet. Mostra o tráfego a partir do momento em que você inicia (atualiza a cada segundo)."/>
+                <DataGrid x:Name="NUsageGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserResizeColumns="False" MaxHeight="420">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="PROGRAMA" Binding="{Binding Name}" Width="*"/>
+                        <DataGridTextColumn Header="PID" Binding="{Binding Pid}" Width="70" ElementStyle="{StaticResource NtMono}"/>
+                        <DataGridTextColumn Header="BAIXANDO" Binding="{Binding Down}" Width="120" ElementStyle="{StaticResource NtMono}"/>
+                        <DataGridTextColumn Header="ENVIANDO" Binding="{Binding Up}" Width="120" ElementStyle="{StaticResource NtMono}"/>
+                        <DataGridTextColumn Header="TOTAL BAIXADO" Binding="{Binding TotalDown}" Width="120" ElementStyle="{StaticResource NtMono}"/>
+                        <DataGridTextColumn Header="TOTAL ENVIADO" Binding="{Binding TotalUp}" Width="120" ElementStyle="{StaticResource NtMono}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <TextBlock Style="{StaticResource NtMuted}" FontSize="11" TextWrapping="Wrap" Margin="0,10,0,0"
+                           Text="É uma estimativa em tempo real (o Windows pode descartar eventos sob carga muito alta) e inclui tráfego da própria máquina (loopback). Para de monitorar ao sair desta página."/>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

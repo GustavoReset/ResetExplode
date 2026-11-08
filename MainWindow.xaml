@@ -308,6 +308,12 @@
                                     <TextBlock Text="Vault de senhas" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
+                            <RadioButton x:Name="NavPdf" Style="{StaticResource NavItem}" Tag="PagePdf" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE8A5;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="PDF" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
                             </StackPanel>
                             <ToggleButton x:Name="GrpMaker" Style="{StaticResource NavGroup}" Content="RESET MAKER"/>
                             <StackPanel x:Name="GrpMakerItems" Margin="10,0,0,4" Visibility="{Binding IsChecked, ElementName=GrpMaker, Converter={StaticResource BoolVis}}">
@@ -781,6 +787,8 @@
                             O teste envia pacotes de ping ao roteador e aos DNS públicos 1.1.1.1 e 8.8.8.8 e baixa/envia dados de teste do servidor público
                             speed.cloudflare.com (cerca de 100 MB no total). Feche downloads, streaming e jogos antes para um resultado fiel.
                         </TextBlock>
+                        <!-- Traceroute e consumo por programa (UserControl em Modules\Network) -->
+                        <local:NetToolsView x:Name="NetTools" Margin="0,24,0,0"/>
                     </StackPanel>
                 </ScrollViewer>
 
@@ -2322,6 +2330,9 @@
 
                 <!-- ===== VAULT DE SENHAS (UserControl em Modules\Vault) ===== -->
                 <local:VaultView x:Name="PageVault" Visibility="Collapsed"/>
+
+                <!-- ===== PDF (UserControl em Modules\Pdf) ===== -->
+                <local:PdfView x:Name="PagePdf" Visibility="Collapsed"/>
 
                 <!-- ===== RESET MAKER · Portas COM (fantasmas e números COM presos) ===== -->
                 <ScrollViewer x:Name="PageMakerPorts" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">

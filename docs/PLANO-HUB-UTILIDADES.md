@@ -105,9 +105,9 @@ Todas rodam em `Task.Run`, com `using` em `PdfDocument`/`FileStream`, progresso 
 
 | Etapa | Entrega | Pronto quando |
 |---|---|---|
-| **1 · Vault** ✔ código escrito | `PasswordVault`, `SecureClipboard`, `VaultView`, `MainWindow.Vault.cs`, backup/restauração | Compila; CRUD persiste após reabrir; copiar limpa em 30 s; arquivo corrompido/ilegível não é sobrescrito |
-| **2 · PDF** | `PdfService` (mesclar, dividir, extrair texto, comprimir básico) + `PdfView`; pacotes no `.csproj` | Mescla 2 PDFs e divide por intervalo sem travar a UI; cancela no meio; sem arquivo travado depois |
-| **3 · Rede** | `BandwidthTest` ao vivo, `TraceRoute`, `ProcessBandwidthMonitor`; `NetworkTest` movido para `Modules/Network` | Traceroute chega ao destino; tabela por processo bate com o Gerenciador de Tarefas (aba Rede); sessão ETW some ao fechar |
+| **1 · Vault** ✔ feito e testado | `PasswordVault`, `SecureClipboard`, `VaultView`, `MainWindow.Vault.cs`, backup/restauração | 23 testes automatizados + teste de interface (ver `REVISAO-VAULT.md`) |
+| **2 · PDF** ✔ feito e testado | `PdfService` (mesclar, dividir, comprimir imagens JPEG, extrair texto) + `PdfView` + `MainWindow.Pdf.cs`; PDFsharp 6.2.4 e PdfPig 0.1.16 fixos no `.csproj` | 38 testes automatizados + teste de interface (ver `REVISAO-PDF.md`) |
+| **3 · Rede** ✔ feito e testado | `BandwidthTest` (ao vivo, sustentado/pico/média, fase de ping), `TraceRoute` + análise, `ProcessBandwidthMonitor` (ETW), `NetToolsView`; `NetworkTest` movido para `Modules/Network` | 49 testes + teste integrado elevado (ver `REVISAO-REDE.md`) |
 
 Cada etapa termina com **revisão de assincronia, segurança e memória** antes da próxima (relatório da Etapa 1 em `docs/REVISAO-VAULT.md`).
 

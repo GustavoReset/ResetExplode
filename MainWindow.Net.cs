@@ -74,6 +74,9 @@ public partial class MainWindow
         }
     }
 
+    /// <summary>Ao sair da página Rede (ou fechar o app): encerra o rastreio e a sessão ETW do monitor de consumo.</summary>
+    private void StopNetTools() => NetTools.StopAll();
+
     // ================= Tema (escuro / claro) =================
 
     private void Theme_Click(object sender, RoutedEventArgs e)

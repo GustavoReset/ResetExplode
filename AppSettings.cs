@@ -99,6 +99,7 @@ public sealed class AppSettings
 
     public static AppSettings Load()
     {
+        LegacyMigration.Migrate(Path.Combine(Path.GetDirectoryName(Folder)!, LegacyMigration.LegacyFolderName), Folder);
         try
         {
             if (File.Exists(FilePath))

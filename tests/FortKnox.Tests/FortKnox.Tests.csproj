@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <RollForward>Major</RollForward>
+  </PropertyGroup>
+  <ItemGroup>
+    <Using Include="System.IO" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Só as camadas de dados/serviço (sem controles de tela), compiladas direto do app -->
+    <Compile Include="..\..\Modules\Vault\PasswordVault.cs" Link="PasswordVault.cs" />
+    <Compile Include="..\..\Modules\Pdf\PdfService.cs" Link="PdfService.cs" />
+    <Compile Include="..\..\LegacyMigration.cs" Link="LegacyMigration.cs" />
+    <Compile Include="..\..\Modules\Network\BandwidthTest.cs" Link="BandwidthTest.cs" />
+    <Compile Include="..\..\Modules\Network\TraceRoute.cs" Link="TraceRoute.cs" />
+    <Compile Include="..\..\Modules\Network\ProcessBandwidthMonitor.cs" Link="ProcessBandwidthMonitor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />
+    <PackageReference Include="PDFsharp" Version="6.2.4" />
+    <PackageReference Include="PdfPig" Version="0.1.16" />
+    <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.2.8" />
+  </ItemGroup>
+</Project>

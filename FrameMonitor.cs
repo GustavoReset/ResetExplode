@@ -35,6 +35,9 @@ public sealed class FrameMonitor : IDisposable
         if (Running) return;
         try
         {
+            // Legado: o app antigo usava outro nome de sessão. Se ele foi fechado à força, a sessão ficou órfã no Windows.
+            try { TraceEventSession.GetActiveSession("ResetExplode-Frames")?.Dispose(); } catch { }
+
             // Opção Create derruba uma sessão antiga com o mesmo nome (ex.: app fechado à força).
             _session = new TraceEventSession(SessionName, TraceEventSessionOptions.Create) { StopOnDispose = true };
             _session.EnableProvider(DxgiProvider, TraceEventLevel.Informational, ulong.MaxValue, null);

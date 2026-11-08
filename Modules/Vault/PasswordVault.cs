@@ -64,7 +64,7 @@ public sealed class PasswordVault
     public static string DefaultPath => Path.Combine(AppSettings.Folder, "vault.dat");
 
     public VaultState State { get; private set; } = VaultState.NotLoaded;
-    /// <summary>Explicação em português quando State == Unreadable.</summary>
+    /// <summary>Explicação em português quando State == Unreadable; também um aviso quando o cofre abriu a partir do .bak.</summary>
     public string? Problem { get; private set; }
     public int Count => _entries.Count;
     // ------------------------------------------------------------------ Carregar / bloquear
@@ -100,12 +100,15 @@ public sealed class PasswordVault
         var main = TryRead(_path);
         if (main.Status == ReadStatus.Ok) return (VaultState.Ready, main.Entries!, null);
 
-        // Arquivo corrompido (queda de energia, disco)? A cópia anterior (.bak) pode estar íntegra.
-        if (main.Status == ReadStatus.Corrupt && File.Exists(_path + ".bak"))
+        // Arquivo corrompido (queda de energia, disco)? A cópia anterior (.bak) pode estar íntegra. Um blob com bits trocados
+        // também aparece como "não consigo decifrar", então a cópia é tentada nos dois casos; se o problema for o DPAPI de
+        // verdade (outra conta), o .bak falha do mesmo jeito e o resultado abaixo continua sendo "ilegível".
+        if (File.Exists(_path + ".bak"))
         {
             var bak = TryRead(_path + ".bak");
             if (bak.Status == ReadStatus.Ok)
-                return (VaultState.Ready, bak.Entries!, null);
+                return (VaultState.Ready, bak.Entries!, "O arquivo principal estava danificado; o cofre foi aberto a partir da cópia anterior " +
+                                                        "(.bak). Alterações mais recentes podem ter sido perdidas.");
         }
 
         return (VaultState.Unreadable, Array.Empty<VaultEntry>(), main.Status == ReadStatus.CannotDecrypt
@@ -212,7 +215,7 @@ public sealed class PasswordVault
             var next = _entries.ToList();
             var result = change(next);
             await Task.Run(() => WriteToDisk(next), ct);
-            if (epoch == _epoch) _entries = next;
+            if (epoch == _epoch) { _entries = next; Problem = null; } // gravou: o arquivo principal voltou a ser válido
             return result;
         }
         finally { _gate.Release(); }

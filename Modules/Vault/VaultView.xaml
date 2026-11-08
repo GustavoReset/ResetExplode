@@ -55,6 +55,21 @@
             </StackPanel>
         </Border>
 
+        <!-- ===== Windows Hello: não verificado ===== -->
+        <Border x:Name="VAuthBanner" Grid.Row="1" Style="{StaticResource CardBorder}" BorderBrush="{DynamicResource LineStrong}"
+                Margin="0,0,0,16" Visibility="Collapsed">
+            <StackPanel>
+                <TextBlock Text="VAULT PROTEGIDO PELO WINDOWS HELLO" Style="{StaticResource Label}"/>
+                <TextBlock x:Name="VAuthText" TextWrapping="Wrap" Margin="0,0,0,12"/>
+                <StackPanel Orientation="Horizontal">
+                    <Button Style="{StaticResource PrimaryButton}" Content="TENTAR DE NOVO" Padding="16,8" Margin="0,0,8,0" Click="VUnlock_Click"/>
+                    <Button x:Name="VBtnOpenAnyway" Style="{StaticResource OutlineButton}" Content="ABRIR SEM WINDOWS HELLO (SÓ AGORA)" Padding="16,8"
+                            Visibility="Collapsed" Click="VOpenAnyway_Click"
+                            ToolTip="Abre o cofre apenas nesta vez, sem verificação. A exigência continua ativa na próxima abertura."/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
         <!-- ===== Backup: pede a senha do arquivo ===== -->
         <Border x:Name="VBackupPanel" Grid.Row="2" Style="{StaticResource CardBorder}" Margin="0,0,0,16" Visibility="Collapsed">
             <StackPanel>

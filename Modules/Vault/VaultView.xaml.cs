@@ -20,29 +20,87 @@ public partial class VaultView : UserControl
 
     public VaultView() => InitializeComponent();
 
+    /// <summary>
+    /// Exigência de autenticação antes de abrir (Windows Hello). Definida pela janela. Null = abre direto (testes).
+    /// O arquivo do cofre só é lido DEPOIS que isto devolver "verificado".
+    /// </summary>
+    public Func<Task<HelloResult>>? Gate { get; set; }
+
+    /// <summary>Disparado quando o usuário clica em BLOQUEAR: a janela deve esquecer a verificação do Hello.</summary>
+    public event Action? ManualLock;
+
+    private bool _authenticating;
+    private int _epoch; // sobe a cada Lock(): uma abertura que terminou depois de bloquear é descartada
+
     // ------------------------------------------------------------------ Ciclo de vida (chamado pela MainWindow.Vault.cs)
 
-    /// <summary>Carrega o cofre em segundo plano e mostra a lista. Seguro chamar de novo a cada vez que a página abre.</summary>
-    public async Task OpenAsync(PasswordVault vault)
+    /// <summary>
+    /// Verifica o Windows Hello (se houver Gate), carrega o cofre em segundo plano e mostra a lista.
+    /// Seguro chamar de novo a cada vez que a página abre. <paramref name="skipGate"/> = "abrir sem Hello só desta vez".
+    /// </summary>
+    public async Task OpenAsync(PasswordVault vault, bool skipGate = false)
     {
         _vault = vault;
+        if (_busy || _authenticating) return;
+        int epoch = _epoch;
+
+        if (!skipGate && Gate != null)
+        {
+            _locked = true;
+            VBtnLock.Content = "DESBLOQUEAR";
+            VStatus.Text = "Confirme no Windows Hello para abrir o Vault…";
+            UpdateButtons();
+            _authenticating = true;
+            HelloResult result;
+            try { result = await Gate(); }
+            catch (Exception ex) { result = new HelloResult(HelloOutcome.Failed, "Erro ao verificar o Windows Hello: " + ex.Message); }
+            finally { _authenticating = false; }
+
+            if (epoch != _epoch) return; // o usuário saiu da página enquanto o diálogo estava aberto
+            if (!result.IsVerified) { ShowAuthRequired(result); return; }
+        }
+
+        VAuthBanner.Visibility = Visibility.Collapsed;
         _locked = false;
         VBtnLock.Content = "BLOQUEAR";
-        if (_busy) return;
 
         SetBusy(true);
         VStatus.Text = "Abrindo o cofre…";
         try { await vault.LoadAsync(); }
         catch (Exception ex) { VStatus.Text = "Não foi possível abrir o cofre: " + ex.Message; }
         finally { SetBusy(false); }
+        if (epoch != _epoch) { vault.Lock(); return; }
         Refresh();
+    }
+
+    private void ShowAuthRequired(HelloResult r)
+    {
+        VGrid.ItemsSource = null;
+        VEmpty.Visibility = Visibility.Collapsed;
+        VAuthText.Text = r.Message;
+        VBtnOpenAnyway.Visibility = r.Outcome == HelloOutcome.Unavailable ? Visibility.Visible : Visibility.Collapsed; // só quando o PC não tem Hello
+        VAuthBanner.Visibility = Visibility.Visible;
+        VStatus.Text = r.Outcome == HelloOutcome.Unavailable ? "Windows Hello indisponível." : "Vault bloqueado.";
+        UpdateButtons();
+    }
+
+    private async void VUnlock_Click(object sender, RoutedEventArgs e)
+    {
+        if (_vault != null) await OpenAsync(_vault);
+    }
+
+    private async void VOpenAnyway_Click(object sender, RoutedEventArgs e)
+    {
+        if (_vault != null) await OpenAsync(_vault, skipGate: true);
     }
 
     /// <summary>Esvazia a tela e a memória: lista, formulário, senhas digitadas e o próprio cofre.</summary>
     public void Lock()
     {
+        _epoch++;
         _vault?.Lock();
         _locked = true;
+        VAuthBanner.Visibility = Visibility.Collapsed;
         VGrid.ItemsSource = null;
         HideEditor();
         HideBackupPanel();
@@ -78,6 +136,7 @@ public partial class VaultView : UserControl
             VaultState.Unreadable => "O cofre não pôde ser aberto — veja o aviso abaixo.",
             _ => "",
         };
+        if (ready && _vault.Problem != null) VStatus.Text += " · ATENÇÃO: " + _vault.Problem; // aberto a partir do .bak
         if (note != null) VStatus.Text += " · " + note;
         UpdateButtons();
     }
@@ -107,6 +166,7 @@ public partial class VaultView : UserControl
         if (_locked) { await OpenAsync(_vault); return; }
         SecureClipboard.ClearNow(); // bloquear também tira a senha copiada da área de transferência
         Lock();
+        ManualLock?.Invoke(); // bloqueio manual = a próxima abertura pede o Hello de novo, sem tolerância
     }
 
     private static Guid IdOf(object sender) => (Guid)((FrameworkElement)sender).Tag;

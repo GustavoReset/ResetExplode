@@ -37,9 +37,23 @@ public sealed class SensorMonitor : IDisposable
             Walk(hw);
     }
 
+    /// <summary>Quantas leituras de hardware falharam desde que o monitor abriu (a biblioteca/driver lançou exceção).</summary>
+    public int UpdateFailures { get; private set; }
+    /// <summary>Mensagem da última falha de leitura, para diagnóstico.</summary>
+    public string? LastUpdateError { get; private set; }
+
     private void Walk(IHardware hw)
     {
-        hw.Update();
+        // Fronteira com biblioteca de terceiros + driver de hardware: o LibreHardwareMonitor já lançou NullReferenceException em
+        // GenericCpu.Update() (ex.: driver PawnIO ausente ou leitura de MSR que falha). Este método roda num DispatcherTimer a cada
+        // segundo e o app não tem tratador global, então uma exceção aqui derrubava o aplicativo inteiro. Agora o hardware que
+        // falhou mantém os últimos valores e a leitura segue para os demais.
+        try { hw.Update(); }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            UpdateFailures++;
+            LastUpdateError = $"{hw.Name}: {ex.GetType().Name}: {ex.Message}";
+        }
         foreach (var s in hw.Sensors)
         {
             string id = s.Identifier.ToString();

@@ -137,7 +137,7 @@ App WPF (.NET 8) com:
 - Renderização do stress de GPU: [Vortice.Windows](https://github.com/amerkoleci/Vortice.Windows) (MIT), bindings de Direct3D 11 para .NET. Direct3D 12 e DXC (compilador de shaders da Microsoft) também via Vortice, no teste de ray tracing.
 
 ## Requisitos
-- Windows 10/11
+- Windows 10 (versão 2004, build 19041) ou mais novo, ou Windows 11. Para abrir o Vault de senhas é preciso ter o Windows Hello (PIN, digital ou rosto) configurado.
 - .NET 8 SDK (https://dotnet.microsoft.com/download)
 - Driver **PawnIO** (temperatura/consumo da CPU): `winget install namazso.PawnIO`
   A LibreHardwareMonitorLib 0.9.6+ usa o PawnIO no lugar do antigo WinRing0, que o Windows Defender bloqueia.
