@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using Microsoft.Win32;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 /// <summary>Programa que abre junto com o Windows (chave Run do registro ou atalho na pasta Inicializar).</summary>
 public sealed class StartupEntry
@@ -28,7 +28,7 @@ public sealed class StartupBackup
     public bool Machine { get; set; }
     public string Name { get; set; } = "";
     public string? Command { get; set; }   // registro
-    public string? Backup { get; set; }    // pasta: cópia do atalho em %AppData%\ResetExplode\Startup
+    public string? Backup { get; set; }    // pasta: cópia do atalho em %AppData%\FortKnox\Startup
     public string? Original { get; set; }  // pasta: caminho original
 }
 

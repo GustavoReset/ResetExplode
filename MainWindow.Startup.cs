@@ -1,9 +1,9 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace ResetExplode;
+namespace FortKnox;
 
-/// <summary>Aba RESET FERRAMENTAS · Inicialização: programas que abrem junto com o Windows.</summary>
+/// <summary>Aba ARSENAL · Inicialização: programas que abrem junto com o Windows.</summary>
 public partial class MainWindow
 {
     private void ScanStartup()

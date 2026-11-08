@@ -1,9 +1,9 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Windows;
 
-namespace ResetExplode;
+namespace FortKnox;
 
-/// <summary>Aba RESET DRIVER: inventário, NVIDIA (verifica e instala), AMD/placa-mãe (página oficial), Windows Update e backup.</summary>
+/// <summary>Aba ALICERCE: inventário, NVIDIA (verifica e instala), AMD/placa-mãe (página oficial), Windows Update e backup.</summary>
 public partial class MainWindow
 {
     private bool _drvInit, _drvBusy;
@@ -100,7 +100,7 @@ public partial class MainWindow
             : g.UpdateAvailable
             ? $"Instalar o driver NVIDIA {g.Latest} ({g.SizeText})?\nO instalador oficial será baixado e aberto."
             : $"Você já está com a versão {g.Installed}. Baixar e abrir o instalador {g.Latest} mesmo assim (reinstalação)?";
-        if (MessageBox.Show(this, msg, "RESET DRIVER", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+        if (MessageBox.Show(this, msg, "ALICERCE", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
 
         DrvBusy(true);
         _drvCts = new CancellationTokenSource();
@@ -133,7 +133,7 @@ public partial class MainWindow
     private async void BtnDrvWuInstall_Click(object sender, RoutedEventArgs e)
     {
         if (_drvBusy || _drvWu.Count == 0) return;
-        if (MessageBox.Show(this, $"Instalar {_drvWu.Count} driver(s) do Windows Update? Pode ser preciso reiniciar.", "RESET DRIVER",
+        if (MessageBox.Show(this, $"Instalar {_drvWu.Count} driver(s) do Windows Update? Pode ser preciso reiniciar.", "ALICERCE",
                 MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
         DrvBusy(true);
         try

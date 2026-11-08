@@ -2,25 +2,36 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <!-- 10.0.19041 (Windows 10 2004) = mínimo para a projeção WinRT usada pelo Windows Hello do Vault (UserConsentVerifier) -->
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
-    <AssemblyName>ResetExplode</AssemblyName>
-    <Product>RESET EXPLODE</Product>
+    <AssemblyName>FortKnox</AssemblyName>
+    <Product>Fort Knox</Product>
     <Version>0.16.0</Version>
-    <!-- Sempre otimizado: o RESET BENCH e os stress tests precisam do JIT otimizado também em Debug -->
+    <!-- Sempre otimizado: a Forja (benchmarks) e os stress tests precisam do JIT otimizado também em Debug -->
     <Optimize>true</Optimize>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+
+  <!-- O projeto de testes mora em tests\ e não pode ser compilado dentro do app -->
+  <ItemGroup>
+    <Compile Remove="tests\**" />
+    <EmbeddedResource Remove="tests\**" />
+    <None Remove="tests\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <Resource Include="Assets\logo.png" />
     <Resource Include="Assets\app.ico" />
     <Resource Include="Assets\logo-badge.png" />
     <Resource Include="Assets\logo-dark.png" />
+    <!-- Identidade visual: fontes da marca embutidas (SIL OFL 1.1, ver Assets\Fonts\OFL.txt) -->
+    <Resource Include="Assets\Fonts\*.ttf" />
+    <None Include="Assets\Fonts\OFL.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
   <!-- Drivers seriais oficiais embutidos (RESET MAKER): cada pasta Drivers\<chip> vira recurso e é extraída na hora de instalar.
@@ -36,6 +47,9 @@
 
   <ItemGroup>
     <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.6" />
+    <!-- PDF (Modules\Pdf): PDFsharp = MIT (mesclar, dividir, comprimir); PdfPig = Apache-2.0 (extrair texto). Versões fixas de propósito. -->
+    <PackageReference Include="PDFsharp" Version="6.2.4" />
+    <PackageReference Include="PdfPig" Version="0.1.16" />
     <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.2.8" />
     <PackageReference Include="System.Management" Version="10.0.2" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.2" />

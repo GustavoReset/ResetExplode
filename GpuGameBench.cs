@@ -7,7 +7,7 @@ using Vortice.Direct3D11;
 using Vortice.DXGI;
 using Vortice.Mathematics;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 public sealed record GpuGameResult(double AvgFps, double Low1Fps, int Frames, double Seconds, int Width, int Height, string Adapter)
 {
@@ -338,7 +338,7 @@ float4 PostPS(FsOut i) : SV_TARGET
         var oldPriority = Thread.CurrentThread.Priority;
         Thread.CurrentThread.Priority = ThreadPriority.Highest; // medição de frametime precisa de pontualidade
         IntPtr hwnd = IntPtr.Zero;
-        string cls = "ResetExplodeGameBench" + Environment.TickCount64;
+        string cls = "FortKnoxGameBench" + Environment.TickCount64;
         IntPtr hInst = GetModuleHandleW(null);
         var keep = new List<IDisposable>();
         T K<T>(T d) where T : IDisposable { keep.Add(d); return d; }
@@ -359,7 +359,7 @@ float4 PostPS(FsOut i) : SV_TARGET
             const uint style = 0x00CF0000 | 0x10000000; // WS_OVERLAPPEDWINDOW | WS_VISIBLE
             AdjustWindowRect(ref rect, style, false);
             int ww = rect.Right - rect.Left, wh = rect.Bottom - rect.Top;
-            hwnd = CreateWindowExW(0, cls, "RESET BENCH · Cena de jogo", style, (sw - ww) / 2, (sh - wh) / 2, ww, wh,
+            hwnd = CreateWindowExW(0, cls, "FORJA · Cena de jogo", style, (sw - ww) / 2, (sh - wh) / 2, ww, wh,
                                    IntPtr.Zero, IntPtr.Zero, hInst, IntPtr.Zero);
 
             // ---- Dispositivo ----
@@ -578,7 +578,7 @@ float4 PostPS(FsOut i) : SV_TARGET
                     CurrentFps = titleFrames / (now - lastTitle);
                     titleFrames = 0; lastTitle = now;
                     Progress = now / Duration.TotalSeconds;
-                    SetWindowTextW(hwnd, $"RESET BENCH · Cena de jogo · {Width}x{Height} · {CurrentFps:0} FPS · {Progress:P0}");
+                    SetWindowTextW(hwnd, $"FORJA · Cena de jogo · {Width}x{Height} · {CurrentFps:0} FPS · {Progress:P0}");
                 }
             }
 

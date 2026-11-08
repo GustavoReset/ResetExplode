@@ -2,7 +2,7 @@
 bin/
 obj/
 publish/
-ResetExplode-dist/
+FortKnox-dist/
 *.exe
 *.dll
 *.pdb

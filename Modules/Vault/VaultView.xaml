@@ -1,0 +1,167 @@
+<UserControl x:Class="FortKnox.VaultView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <UserControl.Resources>
+        <Style x:Key="VaultMono" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource Mono}"/>
+            <Setter Property="Foreground" Value="{DynamicResource Muted}"/>
+        </Style>
+        <Style x:Key="VaultMuted" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Muted}"/>
+        </Style>
+        <Style x:Key="RowButton" TargetType="Button" BasedOn="{StaticResource OutlineButton}">
+            <Setter Property="Padding" Value="9,4"/>
+            <Setter Property="FontSize" Value="10.5"/>
+            <Setter Property="Margin" Value="0,0,6,0"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid x:Name="VRoot" Margin="36,30,36,30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>   <!-- título + busca + ações -->
+            <RowDefinition Height="Auto"/>   <!-- aviso: cofre ilegível -->
+            <RowDefinition Height="Auto"/>   <!-- painel do backup -->
+            <RowDefinition Height="Auto"/>   <!-- editor -->
+            <RowDefinition Height="*"/>      <!-- grade -->
+        </Grid.RowDefinitions>
+
+        <!-- ===== Cabeçalho ===== -->
+        <Grid Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock Text="COFRE · SENHAS" Style="{StaticResource H1}"/>
+                <TextBlock x:Name="VStatus" Text="Abrindo o cofre…" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBox x:Name="VSearch" Width="260" Tag="Buscar por nome, usuário, site ou categoria…" Margin="0,0,10,0"
+                         TextChanged="VSearch_Changed"/>
+                <Button x:Name="VBtnNew" Style="{StaticResource PrimaryButton}" Content="NOVA SENHA" Padding="16,9" Margin="0,0,8,0" Click="VNew_Click"/>
+                <Button x:Name="VBtnLock" Style="{StaticResource OutlineButton}" Content="BLOQUEAR" Padding="16,9" Click="VLock_Click"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- ===== Aviso: o Windows não abriu o cofre ===== -->
+        <Border x:Name="VBanner" Grid.Row="1" Style="{StaticResource CardBorder}" BorderBrush="{DynamicResource LineStrong}"
+                Margin="0,0,0,16" Visibility="Collapsed">
+            <StackPanel>
+                <TextBlock Text="COFRE ILEGÍVEL" Style="{StaticResource Label}"/>
+                <TextBlock x:Name="VBannerText" TextWrapping="Wrap" Margin="0,0,0,12"/>
+                <Button Style="{StaticResource PrimaryButton}" Content="RESTAURAR DE UM BACKUP (.fkvault)" Padding="16,8"
+                        HorizontalAlignment="Left" Click="VImport_Click"/>
+            </StackPanel>
+        </Border>
+
+        <!-- ===== Windows Hello: não verificado ===== -->
+        <Border x:Name="VAuthBanner" Grid.Row="1" Style="{StaticResource CardBorder}" BorderBrush="{DynamicResource LineStrong}"
+                Margin="0,0,0,16" Visibility="Collapsed">
+            <StackPanel>
+                <TextBlock Text="VAULT PROTEGIDO PELO WINDOWS HELLO" Style="{StaticResource Label}"/>
+                <TextBlock x:Name="VAuthText" TextWrapping="Wrap" Margin="0,0,0,12"/>
+                <StackPanel Orientation="Horizontal">
+                    <Button Style="{StaticResource PrimaryButton}" Content="TENTAR DE NOVO" Padding="16,8" Margin="0,0,8,0" Click="VUnlock_Click"/>
+                    <Button x:Name="VBtnOpenAnyway" Style="{StaticResource OutlineButton}" Content="ABRIR SEM WINDOWS HELLO (SÓ AGORA)" Padding="16,8"
+                            Visibility="Collapsed" Click="VOpenAnyway_Click"
+                            ToolTip="Abre o cofre apenas nesta vez, sem verificação. A exigência continua ativa na próxima abertura."/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- ===== Backup: pede a senha do arquivo ===== -->
+        <Border x:Name="VBackupPanel" Grid.Row="2" Style="{StaticResource CardBorder}" Margin="0,0,0,16" Visibility="Collapsed">
+            <StackPanel>
+                <TextBlock x:Name="VBackupTitle" Style="{StaticResource Label}"/>
+                <TextBlock x:Name="VBackupHint" Style="{StaticResource VaultMuted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                <TextBlock Text="Senha do backup" Style="{StaticResource VaultMuted}" FontSize="11" Margin="0,0,0,4"/>
+                <PasswordBox x:Name="VBackupPass" Width="360" HorizontalAlignment="Left" Margin="0,0,0,8"/>
+                <StackPanel x:Name="VBackupRepeat">
+                    <TextBlock Text="Repita a senha" Style="{StaticResource VaultMuted}" FontSize="11" Margin="0,0,0,4"/>
+                    <PasswordBox x:Name="VBackupPass2" Width="360" HorizontalAlignment="Left" Margin="0,0,0,10"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button Style="{StaticResource PrimaryButton}" Content="CONFIRMAR" Padding="16,8" Margin="0,0,8,0" Click="VBackupOk_Click"/>
+                    <Button Style="{StaticResource OutlineButton}" Content="CANCELAR" Padding="16,8" Click="VBackupCancel_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- ===== Editor (novo / editar) ===== -->
+        <Border x:Name="VEditor" Grid.Row="3" Style="{StaticResource CardBorder}" Margin="0,0,0,16" Visibility="Collapsed">
+            <StackPanel>
+                <TextBlock x:Name="VEditorTitle" Text="NOVO REGISTRO" Style="{StaticResource Label}"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBox x:Name="VTitle" Tag="Nome (ex.: Gmail pessoal)" Margin="0,0,0,10" MaxLength="120"/>
+                    <TextBox x:Name="VUser" Grid.Column="2" Tag="Usuário ou e-mail" Margin="0,0,0,10" MaxLength="200"/>
+                    <Grid Grid.Row="1" Margin="0,0,0,10">
+                        <PasswordBox x:Name="VPass" MaxLength="256" PasswordChanged="VPass_Changed"/>
+                        <TextBlock x:Name="VPassHint" Text="Senha" Foreground="{DynamicResource Faint}" Margin="11,0,0,0"
+                                   VerticalAlignment="Center" IsHitTestVisible="False"/>
+                        <TextBox x:Name="VPassText" Tag="Senha" Visibility="Collapsed" MaxLength="256"/>
+                    </Grid>
+                    <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal" Margin="0,0,0,10">
+                        <Button Style="{StaticResource OutlineButton}" Content="GERAR SENHA FORTE" Padding="12,7" FontSize="11" Margin="0,0,12,0" Click="VGenerate_Click"/>
+                        <CheckBox x:Name="VShow" Content="Mostrar" VerticalAlignment="Center" Checked="VShow_Changed" Unchecked="VShow_Changed"/>
+                    </StackPanel>
+                    <TextBox x:Name="VUrl" Grid.Row="2" Tag="Site (opcional)" MaxLength="300"/>
+                    <TextBox x:Name="VCategory" Grid.Row="2" Grid.Column="2" Tag="Categoria (opcional, ex.: Trabalho)" MaxLength="60"/>
+                </Grid>
+                <TextBox x:Name="VNotes" Tag="Notas (opcional)" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="56" MaxHeight="120"
+                         VerticalScrollBarVisibility="Auto" Margin="0,10,0,12" MaxLength="2000"/>
+                <StackPanel Orientation="Horizontal">
+                    <Button Style="{StaticResource PrimaryButton}" Content="SALVAR" Padding="18,8" Margin="0,0,8,0" Click="VSave_Click"/>
+                    <Button Style="{StaticResource OutlineButton}" Content="CANCELAR" Padding="18,8" Click="VCancel_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- ===== Lista ===== -->
+        <Border Grid.Row="4" Style="{StaticResource CardBorder}" Padding="6,14,6,6">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <DataGrid x:Name="VGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserResizeColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="NOME" Binding="{Binding Title}" Width="*"/>
+                        <DataGridTextColumn Header="USUÁRIO" Binding="{Binding Username}" Width="*" ElementStyle="{StaticResource VaultMuted}"/>
+                        <DataGridTextColumn Header="CATEGORIA" Binding="{Binding Category}" Width="110" ElementStyle="{StaticResource VaultMuted}"/>
+                        <DataGridTextColumn Header="SENHA" Binding="{Binding PasswordMask}" Width="100" ElementStyle="{StaticResource VaultMono}"/>
+                        <DataGridTextColumn Header="ALTERADO" Binding="{Binding ModifiedText}" Width="130" ElementStyle="{StaticResource VaultMono}"/>
+                        <DataGridTemplateColumn Header="AÇÕES" Width="Auto">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Style="{StaticResource RowButton}" Content="USUÁRIO" Tag="{Binding Id}" ToolTip="Copiar o usuário" Click="VCopyUser_Click"/>
+                                        <Button Style="{StaticResource RowButton}" Content="SENHA" Tag="{Binding Id}" ToolTip="Copiar a senha (limpa em 30 s)" Click="VCopyPass_Click"/>
+                                        <Button Style="{StaticResource RowButton}" Content="EDITAR" Tag="{Binding Id}" Click="VEdit_Click"/>
+                                        <Button Style="{StaticResource RowButton}" Content="EXCLUIR" Tag="{Binding Id}" Click="VDelete_Click"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <TextBlock x:Name="VEmpty" Text="Nenhum registro. Clique em NOVA SENHA para começar." Style="{StaticResource VaultMuted}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" IsHitTestVisible="False"/>
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="12,10,0,6">
+                    <Button x:Name="VBtnExport" Style="{StaticResource OutlineButton}" Content="EXPORTAR BACKUP" Padding="12,6" FontSize="11" Margin="0,0,8,0" Click="VExport_Click"/>
+                    <Button x:Name="VBtnImport" Style="{StaticResource OutlineButton}" Content="IMPORTAR BACKUP" Padding="12,6" FontSize="11" Click="VImport_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

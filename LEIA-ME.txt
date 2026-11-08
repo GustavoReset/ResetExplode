@@ -1,12 +1,12 @@
-RESET EXPLODE
+Fort Knox
 =============
 
 Ferramenta de diagnóstico de hardware: informações do sistema, sensores, placa de vídeo,
-FPS estimado em jogos, detector de gargalo, overlay de FPS, RESET BENCH (benchmarks de CPU, GPU, memória e disco)
-RESET OTIMIZA (limpeza de memória e ajustes para jogos) e stress test de CPU / RAM / GPU.
+FPS estimado em jogos, detector de gargalo, overlay de FPS, FORJA (benchmarks de CPU, GPU, memória e disco)
+ARSENAL · OTIMIZAÇÃO (limpeza de memória e ajustes para jogos) e stress test de CPU / RAM / GPU.
 
 REQUISITOS
-- Windows 10 ou 11, 64 bits. Não precisa instalar o .NET (já vem dentro do .exe).
+- Windows 10 (versão 2004 ou mais nova) ou 11, 64 bits. Não precisa instalar o .NET (já vem dentro do .exe). O Vault de senhas pede o Windows Hello (PIN, digital ou rosto) para abrir.
 - Para temperatura e consumo da CPU, instale o driver PawnIO (uma vez só):
       winget install namazso.PawnIO
 - Aceite o pedido de administrador ao abrir (necessário para ler os sensores).
@@ -15,12 +15,12 @@ REQUISITOS
   Se instalou o PawnIO e mesmo assim não aparecer, reinicie o PC.
 
 COMO USAR
-- Abra o ResetExplode.exe. Na primeira vez ele demora alguns segundos para iniciar.
+- Abra o FortKnox.exe. Na primeira vez ele demora alguns segundos para iniciar.
 - Se o Windows mostrar "O Windows protegeu o computador", clique em "Mais informações"
   e depois em "Executar assim mesmo" (o programa não tem assinatura digital paga).
 - Overlay: Ctrl + Shift + O liga e desliga.
 
 OBSERVAÇÕES
 - Placas NVIDIA mostram mais detalhes (VBIOS, limites de energia, CUDA).
-- Configurações e histórico ficam em %AppData%\ResetExplode (não vão junto com o .exe).
+- Configurações e histórico ficam em %AppData%\FortKnox (não vão junto com o .exe).
 - Use os stress tests com o limite de temperatura ligado e boa ventilação.

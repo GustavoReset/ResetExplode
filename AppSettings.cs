@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 public sealed record BenchRun(DateTime Date, double? Multi, double? Single, bool Sustained, string Cpu);
 
@@ -19,7 +19,7 @@ public sealed class HelperProgram
     public string Display => System.IO.Path.GetFileName(Path) + (string.IsNullOrWhiteSpace(Args) ? "" : " " + Args);
 }
 
-/// <summary>Perfil de um jogo na aba RESET JOGOS: desempenho, argumentos de gráficos e programas auxiliares.</summary>
+/// <summary>Perfil de um jogo na aba ARENA: desempenho, argumentos de gráficos e programas auxiliares.</summary>
 public sealed class GameProfile
 {
     public string Priority { get; set; } = "normal";   // normal | above | high
@@ -43,27 +43,27 @@ public sealed class CustomGame
     public string Args { get; set; } = "";
 }
 
-/// <summary>Configurações em %AppData%\ResetExplode. A chave da API é cifrada com DPAPI (só este usuário do Windows a lê).</summary>
+/// <summary>Configurações em %AppData%\FortKnox. A chave da API é cifrada com DPAPI (só este usuário do Windows a lê).</summary>
 public sealed class AppSettings
 {
     public static string Folder { get; } =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ResetExplode");
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FortKnox");
     private static string FilePath => Path.Combine(Folder, "settings.json");
 
     public string? HowManyFpsKeyProtected { get; set; }
 
-    // RESET BENCH: últimos resultados (mais recente primeiro)
+    // FORJA: últimos resultados (mais recente primeiro)
     public List<BenchRun> BenchRuns { get; set; } = new();
     public List<BenchRecord> BenchRecords { get; set; } = new();
 
-    // RESET OTIMIZA: valores originais dos ajustes do Windows antes da primeira alteração ("<ausente>" = não existia)
+    // ARSENAL · OTIMIZAÇÃO: valores originais dos ajustes do Windows antes da primeira alteração ("<ausente>" = não existia)
     public Dictionary<string, string?> TweakBackup { get; set; } = new();
     /// <summary>ComDB original (reservas de números COM) antes da primeira "liberação".</summary>
     public byte[]? ComDbBackup { get; set; }
     /// <summary>Programas de inicialização removidos, para "Restaurar removidos".</summary>
     public List<StartupBackup> StartupRemoved { get; set; } = new();
 
-    // RESET JOGOS
+    // ARENA
     public Dictionary<string, GameProfile> GameProfiles { get; set; } = new();
     public List<CustomGame> CustomGames { get; set; } = new();
 
@@ -99,6 +99,7 @@ public sealed class AppSettings
 
     public static AppSettings Load()
     {
+        LegacyMigration.Migrate(Path.Combine(Path.GetDirectoryName(Folder)!, LegacyMigration.LegacyFolderName), Folder);
         try
         {
             if (File.Exists(FilePath))

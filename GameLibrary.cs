@@ -1,9 +1,9 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 using Microsoft.Win32;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 /// <summary>Jogo instalado (de qualquer loja) ou adicionado à mão.</summary>
 public sealed class LibGame
@@ -236,7 +236,7 @@ public static class SteamInfo
             var apps = AppsNode(root, true)!;
             var app = apps.GetOrAddChild(appId);
             if (string.IsNullOrWhiteSpace(options)) app.Remove("LaunchOptions"); else app.Set("LaunchOptions", options.Trim());
-            File.Copy(f, f + ".resetexplode.bak", true); // cópia de segurança do arquivo original
+            File.Copy(f, f + ".fortknox.bak", true); // cópia de segurança do arquivo original
             File.WriteAllText(f, Vdf.Serialize(root), new System.Text.UTF8Encoding(false));
             return null;
         }

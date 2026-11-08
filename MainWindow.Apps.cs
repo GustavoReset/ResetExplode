@@ -1,9 +1,9 @@
 using System.Diagnostics;
 using System.Windows;
 
-namespace ResetExplode;
+namespace FortKnox;
 
-/// <summary>Aba RESET FERRAMENTAS · Instalar apps: essenciais pós-formatação pelo winget.</summary>
+/// <summary>Aba ARSENAL · Instalar apps: essenciais pós-formatação pelo winget.</summary>
 public partial class MainWindow
 {
     private List<InstallableApp>? _installApps;

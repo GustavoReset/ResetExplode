@@ -1,11 +1,11 @@
 using System.Diagnostics;
 using System.Numerics;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 public sealed record BenchResult(int Threads, double Seconds, long Samples, int Passes)
 {
-    /// <summary>Pontos RESET BENCH: amostras de path tracing por segundo ÷ 10.000. Mesma cena e mesma
+    /// <summary>Pontos FORJA: amostras de path tracing por segundo ÷ 10.000. Mesma cena e mesma
     /// carga em todo teste, então a nota é comparável entre execuções e entre máquinas (nesta versão do app).</summary>
     public double Score => Seconds > 0 ? Samples / Seconds / 10_000 : 0;
 }
@@ -74,7 +74,7 @@ public sealed class BenchRenderer
                         Interlocked.Increment(ref _bucketsDone);
                     }
                     Active[ti] = -1;
-                }) { IsBackground = true, Name = $"RESET BENCH {ti}" };
+                }) { IsBackground = true, Name = $"FORJA {ti}" };
                 workers[t].Start();
             }
             foreach (var w in workers) w.Join();

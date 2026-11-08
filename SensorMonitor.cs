@@ -1,7 +1,7 @@
 using System.Collections.ObjectModel;
 using LibreHardwareMonitor.Hardware;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 /// <summary>Encapsula o LibreHardwareMonitorLib e mantém a lista de sensores atualizada.</summary>
 public sealed class SensorMonitor : IDisposable
@@ -37,9 +37,23 @@ public sealed class SensorMonitor : IDisposable
             Walk(hw);
     }
 
+    /// <summary>Quantas leituras de hardware falharam desde que o monitor abriu (a biblioteca/driver lançou exceção).</summary>
+    public int UpdateFailures { get; private set; }
+    /// <summary>Mensagem da última falha de leitura, para diagnóstico.</summary>
+    public string? LastUpdateError { get; private set; }
+
     private void Walk(IHardware hw)
     {
-        hw.Update();
+        // Fronteira com biblioteca de terceiros + driver de hardware: o LibreHardwareMonitor já lançou NullReferenceException em
+        // GenericCpu.Update() (ex.: driver PawnIO ausente ou leitura de MSR que falha). Este método roda num DispatcherTimer a cada
+        // segundo e o app não tem tratador global, então uma exceção aqui derrubava o aplicativo inteiro. Agora o hardware que
+        // falhou mantém os últimos valores e a leitura segue para os demais.
+        try { hw.Update(); }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            UpdateFailures++;
+            LastUpdateError = $"{hw.Name}: {ex.GetType().Name}: {ex.Message}";
+        }
         foreach (var s in hw.Sensors)
         {
             string id = s.Identifier.ToString();
@@ -119,11 +133,11 @@ public sealed class SensorMonitor : IDisposable
     public static string Explain(CpuSensorProblem p) => p switch
     {
         CpuSensorProblem.NotElevated =>
-            "O RESET EXPLODE não está rodando como administrador, e o Windows só libera os sensores internos da CPU " +
+            "O Fort Knox não está rodando como administrador, e o Windows só libera os sensores internos da CPU " +
             "nesse modo. Feche e abra de novo aceitando o pedido de administrador.",
         CpuSensorProblem.PawnIOMissing =>
             "Falta o driver PawnIO, que lê a temperatura e o consumo da CPU. Ele é gratuito, assinado e usado também " +
-            "pelo LibreHardwareMonitor e pelo FanControl. Depois de instalar, feche e abra o RESET EXPLODE.",
+            "pelo LibreHardwareMonitor e pelo FanControl. Depois de instalar, feche e abra o Fort Knox.",
         CpuSensorProblem.ReadFailed =>
             "O PawnIO está instalado, mas a leitura falhou. Se acabou de instalar, reinicie o PC. Se continuar, " +
             "confira se o antivírus não bloqueou o driver ou se a CPU é muito antiga/recente para a biblioteca de sensores.",

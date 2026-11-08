@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 /// <summary>Programa (agrupado pelo nome do executável) que pode ser fechado para liberar recursos.</summary>
 public sealed class BackgroundApp : INotifyPropertyChanged
@@ -39,7 +39,7 @@ public static class Optimizer
         "ShellExperienceHost", "SearchHost", "SearchIndexer", "TextInputHost", "SecurityHealthService", "SecurityHealthSystray",
         "MsMpEng", "NisSrv", "SgrmBroker", "audiodg", "conhost", "dllhost", "spoolsv", "WmiPrvSE", "LockApp", "ApplicationFrameHost",
         "SystemSettings", "smartscreen", "MemCompression", "Secure System", "WUDFHost", "dasHost", "nvcontainer", "NVDisplay.Container",
-        "atiesrxx", "atieclxx", "amdfendrsr", "RadeonSoftware", "igfxEM", "PawnIO", "ResetExplode", "cmd", "powershell", "WindowsTerminal",
+        "atiesrxx", "atieclxx", "amdfendrsr", "RadeonSoftware", "igfxEM", "PawnIO", "FortKnox", "cmd", "powershell", "WindowsTerminal",
         "OpenConsole", "devenv", "Code", "dotnet",
     };
 

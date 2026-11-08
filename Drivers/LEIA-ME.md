@@ -1,10 +1,10 @@
 # Drivers seriais incluídos (RESET MAKER)
 
-Drivers oficiais, sem modificação, embutidos no `ResetExplode.exe` e instalados pela aba
+Drivers oficiais, sem modificação, embutidos no `FortKnox.exe` e instalados pela aba
 **RESET MAKER › Drivers seriais › Drivers incluídos** (via `pnputil /add-driver /install`).
 Cada pasta é um pacote `.inf` + `.cat` (+ `.sys`/`.dll`) com a assinatura original do fabricante.
 
-**Estes arquivos não fazem parte da licença MIT do RESET EXPLODE:** pertencem aos respectivos fabricantes
+**Estes arquivos não fazem parte da licença MIT do Fort Knox:** pertencem aos respectivos fabricantes
 e são distribuídos conforme os termos de cada um.
 
 | Pasta | Chip | Versão | Origem oficial | Assinatura |

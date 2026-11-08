@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Microsoft.Win32;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 /// <summary>App do catálogo "Instalar apps" (pós-formatação), instalado pelo winget.</summary>
 public sealed class InstallableApp : INotifyPropertyChanged

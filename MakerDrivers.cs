@@ -4,7 +4,7 @@ using System.Text;
 using System.Xml.Linq;
 using Microsoft.Win32;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 /// <summary>Família de chip USB-serial: como reconhecer o dispositivo e o pacote de driver, e onde baixar o oficial.</summary>
 /// <summary>Bundle = pasta em Drivers com o driver oficial embutido no .exe (null = não incluído).</summary>
@@ -26,7 +26,7 @@ public sealed class SerialDeviceRow
     public string State => Ok ? "FUNCIONANDO" : "COM PROBLEMA";
 }
 
-/// <summary>Driver oficial que vem dentro do RESET EXPLODE (pasta Drivers\ do projeto).</summary>
+/// <summary>Driver oficial que vem dentro do Fort Knox (pasta Drivers\ do projeto).</summary>
 public sealed class BundledDriver
 {
     public SerialChip Chip { get; init; } = null!;
@@ -54,7 +54,7 @@ public sealed class SerialDriverPackage
 }
 
 /// <summary>
-/// RESET MAKER · drivers de CH340, CP210x, FTDI, Prolific e Arduino: diagnóstico pelo código de problema do Gerenciador de
+/// OFICINA · drivers de CH340, CP210x, FTDI, Prolific e Arduino: diagnóstico pelo código de problema do Gerenciador de
 /// Dispositivos, reinstalação do dispositivo, remoção de versões do driver (com backup) e instalação dos drivers oficiais embutidos no app.
 /// Tudo via pnputil e SetupAPI, que já vêm no Windows. Requer administrador.
 /// </summary>
@@ -252,7 +252,7 @@ public static class MakerDrivers
     {
         var res = BundleResources(c);
         if (res.Count == 0) return $"O driver do {c.Name} não está incluído nesta versão.";
-        string dir = Path.Combine(Path.GetTempPath(), "ResetExplode", "drivers-incluidos", c.Bundle!);
+        string dir = Path.Combine(Path.GetTempPath(), "FortKnox", "drivers-incluidos", c.Bundle!);
         if (Directory.Exists(dir)) Directory.Delete(dir, true);
         foreach (var n in res)
         {

@@ -4,7 +4,7 @@ using System.Windows.Interop;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 /// <summary>Aviso no canto inferior direito da tela (dispositivo conectado/removido). Não rouba o foco.</summary>
 public partial class ToastWindow : Window

@@ -4,7 +4,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using LibreHardwareMonitor.Hardware;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 /// <summary>
 /// Visão geral: painel de blocos com gráfico de área (CPU × GPU), desempenho, tabela de componentes, anéis de
@@ -61,8 +61,8 @@ public partial class MainWindow
     {
         foreach (var r in _settings.BenchRuns)
         {
-            if (r.Multi is double m) yield return new DashEvent("", "RESET BENCH", "Render · multi-core", $"{m:N0} pts", r.Date);
-            else if (r.Single is double s) yield return new DashEvent("", "RESET BENCH", "Render · single-core", $"{s:N0} pts", r.Date);
+            if (r.Multi is double m) yield return new DashEvent("", "FORJA", "Render · multi-core", $"{m:N0} pts", r.Date);
+            else if (r.Single is double s) yield return new DashEvent("", "FORJA", "Render · single-core", $"{s:N0} pts", r.Date);
         }
         foreach (var r in _settings.BenchRecords)
         {
@@ -159,7 +159,7 @@ public partial class MainWindow
             }
             else DashScoreDelta.Text = "";
         }
-        else { DashScore.Text = "—"; DashScoreDelta.Text = ""; DashScoreSub.Text = "rode o RESET BENCH para ter uma nota"; }
+        else { DashScore.Text = "—"; DashScoreDelta.Text = ""; DashScoreSub.Text = "rode a Forja para ter uma nota"; }
 
         string Last(string test) => _settings.BenchRecords.FirstOrDefault(r => r.Test == test)?.Summary.Split('·')[0].Trim() ?? "—";
         var single = _settings.BenchRuns.FirstOrDefault(r => r.Single != null)?.Single;
@@ -212,7 +212,8 @@ public partial class MainWindow
         double X(int i) => left + plotW * i / Math.Max(1, range - 1) + plotW * (range - data.Count) / Math.Max(1, range - 1);
         double Y(double v) => top + plotH * (1 - (Math.Clamp(v, yMin, yMax) - yMin) / (yMax - yMin));
 
-        var fg = (SolidColorBrush)FindResource("Fg");
+        var fg = (SolidColorBrush)FindResource("Accent"); // CPU em Ouro Reserva (cor da marca)
+        var text = (Brush)FindResource("Fg");
         var faint = (Brush)FindResource("Faint");
         var mono = (FontFamily)FindResource("Mono");
 
@@ -243,7 +244,7 @@ public partial class MainWindow
         for (int i = 0; i < data.Count; i++) if (gpu(data[i]) is float g) gLine.Points.Add(new Point(X(i), Y(g)));
         DashChart.Children.Add(gLine);
 
-        // CPU: área com degradê monocromático + linha
+        // CPU: área com degradê dourado + linha
         var pts = new List<Point>();
         for (int i = 0; i < data.Count; i++) if (cpu(data[i]) is float c) pts.Add(new Point(X(i), Y(c)));
         if (pts.Count < 2) return;
@@ -268,8 +269,9 @@ public partial class MainWindow
         DashChart.Children.Add(dot);
         var bubble = new Border
         {
-            Background = (Brush)FindResource("Hover"), CornerRadius = new CornerRadius(8), Padding = new Thickness(10, 5, 10, 5),
-            Child = new TextBlock { Text = DashChartValue.Text, FontFamily = mono, FontWeight = FontWeights.SemiBold, Foreground = fg }
+            Background = (Brush)FindResource("Hover"), BorderBrush = fg, BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(4), Padding = new Thickness(10, 5, 10, 5),
+            Child = new TextBlock { Text = DashChartValue.Text, FontFamily = mono, FontWeight = FontWeights.SemiBold, Foreground = text }
         };
         bubble.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
         Canvas.SetLeft(bubble, Math.Max(left, last.X - bubble.DesiredSize.Width - 10));
@@ -291,10 +293,12 @@ public partial class MainWindow
         DashMemHero.Text = total > 0 ? $"{(total - avail) / 1073741824.0:0.0} GB" : "—";
         DashMemSub.Text = total > 0 ? $"de RAM em uso · {total / 1073741824.0:0} GB instalados" : "";
 
-        Brush fg = (Brush)FindResource("Fg"), muted = (Brush)FindResource("Muted"), faint = (Brush)FindResource("Faint");
-        var rings = new List<(double Frac, Brush Brush, string Label)> { (ram, fg, "RAM") };
-        if (vram is double v) rings.Add((v, muted, "VRAM"));
-        if (c0 != null) rings.Add((c0.UsedFraction, faint, $"Disco {c0.Letter}"));
+        // Anéis: RAM em ouro, VRAM em ouro claro, disco em aço (paleta da marca)
+        Brush fg = (Brush)FindResource("Fg"), gold = (Brush)FindResource("Accent"), goldLight = (Brush)FindResource("AccentText"),
+              steel = (Brush)FindResource("Muted");
+        var rings = new List<(double Frac, Brush Brush, string Label)> { (ram, gold, "RAM") };
+        if (vram is double v) rings.Add((v, goldLight, "VRAM"));
+        if (c0 != null) rings.Add((c0.UsedFraction, steel, $"Disco {c0.Letter}"));
 
         DashRings.Children.Clear();
         double cx = DashRings.Width / 2, cy = DashRings.Height / 2;
@@ -355,7 +359,7 @@ public partial class MainWindow
         var gm = _tweaks.FirstOrDefault(t => t.Id == "gamemode");
         var dvr = _tweaks.FirstOrDefault(t => t.Id == "gamedvr");
         try { gm?.Refresh(); dvr?.Refresh(); } catch { }
-        if (gm != null) list.Add(Item(gm.IsOn, "Modo de Jogo ligado", "O Windows prioriza o jogo.", "Desligado: ligue em RESET OTIMIZA."));
+        if (gm != null) list.Add(Item(gm.IsOn, "Modo de Jogo ligado", "O Windows prioriza o jogo.", "Desligado: ligue em Arsenal › Otimização."));
         if (dvr != null) list.Add(Item(dvr.IsOn, "Gravação em segundo plano desligada", "O Game Bar não grava o tempo todo.",
                                        "O Game DVR está gravando: custa FPS."));
 

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Session;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 public sealed record FrameStats(int ProcessId, string ProcessName, double Fps, double FrameTimeMs, double Low1Fps,
                                 IReadOnlyList<double> RecentFrameTimes);
@@ -15,7 +15,7 @@ public sealed record FrameStats(int ProcessId, string ProcessName, double Fps, d
 /// </summary>
 public sealed class FrameMonitor : IDisposable
 {
-    private const string SessionName = "ResetExplode-Frames";
+    private const string SessionName = "FortKnox-Frames";
     private static readonly Guid DxgiProvider = new("CA11C036-0102-4A2D-A6AD-F03CFED5D3C9");
     private static readonly Guid D3D9Provider = new("783ACA0A-790E-4D7F-8451-AA850511C6B9");
     private const int DxgiPresentStart = 42, D3D9PresentStart = 1;
@@ -35,6 +35,9 @@ public sealed class FrameMonitor : IDisposable
         if (Running) return;
         try
         {
+            // Legado: o app antigo usava outro nome de sessão. Se ele foi fechado à força, a sessão ficou órfã no Windows.
+            try { TraceEventSession.GetActiveSession("ResetExplode-Frames")?.Dispose(); } catch { }
+
             // Opção Create derruba uma sessão antiga com o mesmo nome (ex.: app fechado à força).
             _session = new TraceEventSession(SessionName, TraceEventSessionOptions.Create) { StopOnDispose = true };
             _session.EnableProvider(DxgiProvider, TraceEventLevel.Informational, ulong.MaxValue, null);

@@ -1,7 +1,7 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Threading;
 
-namespace ResetExplode;
+namespace FortKnox;
 
 /// <summary>Páginas Energia (bateria e fonte) e Rede (diagnóstico de lag).</summary>
 public partial class MainWindow
@@ -74,6 +74,9 @@ public partial class MainWindow
         }
     }
 
+    /// <summary>Ao sair da página Rede (ou fechar o app): encerra o rastreio e a sessão ETW do monitor de consumo.</summary>
+    private void StopNetTools() => NetTools.StopAll();
+
     // ================= Tema (escuro / claro) =================
 
     private void Theme_Click(object sender, RoutedEventArgs e)
@@ -84,13 +87,11 @@ public partial class MainWindow
         UpdateThemeButton();
     }
 
-    /// <summary>Mostra o ícone do modo para onde o clique leva (sol = ir para o claro, lua = ir para o escuro) e troca o logo.</summary>
+    /// <summary>Mostra o ícone do modo para onde o clique leva (sol = ir para o claro, lua = ir para o escuro). O símbolo da marca é vetorial e serve nos dois modos.</summary>
     private void UpdateThemeButton()
     {
         bool light = ThemeManager.IsLight;
         BtnTheme.Content = light ? "\uE708" : "\uE706";
         BtnTheme.ToolTip = light ? "Modo escuro" : "Modo claro";
-        TitleLogo.Source = new System.Windows.Media.Imaging.BitmapImage(
-            new Uri(light ? "pack://application:,,,/Assets/logo-dark.png" : "pack://application:,,,/Assets/logo.png"));
     }
 }

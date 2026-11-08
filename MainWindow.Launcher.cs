@@ -1,11 +1,11 @@
-﻿using System.IO;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Win32;
 
-namespace ResetExplode;
+namespace FortKnox;
 
-/// <summary>Aba RESET JOGOS: lista os jogos instalados, guarda um perfil por jogo e inicia aplicando o perfil.</summary>
+/// <summary>Aba ARENA: lista os jogos instalados, guarda um perfil por jogo e inicia aplicando o perfil.</summary>
 public partial class MainWindow
 {
     private List<LibGame> _libGames = new();
@@ -251,7 +251,7 @@ public partial class MainWindow
                 var ask = MessageBox.Show(this,
                     "A Steam precisa ser fechada para gravar as opções de inicialização (senão ela as sobrescreve ao sair).\n\n" +
                     "Fechar a Steam agora? Jogos abertos serão encerrados. Feito um backup do arquivo antes de alterar.",
-                    "RESET JOGOS · Steam", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    "ARENA · Steam", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (ask != MessageBoxResult.Yes) return;
                 LStatus.Text = "Fechando a Steam…";
                 if (!await SteamInfo.ShutdownAsync()) { LStatus.Text = "A Steam não fechou. Feche-a manualmente e tente de novo."; return; }

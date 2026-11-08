@@ -1,9 +1,9 @@
-﻿using System.Diagnostics.Eventing.Reader;
+using System.Diagnostics.Eventing.Reader;
 using System.Management;
 
-namespace ResetExplode;
+namespace FortKnox;
 
-/// <summary>Apoio da aba RESET OC: procura erros de hardware no registro do Windows e identifica a placa-mãe.</summary>
+/// <summary>Apoio da aba FORJA · OVERCLOCK: procura erros de hardware no registro do Windows e identifica a placa-mãe.</summary>
 public static class OcCheck
 {
     /// <summary>Conta erros WHEA (CPU/RAM/PCIe) e reinícios do driver de vídeo desde o instante informado.</summary>

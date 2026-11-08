@@ -1,0 +1,141 @@
+<UserControl x:Class="FortKnox.PdfView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             AllowDrop="True" DragOver="View_DragOver" Drop="View_Drop">
+
+    <UserControl.Resources>
+        <Style x:Key="PdfMuted" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Muted}"/>
+        </Style>
+        <Style x:Key="PdfMono" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource Mono}"/>
+            <Setter Property="Foreground" Value="{DynamicResource Muted}"/>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel x:Name="PdfRoot" Margin="36,30,36,30">
+
+            <TextBlock Text="PRENSA · PDF" Style="{StaticResource H1}"/>
+            <TextBlock Text="Mesclar, dividir, comprimir e extrair texto · tudo local, seus arquivos não saem do computador · arraste PDFs para esta tela"
+                       Style="{StaticResource Sub}" TextWrapping="Wrap" Margin="0,4,0,18"/>
+
+            <!-- Progresso -->
+            <Grid Height="3" Margin="0,0,0,8" Background="{DynamicResource Line}">
+                <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
+                    <Border.RenderTransform><ScaleTransform x:Name="PBar" ScaleX="0"/></Border.RenderTransform>
+                </Border>
+            </Grid>
+            <Grid Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="PStatus" Text="Escolha uma operação." Foreground="{DynamicResource Muted}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button x:Name="PBtnReveal" Style="{StaticResource OutlineButton}" Content="MOSTRAR NA PASTA" Padding="12,6" FontSize="11"
+                            Margin="12,0,0,0" Visibility="Collapsed" Click="PReveal_Click"/>
+                    <Button x:Name="PBtnCancel" Style="{StaticResource OutlineButton}" Content="CANCELAR" Padding="12,6" FontSize="11"
+                            Margin="8,0,0,0" Visibility="Collapsed" Click="PCancel_Click"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Abas -->
+            <WrapPanel Margin="0,0,0,16">
+                <RadioButton Style="{StaticResource Chip}" GroupName="PdfTab" Content="MESCLAR" Tag="merge" IsChecked="True" Checked="PTab_Checked" Margin="0,0,6,0"/>
+                <RadioButton Style="{StaticResource Chip}" GroupName="PdfTab" Content="DIVIDIR" Tag="split" Checked="PTab_Checked" Margin="0,0,6,0"/>
+                <RadioButton Style="{StaticResource Chip}" GroupName="PdfTab" Content="COMPRIMIR" Tag="compress" Checked="PTab_Checked" Margin="0,0,6,0"/>
+                <RadioButton Style="{StaticResource Chip}" GroupName="PdfTab" Content="EXTRAIR TEXTO" Tag="text" Checked="PTab_Checked"/>
+            </WrapPanel>
+
+            <!-- Arquivo (abas dividir / comprimir / extrair) -->
+            <Border x:Name="PFileCard" Style="{StaticResource CardBorder}" Margin="0,0,0,16" Visibility="Collapsed">
+                <StackPanel>
+                    <TextBlock Text="ARQUIVO PDF" Style="{StaticResource Label}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="PFilePath" IsReadOnly="True" Tag="Nenhum arquivo escolhido (ou arraste um PDF para cá)"/>
+                        <Button Grid.Column="1" Style="{StaticResource OutlineButton}" Content="ESCOLHER…" Padding="14,8" Margin="8,0,0,0" Click="PChooseFile_Click"/>
+                    </Grid>
+                    <TextBlock x:Name="PFileInfo" Style="{StaticResource PdfMuted}" FontSize="12" Margin="0,8,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- MESCLAR -->
+            <Border x:Name="PanelMerge" Style="{StaticResource CardBorder}">
+                <StackPanel>
+                    <TextBlock Text="PDFs NA ORDEM DA MESCLAGEM" Style="{StaticResource Label}"/>
+                    <DataGrid x:Name="PMergeGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserResizeColumns="False"
+                              MinHeight="120" MaxHeight="320" Margin="0,0,0,12">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="#" Binding="{Binding Order}" Width="40" ElementStyle="{StaticResource PdfMono}"/>
+                            <DataGridTextColumn Header="ARQUIVO" Binding="{Binding Name}" Width="*"/>
+                            <DataGridTextColumn Header="PÁGINAS" Binding="{Binding Pages}" Width="90" ElementStyle="{StaticResource PdfMono}"/>
+                            <DataGridTextColumn Header="TAMANHO" Binding="{Binding Size}" Width="100" ElementStyle="{StaticResource PdfMono}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <TextBlock x:Name="PMergeEmpty" Text="Adicione 2 ou mais PDFs (botão abaixo ou arrastando para a tela)." Style="{StaticResource PdfMuted}" Margin="0,0,0,12"/>
+                    <WrapPanel>
+                        <Button Style="{StaticResource OutlineButton}" Content="ADICIONAR…" Padding="12,7" FontSize="11" Margin="0,0,8,8" Click="PMergeAdd_Click"/>
+                        <Button Style="{StaticResource OutlineButton}" Content="REMOVER" Padding="12,7" FontSize="11" Margin="0,0,8,8" Click="PMergeRemove_Click"/>
+                        <Button Style="{StaticResource OutlineButton}" Content="SUBIR" Padding="12,7" FontSize="11" Margin="0,0,8,8" Click="PMergeUp_Click"/>
+                        <Button Style="{StaticResource OutlineButton}" Content="DESCER" Padding="12,7" FontSize="11" Margin="0,0,8,8" Click="PMergeDown_Click"/>
+                        <Button Style="{StaticResource OutlineButton}" Content="LIMPAR" Padding="12,7" FontSize="11" Margin="0,0,20,8" Click="PMergeClear_Click"/>
+                        <Button x:Name="PBtnMerge" Style="{StaticResource PrimaryButton}" Content="MESCLAR" Padding="22,8" Margin="0,0,0,8" Click="PMerge_Click"/>
+                    </WrapPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- DIVIDIR -->
+            <Border x:Name="PanelSplit" Style="{StaticResource CardBorder}" Visibility="Collapsed">
+                <StackPanel>
+                    <TextBlock Text="INTERVALOS" Style="{StaticResource Label}"/>
+                    <TextBox x:Name="PRanges" Tag="ex.: 1-3,5,8-   (vazio = um arquivo por página)" Margin="0,0,0,6"/>
+                    <TextBlock Text="Cada intervalo vira um arquivo. &quot;8-&quot; significa da página 8 até o fim." Style="{StaticResource PdfMuted}" FontSize="11" Margin="0,0,0,14"/>
+                    <TextBlock Text="PASTA DE SAÍDA" Style="{StaticResource Label}"/>
+                    <Grid Margin="0,0,0,14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:Name="PSplitDir" Tag="Por padrão, a mesma pasta do PDF"/>
+                        <Button Grid.Column="1" Style="{StaticResource OutlineButton}" Content="PASTA…" Padding="14,8" Margin="8,0,0,0" Click="PSplitDir_Click"/>
+                    </Grid>
+                    <Button x:Name="PBtnSplit" Style="{StaticResource PrimaryButton}" Content="DIVIDIR" Padding="22,8" HorizontalAlignment="Left" Click="PSplit_Click"/>
+                </StackPanel>
+            </Border>
+
+            <!-- COMPRIMIR -->
+            <Border x:Name="PanelCompress" Style="{StaticResource CardBorder}" Visibility="Collapsed">
+                <StackPanel>
+                    <TextBlock Text="NÍVEL" Style="{StaticResource Label}"/>
+                    <WrapPanel Margin="0,0,0,8">
+                        <RadioButton Style="{StaticResource Chip}" GroupName="PdfLevel" Content="LEVE" Tag="low" Margin="0,0,6,0" Checked="PLevel_Checked"/>
+                        <RadioButton Style="{StaticResource Chip}" GroupName="PdfLevel" Content="MÉDIO" Tag="medium" IsChecked="True" Margin="0,0,6,0" Checked="PLevel_Checked"/>
+                        <RadioButton Style="{StaticResource Chip}" GroupName="PdfLevel" Content="FORTE" Tag="high" Checked="PLevel_Checked"/>
+                    </WrapPanel>
+                    <TextBlock x:Name="PLevelHint" Style="{StaticResource PdfMuted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                    <TextBlock Style="{StaticResource PdfMuted}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,14"
+                               Text="A redução vem de recomprimir as imagens JPEG do PDF. Texto, fontes e vetores não são alterados. O original nunca é modificado: o resultado é salvo em outro arquivo, e só se ficar menor."/>
+                    <Button x:Name="PBtnCompress" Style="{StaticResource PrimaryButton}" Content="COMPRIMIR" Padding="22,8" HorizontalAlignment="Left" Click="PCompress_Click"/>
+                </StackPanel>
+            </Border>
+
+            <!-- EXTRAIR TEXTO -->
+            <Border x:Name="PanelText" Style="{StaticResource CardBorder}" Visibility="Collapsed">
+                <StackPanel>
+                    <Button x:Name="PBtnExtract" Style="{StaticResource PrimaryButton}" Content="EXTRAIR TEXTO" Padding="22,8" HorizontalAlignment="Left" Margin="0,0,0,14" Click="PExtract_Click"/>
+                    <TextBox x:Name="PText" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" FontFamily="{StaticResource Mono}" FontSize="12"
+                             MinHeight="160" MaxHeight="380" VerticalScrollBarVisibility="Auto" Tag="O texto extraído aparece aqui."/>
+                    <WrapPanel Margin="0,12,0,0">
+                        <Button x:Name="PBtnSaveTxt" Style="{StaticResource OutlineButton}" Content="SALVAR COMO .TXT" Padding="12,7" FontSize="11" Margin="0,0,8,0" IsEnabled="False" Click="PSaveTxt_Click"/>
+                        <Button x:Name="PBtnCopyTxt" Style="{StaticResource OutlineButton}" Content="COPIAR TUDO" Padding="12,7" FontSize="11" IsEnabled="False" Click="PCopyTxt_Click"/>
+                    </WrapPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
