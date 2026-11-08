@@ -4,8 +4,8 @@
         xmlns:local="clr-namespace:FortKnox"
         Title="Fort Knox" Icon="Assets/app.ico" Width="1320" Height="840" MinWidth="1120" MinHeight="660"
         WindowStartupLocation="CenterScreen" WindowStyle="None" ResizeMode="CanResize"
-        Background="{DynamicResource Bg}" Foreground="{DynamicResource Fg}"
-        FontFamily="Segoe UI Variable Text, Segoe UI" FontSize="13"
+        Background="{DynamicResource WindowBg}" Foreground="{DynamicResource Fg}"
+        FontFamily="{StaticResource Text}" FontSize="13"
         UseLayoutRounding="True" TextOptions.TextFormattingMode="Display">
 
     <WindowChrome.WindowChrome>
@@ -87,7 +87,7 @@
                 <TextBlock Grid.Column="1" Text="{Binding Value}" FontFamily="{StaticResource Mono}" HorizontalAlignment="Right"
                            TextTrimming="CharacterEllipsis"/>
                 <Grid Grid.Row="1" Grid.ColumnSpan="2" Height="4" Margin="0,6,0,0" Background="{DynamicResource Line}">
-                    <Border Background="{DynamicResource Fg}" RenderTransformOrigin="0,0.5">
+                    <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
                         <Border.RenderTransform>
                             <ScaleTransform ScaleX="{Binding Fraction}"/>
                         </Border.RenderTransform>
@@ -120,11 +120,12 @@
 
             <!-- ===== Barra de título (marca + página atual + botões da janela) ===== -->
             <StackPanel Grid.ColumnSpan="2" Orientation="Horizontal" Margin="30,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
-                <Image x:Name="TitleLogo" Source="Assets/logo.png" Width="22" Height="22" Margin="0,0,12,0" VerticalAlignment="Center"
-                       RenderOptions.BitmapScalingMode="HighQuality"/>
-                <TextBlock Text="RESET" FontWeight="Bold" FontSize="13" VerticalAlignment="Center"/>
-                <TextBlock Text=" EXPLODE" FontWeight="Light" FontSize="13" VerticalAlignment="Center"/>
-                <TextBlock x:Name="TitlePage" Foreground="{DynamicResource Faint}" FontSize="13" Margin="16,0,0,0" VerticalAlignment="Center"/>
+                <!-- Assinatura da marca: símbolo Bastião + logotipo FORT ⬟ KNOX (vetores de Brand.xaml) -->
+                <Image x:Name="TitleLogo" Source="{StaticResource BrandSymbol}" Width="22" Height="23" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                <Image Source="{StaticResource BrandWordmark}" Height="11" VerticalAlignment="Center" Margin="0,1,0,0"/>
+                <Border Width="1" Height="16" Background="{DynamicResource LineStrong}" Margin="18,0,16,0" VerticalAlignment="Center"/>
+                <TextBlock x:Name="TitlePage" Foreground="{DynamicResource Muted}" FontFamily="{StaticResource Mono}" FontSize="11.5"
+                           VerticalAlignment="Center"/>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right"
                         WindowChrome.IsHitTestVisibleInChrome="True">
@@ -135,13 +136,13 @@
             </StackPanel>
 
             <!-- ===== Menu lateral por categorias (painel arredondado, sempre visível) ===== -->
-            <Border x:Name="Sidebar" Grid.Row="1" Margin="14,0,0,14" Background="{DynamicResource Panel}"
-                    BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="20">
+            <Border x:Name="Sidebar" Grid.Row="1" Margin="14,0,0,14" Background="{DynamicResource PanelFill}"
+                    BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="8">
                 <DockPanel>
                     <!-- Rodapé: aviso de sensores + leitura ao vivo compacta -->
                     <StackPanel DockPanel.Dock="Bottom" Margin="16,6,16,16">
-                        <Border x:Name="CpuSensorWarn" Visibility="Collapsed" BorderBrush="{DynamicResource Fg}" BorderThickness="1"
-                                CornerRadius="12" Padding="12,10" Margin="0,0,0,12">
+                        <Border x:Name="CpuSensorWarn" Visibility="Collapsed" BorderBrush="{DynamicResource Danger}" BorderThickness="1"
+                                CornerRadius="8" Padding="12,10" Margin="0,0,0,12">
                             <StackPanel>
                                 <TextBlock Text="Sem temperatura e consumo da CPU" FontWeight="SemiBold" FontSize="12" TextWrapping="Wrap"/>
                                 <TextBlock x:Name="CpuSensorWarnText" Foreground="{DynamicResource Muted}" FontSize="11" TextWrapping="Wrap" Margin="0,3,0,8"/>
@@ -149,7 +150,7 @@
                                         Click="BtnFixCpuSensors_Click"/>
                             </StackPanel>
                         </Border>
-                        <Border Background="{DynamicResource Card}" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="14" Padding="14,10">
+                        <Border Background="{DynamicResource CardFill}" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="8" Padding="14,10">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="46"/>
@@ -161,17 +162,21 @@
                                     <RowDefinition/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="CPU" Foreground="{DynamicResource Faint}" FontSize="10.5" FontWeight="Bold" Margin="0,3" VerticalAlignment="Center"/>
+                                <TextBlock Text="CPU" Foreground="{DynamicResource AccentText}" FontFamily="{StaticResource Mono}" FontSize="10" FontWeight="Bold" Margin="0,3" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="SideTemp" Grid.Column="1" Text="—" FontFamily="{StaticResource Mono}" FontSize="12" Margin="0,3"/>
                                 <TextBlock x:Name="SideLoad" Grid.Column="2" Text="—" FontFamily="{StaticResource Mono}" FontSize="12" Foreground="{DynamicResource Muted}" Margin="0,3"/>
-                                <TextBlock Grid.Row="1" Text="GPU" Foreground="{DynamicResource Faint}" FontSize="10.5" FontWeight="Bold" Margin="0,3" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Row="1" Text="GPU" Foreground="{DynamicResource AccentText}" FontFamily="{StaticResource Mono}" FontSize="10" FontWeight="Bold" Margin="0,3" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="SideGpuTemp" Grid.Row="1" Grid.Column="1" Text="—" FontFamily="{StaticResource Mono}" FontSize="12" Margin="0,3"/>
                                 <TextBlock x:Name="SideGpuLoad" Grid.Row="1" Grid.Column="2" Text="—" FontFamily="{StaticResource Mono}" FontSize="12" Foreground="{DynamicResource Muted}" Margin="0,3"/>
-                                <TextBlock Grid.Row="2" Text="TESTE" Foreground="{DynamicResource Faint}" FontSize="10.5" FontWeight="Bold" Margin="0,3" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Row="2" Text="TESTE" Foreground="{DynamicResource AccentText}" FontFamily="{StaticResource Mono}" FontSize="10" FontWeight="Bold" Margin="0,3" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="SideStress" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Text="parado" FontFamily="{StaticResource Mono}" FontSize="12" Margin="0,3"/>
                             </Grid>
                         </Border>
-                        <TextBlock x:Name="SideVersion" Text="v0.16" Foreground="{DynamicResource Faint}" FontSize="11" Margin="4,10,0,0"/>
+                        <DockPanel Margin="4,12,2,0">
+                            <Image Source="{StaticResource BrandSymbol}" Width="12" Height="12.5" Margin="0,0,8,0" VerticalAlignment="Center" Opacity="0.85"/>
+                            <TextBlock x:Name="SideVersion" Text="v0.16" Foreground="{DynamicResource Faint}" FontFamily="{StaticResource Mono}" FontSize="10.5" VerticalAlignment="Center"/>
+                            <TextBlock Text="OFFLINE" HorizontalAlignment="Right" Foreground="{DynamicResource Faint}" FontFamily="{StaticResource Mono}" FontSize="10" VerticalAlignment="Center"/>
+                        </DockPanel>
                     </StackPanel>
 
                     <!-- Navegação por categorias -->
@@ -180,10 +185,11 @@
                             <RadioButton x:Name="NavDash" Style="{StaticResource NavItem}" Tag="PageDash" Checked="Nav_Checked" IsChecked="True">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE80F;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Visão geral" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Painel" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
-                            <ToggleButton x:Name="GrpExplode" Style="{StaticResource NavGroup}" Content="Fort Knox"/>
+                            <Border Height="1" Background="{DynamicResource Line}" Margin="22,10,22,6"/>
+                            <ToggleButton x:Name="GrpExplode" Style="{StaticResource NavGroup}" Content="SENTINELA"/>
                             <StackPanel x:Name="GrpExplodeItems" Margin="10,0,0,4" Visibility="{Binding IsChecked, ElementName=GrpExplode, Converter={StaticResource BoolVis}}">
                             <RadioButton x:Name="NavSystem" Style="{StaticResource NavItem}" Tag="PageSystem" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
@@ -215,41 +221,8 @@
                                     <TextBlock Text="Energia" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
-                            <RadioButton x:Name="NavNet" Style="{StaticResource NavItem}" Tag="PageNet" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE839;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Rede" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
                             </StackPanel>
-                            <ToggleButton x:Name="GrpGames" Style="{StaticResource NavGroup}" Content="RESET JOGOS"/>
-                            <StackPanel x:Name="GrpGamesItems" Margin="10,0,0,4" Visibility="{Binding IsChecked, ElementName=GrpGames, Converter={StaticResource BoolVis}}">
-                            <RadioButton x:Name="NavLauncher" Style="{StaticResource NavItem}" Tag="PageLauncher" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE8F1;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Biblioteca" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavGames" Style="{StaticResource NavItem}" Tag="PageGames" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xEC49;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="FPS estimado" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavBottleneck" Style="{StaticResource NavItem}" Tag="PageBottleneck" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE9D2;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Gargalo" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavOverlay" Style="{StaticResource NavItem}" Tag="PageOverlay" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE81E;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Overlay" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            </StackPanel>
-                            <ToggleButton x:Name="GrpPerf" Style="{StaticResource NavGroup}" Content="RESET DESEMPENHO"/>
+                            <ToggleButton x:Name="GrpPerf" Style="{StaticResource NavGroup}" Content="FORJA"/>
                             <StackPanel x:Name="GrpPerfItems" Margin="10,0,0,4" Visibility="{Binding IsChecked, ElementName=GrpPerf, Converter={StaticResource BoolVis}}">
                             <RadioButton x:Name="NavBench" Style="{StaticResource NavItem}" Tag="PageBench" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
@@ -270,7 +243,28 @@
                                 </StackPanel>
                             </RadioButton>
                             </StackPanel>
-                            <ToggleButton x:Name="GrpTools" Style="{StaticResource NavGroup}" Content="RESET FERRAMENTAS"/>
+                            <ToggleButton x:Name="GrpGames" Style="{StaticResource NavGroup}" Content="ARENA"/>
+                            <StackPanel x:Name="GrpGamesItems" Margin="10,0,0,4" Visibility="{Binding IsChecked, ElementName=GrpGames, Converter={StaticResource BoolVis}}">
+                            <RadioButton x:Name="NavLauncher" Style="{StaticResource NavItem}" Tag="PageLauncher" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE8F1;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Biblioteca" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavGames" Style="{StaticResource NavItem}" Tag="PageGames" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xEC49;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="FPS estimado" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavBottleneck" Style="{StaticResource NavItem}" Tag="PageBottleneck" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE9D2;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Gargalo" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
+                            </StackPanel>
+                            <ToggleButton x:Name="GrpTools" Style="{StaticResource NavGroup}" Content="ARSENAL"/>
                             <StackPanel x:Name="GrpToolsItems" Margin="10,0,0,4" Visibility="{Binding IsChecked, ElementName=GrpTools, Converter={StaticResource BoolVis}}">
                             <RadioButton x:Name="NavOptimize" Style="{StaticResource NavItem}" Tag="PageOptimize" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
@@ -290,32 +284,8 @@
                                     <TextBlock Text="Instalar apps" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
-                            <RadioButton x:Name="NavDriver" Style="{StaticResource NavItem}" Tag="PageDriver" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE896;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Drivers" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavInteg" Style="{StaticResource NavItem}" Tag="PageInteg" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE790;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Integração" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavVault" Style="{StaticResource NavItem}" Tag="PageVault" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE72E;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Vault de senhas" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavPdf" Style="{StaticResource NavItem}" Tag="PagePdf" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE8A5;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="PDF" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
                             </StackPanel>
-                            <ToggleButton x:Name="GrpMaker" Style="{StaticResource NavGroup}" Content="RESET MAKER"/>
+                            <ToggleButton x:Name="GrpMaker" Style="{StaticResource NavGroup}" Content="OFICINA"/>
                             <StackPanel x:Name="GrpMakerItems" Margin="10,0,0,4" Visibility="{Binding IsChecked, ElementName=GrpMaker, Converter={StaticResource BoolVis}}">
                             <RadioButton x:Name="NavMakerPorts" Style="{StaticResource NavItem}" Tag="PageMakerPorts" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
@@ -330,6 +300,58 @@
                                 </StackPanel>
                             </RadioButton>
                             </StackPanel>
+                            <Border Height="1" Background="{DynamicResource Line}" Margin="22,10,22,6"/>
+                            <RadioButton x:Name="NavNet" Style="{StaticResource NavItem}" Tag="PageNet" Checked="Nav_Checked">
+                                <DockPanel>
+                                    <TextBlock Text="&#xE839;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock DockPanel.Dock="Right" Text="rede" Foreground="{DynamicResource Faint}" FontSize="11" VerticalAlignment="Center" Margin="6,0,4,0"/>
+                                    <TextBlock Text="Radar" VerticalAlignment="Center"/>
+                                </DockPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavOverlay" Style="{StaticResource NavItem}" Tag="PageOverlay" Checked="Nav_Checked">
+                                <DockPanel>
+                                    <TextBlock Text="&#xE81E;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock DockPanel.Dock="Right" Text="overlay" Foreground="{DynamicResource Faint}" FontSize="11" VerticalAlignment="Center" Margin="6,0,4,0"/>
+                                    <TextBlock Text="Vigia" VerticalAlignment="Center"/>
+                                </DockPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavDriver" Style="{StaticResource NavItem}" Tag="PageDriver" Checked="Nav_Checked">
+                                <DockPanel>
+                                    <TextBlock Text="&#xE896;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock DockPanel.Dock="Right" Text="drivers" Foreground="{DynamicResource Faint}" FontSize="11" VerticalAlignment="Center" Margin="6,0,4,0"/>
+                                    <TextBlock Text="Alicerce" VerticalAlignment="Center"/>
+                                </DockPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavInteg" Style="{StaticResource NavItem}" Tag="PageInteg" Checked="Nav_Checked">
+                                <DockPanel>
+                                    <TextBlock Text="&#xE790;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock DockPanel.Dock="Right" Text="RGB" Foreground="{DynamicResource Faint}" FontSize="11" VerticalAlignment="Center" Margin="6,0,4,0"/>
+                                    <TextBlock Text="Prisma" VerticalAlignment="Center"/>
+                                </DockPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavVault" Style="{StaticResource NavItem}" Tag="PageVault" Checked="Nav_Checked">
+                                <DockPanel>
+                                    <TextBlock Text="&#xE72E;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock DockPanel.Dock="Right" Text="senhas" Foreground="{DynamicResource Faint}" FontSize="11" VerticalAlignment="Center" Margin="6,0,4,0"/>
+                                    <TextBlock Text="Cofre" VerticalAlignment="Center"/>
+                                </DockPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavPdf" Style="{StaticResource NavItem}" Tag="PagePdf" Checked="Nav_Checked">
+                                <DockPanel>
+                                    <TextBlock Text="&#xE8A5;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock DockPanel.Dock="Right" Text="PDF" Foreground="{DynamicResource Faint}" FontSize="11" VerticalAlignment="Center" Margin="6,0,4,0"/>
+                                    <TextBlock Text="Prensa" VerticalAlignment="Center"/>
+                                </DockPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="NavShield" Style="{StaticResource NavItem}" IsEnabled="False" ToolTip="Antivírus offline: em breve">
+                                <DockPanel>
+                                    <TextBlock Text="&#xEA18;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <Border DockPanel.Dock="Right" BorderBrush="{DynamicResource Danger}" BorderThickness="1" CornerRadius="3" Padding="5,0" Margin="6,0,4,0" VerticalAlignment="Center">
+                                        <TextBlock Text="EM BREVE" Foreground="{DynamicResource Danger}" FontFamily="{StaticResource Mono}" FontSize="9"/>
+                                    </Border>
+                                    <TextBlock Text="Muralha" VerticalAlignment="Center"/>
+                                </DockPanel>
+                            </RadioButton>
                         </StackPanel>
                     </ScrollViewer>
                 </DockPanel>
@@ -341,6 +363,22 @@
                 <!-- ===== VISÃO GERAL (painel) ===== -->
                 <ScrollViewer x:Name="PageDash" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="20,6,24,20">
+
+                        <!-- Cabeçalho do Painel: nome do módulo + assinatura da marca -->
+                        <Grid Margin="4,2,0,18">
+                            <StackPanel>
+                                <TextBlock Text="PAINEL" Style="{StaticResource H1}"/>
+                                <TextBlock Text="Seu PC, blindado. Inviolável, offline e tudo em um só lugar." Style="{StaticResource Sub}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <Border BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="4" Padding="10,4" Margin="0,0,8,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Ellipse Width="6" Height="6" Fill="{DynamicResource Ok}" VerticalAlignment="Center" Margin="0,0,7,0"/>
+                                        <TextBlock Text="OFFLINE · SEM TELEMETRIA" FontFamily="{StaticResource Mono}" FontSize="10" Foreground="{DynamicResource Muted}"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
 
                         <!-- Linha 1: gráfico grande + desempenho -->
                         <Grid Margin="0,0,0,16">
@@ -378,7 +416,7 @@
                                     </Grid>
                                     <Canvas x:Name="DashChart" Height="210" ClipToBounds="True" SizeChanged="DashChart_SizeChanged"/>
                                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                                        <Rectangle Width="14" Height="2" Fill="{DynamicResource Fg}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                        <Rectangle Width="14" Height="2" Fill="{DynamicResource Accent}" VerticalAlignment="Center" Margin="0,0,6,0"/>
                                         <TextBlock Text="CPU" Foreground="{DynamicResource Muted}" FontSize="11" Margin="0,0,16,0"/>
                                         <Line X1="0" X2="14" Stroke="{DynamicResource Muted}" StrokeDashArray="3 2" VerticalAlignment="Center" Margin="0,0,6,0"/>
                                         <TextBlock Text="GPU" Foreground="{DynamicResource Muted}" FontSize="11"/>
@@ -392,9 +430,9 @@
                                     <Button DockPanel.Dock="Bottom" Style="{StaticResource PrimaryButton}" Content="RODAR BENCHMARK" Margin="0,14,0,0"
                                             Padding="20,13" Click="DashBench_Click"/>
                                     <StackPanel>
-                                        <TextBlock Text="DESEMPENHO · RESET BENCH" Style="{StaticResource Label}" Margin="0,0,0,4"/>
+                                        <TextBlock Text="DESEMPENHO · FORJA" Style="{StaticResource Label}" Margin="0,0,0,4"/>
                                         <Grid>
-                                            <TextBlock x:Name="DashScore" Text="—" Style="{StaticResource Hero}" FontFamily="{StaticResource Mono}"/>
+                                            <TextBlock x:Name="DashScore" Text="—" Style="{StaticResource Hero}"/>
                                             <TextBlock x:Name="DashScoreDelta" Foreground="{DynamicResource Muted}" FontSize="12"
                                                        HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                         </Grid>
@@ -402,7 +440,7 @@
                                         <Border Height="1" Background="{DynamicResource Line}" Margin="0,16"/>
                                         <ItemsControl x:Name="DashScores" ItemTemplate="{StaticResource KeyValueRow}"/>
                                         <!-- Caixa interna, como o widget de troca da referência -->
-                                        <Border Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="14"
+                                        <Border Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="8"
                                                 Padding="14,4" Margin="0,14,0,0">
                                             <StackPanel>
                                                 <Grid Margin="0,10">
@@ -526,8 +564,8 @@
                                                             <ColumnDefinition Width="*"/>
                                                             <ColumnDefinition Width="Auto"/>
                                                         </Grid.ColumnDefinitions>
-                                                        <Border Width="34" Height="34" CornerRadius="17" Background="{DynamicResource Fg}" Margin="0,0,12,0">
-                                                            <TextBlock Text="{Binding Icon}" FontFamily="{StaticResource Icons}" FontSize="14" Foreground="{DynamicResource Ink}"
+                                                        <Border Width="34" Height="34" CornerRadius="8" Background="{DynamicResource AccentSoft}" BorderBrush="{DynamicResource Accent}" BorderThickness="1" Margin="0,0,12,0">
+                                                            <TextBlock Text="{Binding Icon}" FontFamily="{StaticResource Icons}" FontSize="14" Foreground="{DynamicResource AccentText}"
                                                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                         </Border>
                                                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
@@ -549,7 +587,7 @@
                             <!-- Saúde do PC (como "Rewards"): lista de verificação + ação -->
                             <Border Grid.Column="4" Style="{StaticResource CardBorder}" Padding="22,20">
                                 <DockPanel>
-                                    <Button DockPanel.Dock="Bottom" Style="{StaticResource PrimaryButton}" Content="RESET OTIMIZA" Padding="20,13"
+                                    <Button DockPanel.Dock="Bottom" Style="{StaticResource PrimaryButton}" Content="OTIMIZAR AGORA" Padding="20,13"
                                             Margin="0,14,0,0" Click="DashOptimize_Click"/>
                                     <StackPanel>
                                         <TextBlock Text="Saúde do PC" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,10"/>
@@ -594,7 +632,7 @@
                     </Grid.RowDefinitions>
                     <Grid Margin="0,0,0,24">
                         <StackPanel Margin="0,0,200,0">
-                            <TextBlock Text="Sistema" Style="{StaticResource H1}"/>
+                            <TextBlock Text="SENTINELA · SISTEMA" Style="{StaticResource H1}"/>
                             <TextBlock x:Name="SystemSub" Text="Hardware e software detectados" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                         </StackPanel>
                         <Button x:Name="BtnReport" Style="{StaticResource OutlineButton}" Content="EXPORTAR RELATÓRIO" Padding="16,9"
@@ -644,7 +682,7 @@
                                                             <!-- Anel: trilha cinza = vazio, arco branco = usado -->
                                                             <Grid Width="84" Height="84" Margin="0,0,16,0" VerticalAlignment="Center">
                                                                 <Ellipse Width="72" Height="72" Stroke="{DynamicResource Line}" StrokeThickness="8"/>
-                                                                <Path Data="{Binding UsedArc}" Stroke="{DynamicResource Fg}" StrokeThickness="8" StrokeStartLineCap="Flat" StrokeEndLineCap="Flat"/>
+                                                                <Path Data="{Binding UsedArc}" Stroke="{DynamicResource Accent}" StrokeThickness="8" StrokeStartLineCap="Flat" StrokeEndLineCap="Flat"/>
                                                                 <TextBlock Text="{Binding UsedPercent}" FontFamily="{StaticResource Mono}" FontSize="15"
                                                                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                             </Grid>
@@ -673,7 +711,7 @@
                     <StackPanel Margin="36,30,36,30">
                         <Grid Margin="0,0,0,20">
                             <StackPanel Margin="0,0,160,0">
-                                <TextBlock Text="Discos" Style="{StaticResource H1}"/>
+                                <TextBlock Text="SENTINELA · DISCOS" Style="{StaticResource H1}"/>
                                 <TextBlock x:Name="DiskHealthStatus" Text="Saúde, desgaste e temperatura de cada disco" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                             </StackPanel>
                             <Button x:Name="BtnDiskRefresh" Style="{StaticResource OutlineButton}" Content="ATUALIZAR" Padding="18,9"
@@ -690,13 +728,13 @@
                                                     <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap"/>
                                                     <TextBlock Text="{Binding Meta}" Foreground="{DynamicResource Muted}" FontSize="12" Margin="0,3,0,0" TextWrapping="Wrap"/>
                                                 </StackPanel>
-                                                <Border HorizontalAlignment="Right" VerticalAlignment="Top" BorderBrush="{DynamicResource Fg}" BorderThickness="1" Padding="12,4">
+                                                <Border HorizontalAlignment="Right" VerticalAlignment="Top" BorderBrush="{DynamicResource Accent}" BorderThickness="1" CornerRadius="4" Padding="12,4">
                                                     <Border.Style>
                                                         <Style TargetType="Border">
                                                             <Setter Property="Background" Value="Transparent"/>
                                                             <Style.Triggers>
                                                                 <DataTrigger Binding="{Binding IsAlert}" Value="True">
-                                                                    <Setter Property="Background" Value="{DynamicResource Fg}"/>
+                                                                    <Setter Property="Background" Value="{DynamicResource Danger}"/>
                                                                 </DataTrigger>
                                                             </Style.Triggers>
                                                         </Style>
@@ -751,7 +789,7 @@
                     <StackPanel Margin="36,30,36,30">
                         <Grid Margin="0,0,0,20">
                             <StackPanel Margin="0,0,160,0">
-                                <TextBlock Text="Energia" Style="{StaticResource H1}"/>
+                                <TextBlock Text="SENTINELA · ENERGIA" Style="{StaticResource H1}"/>
                                 <TextBlock x:Name="EnergyStatus" Text="Bateria, fonte de energia e consumo" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                             </StackPanel>
                             <Button x:Name="BtnEnergyRefresh" Style="{StaticResource OutlineButton}" Content="ATUALIZAR" Padding="18,9"
@@ -770,14 +808,14 @@
                     <StackPanel Margin="36,30,36,30">
                         <Grid Margin="0,0,0,20">
                             <StackPanel Margin="0,0,160,0">
-                                <TextBlock Text="Rede" Style="{StaticResource H1}"/>
+                                <TextBlock Text="RADAR · REDE" Style="{StaticResource H1}"/>
                                 <TextBlock Text="Descubra se o lag vem do seu PC, do Wi-Fi ou do provedor" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                             </StackPanel>
                             <Button x:Name="BtnNetTest" Style="{StaticResource PrimaryButton}" Content="TESTAR" Padding="22,9"
                                     HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnNetTest_Click"/>
                         </Grid>
                         <Grid Height="3" Margin="0,0,0,8" Background="{DynamicResource Line}">
-                            <Border Background="{DynamicResource Fg}" RenderTransformOrigin="0,0.5">
+                            <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
                                 <Border.RenderTransform><ScaleTransform x:Name="NetProgress" ScaleX="0"/></Border.RenderTransform>
                             </Border>
                         </Grid>
@@ -792,19 +830,19 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- ===== RESET DRIVER ===== -->
+                <!-- ===== ALICERCE ===== -->
                 <ScrollViewer x:Name="PageDriver" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <Grid Margin="0,0,0,20">
                             <StackPanel Margin="0,0,190,0">
-                                <TextBlock Text="RESET DRIVER" Style="{StaticResource H1}"/>
+                                <TextBlock Text="ALICERCE · DRIVERS" Style="{StaticResource H1}"/>
                                 <TextBlock Text="Verifique, baixe e instale drivers · NVIDIA e AMD automáticos, fabricantes pela página oficial" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                             </StackPanel>
                             <Button x:Name="BtnDrvScan" Style="{StaticResource PrimaryButton}" Content="VERIFICAR TUDO" Padding="20,9"
                                     HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnDrvScan_Click"/>
                         </Grid>
                         <Grid Height="3" Margin="0,0,0,8" Background="{DynamicResource Line}">
-                            <Border Background="{DynamicResource Fg}" RenderTransformOrigin="0,0.5">
+                            <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
                                 <Border.RenderTransform><ScaleTransform x:Name="DrvProgress" ScaleX="0"/></Border.RenderTransform>
                             </Border>
                         </Grid>
@@ -902,12 +940,12 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- ===== RESET INTEGRAÇÃO (iluminação) ===== -->
+                <!-- ===== PRISMA (iluminação) ===== -->
                 <ScrollViewer x:Name="PageInteg" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <Grid Margin="0,0,0,20">
                             <StackPanel Margin="0,0,190,0">
-                                <TextBlock Text="RESET INTEGRAÇÃO" Style="{StaticResource H1}"/>
+                                <TextBlock Text="PRISMA · ILUMINAÇÃO" Style="{StaticResource H1}"/>
                                 <TextBlock Text="Iluminação e efeitos do PC · Corsair iCUE, OpenRGB (MSI, Gigabyte, ASUS...) e Razer Chroma (em teste)" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                             </StackPanel>
                             <Button x:Name="BtnLightConnect" Style="{StaticResource OutlineButton}" Content="CONECTAR TUDO" Padding="20,9"
@@ -1037,7 +1075,7 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- ===== RESET JOGOS (inicializador) ===== -->
+                <!-- ===== ARENA (inicializador) ===== -->
                 <Grid x:Name="PageLauncher" Margin="36,30,36,30" Visibility="Collapsed">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="320"/>
@@ -1053,7 +1091,7 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <StackPanel Grid.Row="0" Margin="0,0,0,14">
-                            <TextBlock Text="RESET JOGOS" Style="{StaticResource H1}"/>
+                            <TextBlock Text="ARENA · BIBLIOTECA" Style="{StaticResource H1}"/>
                             <TextBlock x:Name="LGameCount" Text="Procurando seus jogos…" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                         </StackPanel>
                         <StackPanel Grid.Row="1" Margin="0,0,0,10">
@@ -1167,7 +1205,7 @@
                                 <StackPanel>
                                     <TextBlock Text="PROGRAMAS AUXILIARES" Style="{StaticResource Label}"/>
                                     <TextBlock Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,6,0,10">
-                                        Ferramentas de terceiros que abrem antes do jogo (monitoramento, comandos, mixer de áudio, script...). O RESET JOGOS as abre
+                                        Ferramentas de terceiros que abrem antes do jogo (monitoramento, comandos, mixer de áudio, script...). A ARENA as abre
                                         sozinho ao clicar em JOGAR e pode fechá-las junto com o jogo. Nada é escrito nas opções da Steam.
                                     </TextBlock>
                                     <ItemsControl x:Name="LHelpers">
@@ -1200,7 +1238,7 @@
                     </Grid.RowDefinitions>
                     <Grid Margin="0,0,0,20">
                         <StackPanel>
-                            <TextBlock Text="Sensores" Style="{StaticResource H1}"/>
+                            <TextBlock Text="SENTINELA · SENSORES" Style="{StaticResource H1}"/>
                             <TextBlock x:Name="StatusText" Text="Lendo sensores…" Style="{StaticResource Sub}"/>
                         </StackPanel>
                         <TextBox x:Name="SensorSearch" Width="260" HorizontalAlignment="Right" VerticalAlignment="Center"
@@ -1240,7 +1278,7 @@
 
                     <Grid Margin="0,0,0,20">
                         <StackPanel>
-                            <TextBlock Text="Placa de vídeo" Style="{StaticResource H1}"/>
+                            <TextBlock Text="SENTINELA · PLACA DE VÍDEO" Style="{StaticResource H1}"/>
                             <TextBlock Text="Especificações completas e sensores em tempo real" Style="{StaticResource Sub}"/>
                         </StackPanel>
                         <WrapPanel x:Name="GpuChips" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
@@ -1316,7 +1354,7 @@
 
                     <Grid Margin="0,0,0,20">
                         <StackPanel>
-                            <TextBlock Text="Jogos" Style="{StaticResource H1}"/>
+                            <TextBlock Text="ARENA · FPS ESTIMADO" Style="{StaticResource H1}"/>
                             <TextBlock x:Name="GamesSub" Text="FPS esperado no seu PC" Style="{StaticResource Sub}"/>
                         </StackPanel>
                         <TextBox x:Name="GameSearch" Width="260" HorizontalAlignment="Right" VerticalAlignment="Center"
@@ -1401,7 +1439,7 @@
                                             </Grid>
                                             <!-- Barra: escala até 240 FPS -->
                                             <Grid Height="3" Margin="0,8,0,8" Background="{DynamicResource Line}">
-                                                <Border Background="{DynamicResource Fg}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5">
+                                                <Border Background="{StaticResource GoldGradient}" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5">
                                                     <Border.RenderTransform>
                                                         <ScaleTransform ScaleX="{Binding Bar}"/>
                                                     </Border.RenderTransform>
@@ -1425,7 +1463,7 @@
                 <ScrollViewer x:Name="PageBottleneck" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="Detector de gargalo" Style="{StaticResource H1}"/>
+                            <TextBlock Text="ARENA · GARGALO" Style="{StaticResource H1}"/>
                             <TextBlock Text="Descobre o que está limitando o seu FPS: GPU, CPU, memória ou temperatura" Style="{StaticResource Sub}"/>
                         </StackPanel>
 
@@ -1449,7 +1487,7 @@
                                         <Border Height="4" Background="{DynamicResource Line}" VerticalAlignment="Center"/>
                                         <Border Width="2" Height="10" Background="{DynamicResource Faint}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         <Canvas x:Name="BnBalanceCanvas" SizeChanged="BnBalanceCanvas_SizeChanged">
-                                            <Ellipse x:Name="BnBalanceDot" Width="14" Height="14" Fill="{DynamicResource Fg}" Canvas.Top="4"/>
+                                            <Ellipse x:Name="BnBalanceDot" Width="14" Height="14" Fill="{StaticResource GoldGradient}" Canvas.Top="4"/>
                                         </Canvas>
                                     </Grid>
                                     <Grid>
@@ -1527,7 +1565,7 @@
                 <ScrollViewer x:Name="PageOverlay" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="Overlay" Style="{StaticResource H1}"/>
+                            <TextBlock Text="VIGIA · OVERLAY" Style="{StaticResource H1}"/>
                             <TextBlock Text="FPS, frametime e sensores por cima do jogo" Style="{StaticResource Sub}"/>
                         </StackPanel>
 
@@ -1598,7 +1636,7 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- ===== RESET BENCH ===== -->
+                <!-- ===== FORJA ===== -->
                 <Grid x:Name="PageBench" Margin="36,30,36,30" Visibility="Collapsed">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -1606,7 +1644,7 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <StackPanel Margin="0,0,0,16">
-                        <TextBlock Text="RESET BENCH" Style="{StaticResource H1}"/>
+                        <TextBlock Text="FORJA · BENCHMARK" Style="{StaticResource H1}"/>
                         <TextBlock x:Name="BenchSub" Text="Benchmark de CPU por renderização 3D (path tracing), no mesmo princípio do Cinebench" Style="{StaticResource Sub}"/>
                     </StackPanel>
 
@@ -1641,7 +1679,7 @@
                                     </Viewbox>
                                 </Border>
                                 <Grid Height="3" Margin="0,12,0,8" Background="{DynamicResource Line}">
-                                    <Border Background="{DynamicResource Fg}" RenderTransformOrigin="0,0.5">
+                                    <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
                                         <Border.RenderTransform>
                                             <ScaleTransform x:Name="BenchProgress" ScaleX="0"/>
                                         </Border.RenderTransform>
@@ -1750,7 +1788,7 @@
                                     </StackPanel>
                                 </Grid>
                                 <Grid Height="3" Margin="0,14,0,8" Background="{DynamicResource Line}">
-                                    <Border Background="{DynamicResource Fg}" RenderTransformOrigin="0,0.5">
+                                    <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
                                         <Border.RenderTransform><ScaleTransform x:Name="GbProgress" ScaleX="0"/></Border.RenderTransform>
                                     </Border>
                                 </Grid>
@@ -1820,7 +1858,7 @@
                                             </StackPanel>
                                         </Grid>
                                         <Grid Height="3" Margin="0,14,0,8" Background="{DynamicResource Line}">
-                                            <Border Background="{DynamicResource Fg}" RenderTransformOrigin="0,0.5">
+                                            <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
                                                 <Border.RenderTransform><ScaleTransform x:Name="RtProgress" ScaleX="0"/></Border.RenderTransform>
                                             </Border>
                                         </Grid>
@@ -1908,7 +1946,7 @@
                                                HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Grid>
                                 <Grid Height="3" Margin="0,12,0,8" Background="{DynamicResource Line}">
-                                    <Border Background="{DynamicResource Fg}" RenderTransformOrigin="0,0.5">
+                                    <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
                                         <Border.RenderTransform><ScaleTransform x:Name="SimProgress" ScaleX="0"/></Border.RenderTransform>
                                     </Border>
                                 </Grid>
@@ -1977,7 +2015,7 @@
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                                 <Grid Height="3" Margin="0,16,0,8" Background="{DynamicResource Line}">
-                                    <Border Background="{DynamicResource Fg}" RenderTransformOrigin="0,0.5">
+                                    <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
                                         <Border.RenderTransform><ScaleTransform x:Name="MemProgress" ScaleX="0"/></Border.RenderTransform>
                                     </Border>
                                 </Grid>
@@ -2032,7 +2070,7 @@
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                                 <Grid Height="3" Margin="0,16,0,8" Background="{DynamicResource Line}">
-                                    <Border Background="{DynamicResource Fg}" RenderTransformOrigin="0,0.5">
+                                    <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
                                         <Border.RenderTransform><ScaleTransform x:Name="DiskProgress" ScaleX="0"/></Border.RenderTransform>
                                     </Border>
                                 </Grid>
@@ -2069,11 +2107,11 @@
                     </Grid>
                 </Grid>
 
-                <!-- ===== RESET OTIMIZA ===== -->
+                <!-- ===== ARSENAL · OTIMIZAÇÃO ===== -->
                 <ScrollViewer x:Name="PageOptimize" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="RESET OTIMIZA" Style="{StaticResource H1}"/>
+                            <TextBlock Text="ARSENAL · OTIMIZAÇÃO" Style="{StaticResource H1}"/>
                             <TextBlock Text="Libera memória, fecha o que atrapalha e ajusta o Windows para jogos" Style="{StaticResource Sub}"/>
                         </StackPanel>
 
@@ -2090,7 +2128,7 @@
                                         <TextBlock x:Name="OptRamText" FontFamily="{StaticResource Mono}" HorizontalAlignment="Right"/>
                                     </Grid>
                                     <Grid Height="6" Background="{DynamicResource Line}" Margin="0,0,0,12">
-                                        <Border Background="{DynamicResource Fg}" RenderTransformOrigin="0,0.5">
+                                        <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
                                             <Border.RenderTransform>
                                                 <ScaleTransform x:Name="OptRamBar" ScaleX="0"/>
                                             </Border.RenderTransform>
@@ -2102,7 +2140,7 @@
                                     </TextBlock>
                                     <TextBlock x:Name="OptResult" TextWrapping="Wrap" Margin="0,10,0,0"/>
                                 </StackPanel>
-                                <Button x:Name="BtnOptimize" Grid.Column="1" Style="{StaticResource PrimaryButton}" Content="RESET OTIMIZA"
+                                <Button x:Name="BtnOptimize" Grid.Column="1" Style="{StaticResource PrimaryButton}" Content="OTIMIZAR AGORA"
                                         FontSize="16" Padding="34,16" VerticalAlignment="Center" Click="BtnOptimize_Click"/>
                             </Grid>
                         </Border>
@@ -2200,7 +2238,7 @@
                     <StackPanel Margin="36,30,36,30">
                         <Grid Margin="0,0,0,20">
                             <StackPanel Margin="0,0,190,0">
-                                <TextBlock Text="INICIALIZAÇÃO" Style="{StaticResource H1}"/>
+                                <TextBlock Text="ARSENAL · INICIALIZAÇÃO" Style="{StaticResource H1}"/>
                                 <TextBlock Text="Programas que abrem junto com o Windows · desative ou remova o que não precisa" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                             </StackPanel>
                             <Button Style="{StaticResource PrimaryButton}" Content="ATUALIZAR" Padding="20,9"
@@ -2260,14 +2298,14 @@
                     <StackPanel Margin="36,30,36,30">
                         <Grid Margin="0,0,0,20">
                             <StackPanel Margin="0,0,250,0">
-                                <TextBlock Text="INSTALAR APPS" Style="{StaticResource H1}"/>
+                                <TextBlock Text="ARSENAL · INSTALAR APPS" Style="{StaticResource H1}"/>
                                 <TextBlock Text="Os essenciais depois de formatar o PC · versão oficial mais recente, instalação silenciosa" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                             </StackPanel>
                             <Button x:Name="BtnAppsInstall" Style="{StaticResource PrimaryButton}" Content="INSTALAR SELECIONADOS" Padding="20,9"
                                     HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnAppsInstall_Click"/>
                         </Grid>
                         <Grid Height="3" Margin="0,0,0,8" Background="{DynamicResource Line}">
-                            <Border Background="{DynamicResource Fg}" RenderTransformOrigin="0,0.5">
+                            <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
                                 <Border.RenderTransform><ScaleTransform x:Name="AppsProgress" ScaleX="0"/></Border.RenderTransform>
                             </Border>
                         </Grid>
@@ -2334,11 +2372,11 @@
                 <!-- ===== PDF (UserControl em Modules\Pdf) ===== -->
                 <local:PdfView x:Name="PagePdf" Visibility="Collapsed"/>
 
-                <!-- ===== RESET MAKER · Portas COM (fantasmas e números COM presos) ===== -->
+                <!-- ===== OFICINA · Portas COM (fantasmas e números COM presos) ===== -->
                 <ScrollViewer x:Name="PageMakerPorts" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="PORTAS COM" Style="{StaticResource H1}"/>
+                            <TextBlock Text="OFICINA · PORTAS COM" Style="{StaticResource H1}"/>
                             <TextBlock Text="Arduino, ESP32 e conversores seriais · remova dispositivos fantasmas e libere números COM presos" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                         </StackPanel>
                         <Border Style="{StaticResource CardBorder}">
@@ -2406,12 +2444,12 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- ===== RESET MAKER · Drivers seriais (CH340, CP210x, FTDI, Prolific, Arduino) ===== -->
+                <!-- ===== OFICINA · Drivers seriais (CH340, CP210x, FTDI, Prolific, Arduino) ===== -->
                 <ScrollViewer x:Name="PageMakerDrv" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <Grid Margin="0,0,0,20">
                             <StackPanel Margin="0,0,190,0">
-                                <TextBlock Text="DRIVERS SERIAIS" Style="{StaticResource H1}"/>
+                                <TextBlock Text="OFICINA · DRIVERS SERIAIS" Style="{StaticResource H1}"/>
                                 <TextBlock Text="CH340 · CP2102/CP210x · FTDI · Prolific · Arduino — diagnóstico, reinstalação e troca de versão do driver" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                             </StackPanel>
                             <Button x:Name="BtnMakerScan" Style="{StaticResource PrimaryButton}" Content="VERIFICAR" Padding="20,9"
@@ -2568,11 +2606,11 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- ===== RESET OC ===== -->
+                <!-- ===== FORJA · OVERCLOCK ===== -->
                 <ScrollViewer x:Name="PageOc" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="36,30,36,30">
                         <StackPanel Margin="0,0,0,20">
-                            <TextBlock Text="RESET OC" Style="{StaticResource H1}"/>
+                            <TextBlock Text="FORJA · OVERCLOCK" Style="{StaticResource H1}"/>
                             <TextBlock Text="Ajustes da GPU, verificador de estabilidade e guia de overclock na BIOS" Style="{StaticResource Sub}"/>
                         </StackPanel>
 
@@ -2648,7 +2686,7 @@
                                         HorizontalAlignment="Left" Padding="24,10" Margin="0,14,0,0" Click="BtnOcCheck_Click"/>
 
                                 <Grid Height="4" Margin="0,12,0,8" Background="{DynamicResource Line}">
-                                    <Border Background="{DynamicResource Fg}" RenderTransformOrigin="0,0.5">
+                                    <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
                                         <Border.RenderTransform>
                                             <ScaleTransform x:Name="OcProgress" ScaleX="0"/>
                                         </Border.RenderTransform>
@@ -2731,7 +2769,7 @@
                     </Grid.RowDefinitions>
 
                     <StackPanel Margin="0,0,0,20">
-                        <TextBlock Text="Stress test" Style="{StaticResource H1}"/>
+                        <TextBlock Text="FORJA · STRESS TEST" Style="{StaticResource H1}"/>
                         <TextBlock Text="Carga máxima com corte automático por temperatura" Style="{StaticResource Sub}"/>
                     </StackPanel>
 
@@ -2898,7 +2936,7 @@
                             <Grid DockPanel.Dock="Top" Margin="0,0,0,8">
                                 <TextBlock Text="TEMPERATURAS — ÚLTIMOS 5 MIN" Style="{StaticResource Label}" Margin="0"/>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                    <Rectangle Width="14" Height="2" Fill="{DynamicResource Fg}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <Rectangle Width="14" Height="2" Fill="{DynamicResource Accent}" VerticalAlignment="Center" Margin="0,0,6,0"/>
                                     <TextBlock Text="CPU" Foreground="{DynamicResource Muted}" FontSize="11" Margin="0,0,16,0"/>
                                     <Rectangle Width="14" Height="2" Fill="{DynamicResource Muted}" VerticalAlignment="Center" Margin="0,0,6,0"/>
                                     <TextBlock Text="GPU" Foreground="{DynamicResource Muted}" FontSize="11" Margin="0,0,16,0"/>

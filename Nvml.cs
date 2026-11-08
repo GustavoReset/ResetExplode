@@ -74,7 +74,7 @@ internal static class Nvml
         catch (EntryPointNotFoundException) { return false; }
     }
 
-    // ---- Escrita (RESET OC): exige administrador e só vale até reiniciar o PC ----
+    // ---- Escrita (FORJA · OVERCLOCK): exige administrador e só vale até reiniciar o PC ----
 
     /// <summary>Traduz o código de retorno da NVML; null = sucesso.</summary>
     public static string? Explain(int code) => code switch

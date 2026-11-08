@@ -1,19 +1,19 @@
 ## Novidades da v0.16
 
-**Nova página · RESET FERRAMENTAS › Inicialização**
+**Nova página · ARSENAL › Inicialização**
 - Lista os programas que abrem junto com o Windows: chaves Run do registro (usuário, todos os usuários, 32 e 64 bits)
   e pastas Inicializar, com descrição, fabricante e aviso quando o arquivo do programa não existe mais.
 - Interruptor para ativar/desativar, igual ao Gerenciador de Tarefas: a entrada continua lá e pode ser religada.
 - Botão **REMOVER** com confirmação; o programa continua instalado e tudo pode ser desfeito em **Restaurar removidos**.
 
-**Nova página · RESET FERRAMENTAS › Instalar apps**
+**Nova página · ARSENAL › Instalar apps**
 - Os essenciais depois de formatar o PC: Steam, Google Chrome, Discord, Lightshot, 7-Zip, WinRAR e VLC.
 - Instala pelo winget (instalador de pacotes da Microsoft que já vem no Windows): versão oficial mais recente,
   sem janelas, um app de cada vez, com o resultado de cada um na lista.
 - Mostra o que já está instalado; se o winget ainda não existir (PC recém-formatado), um botão abre a Microsoft Store
   para atualizar o "Instalador de Aplicativo".
 
-**Nova categoria · RESET MAKER** (Arduino, ESP32 e conversores USB-serial)
+**Nova categoria · OFICINA** (Arduino, ESP32 e conversores USB-serial)
 - **Portas COM**: a limpeza de dispositivos fantasmas e de números COM presos saiu de Otimização e ganhou página própria.
 - **Drivers seriais**: diagnóstico das placas com CH340/CH341, CP2102/CP210x, FTDI, Prolific PL2303 e Arduino
   (sem driver, código 10, código 43, FTDI falsificado travado em PID 0000), com a orientação de cada caso.
@@ -39,7 +39,7 @@
   ocupado, temperatura, clock médio, clock máximo, consumo); RAM (GB, %); nome do jogo e hora. Atalhos SÓ FPS, PADRÃO e TUDO.
 - Cada componente vira uma linha só com os itens escolhidos; a escolha fica salva e vale na hora.
 
-**RESET JOGOS**
+**ARENA**
 - Novo atalho em Extras: **-allow_third_party_software** (CS2), que libera captura de jogo do OBS, ReShade e overlays
   bloqueados pelo modo confiável; o aviso sobre o Fator de Confiança aparece ao passar o mouse.
 

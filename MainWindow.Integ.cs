@@ -18,7 +18,7 @@ public sealed class LightDeviceVm
 }
 
 /// <summary>
-/// Aba RESET INTEGRAÇÃO: controle de iluminação e efeitos. Pontes: Corsair iCUE (SDK), OpenRGB (MSI Mystic Light, Gigabyte RGB Fusion,
+/// Aba PRISMA: controle de iluminação e efeitos. Pontes: Corsair iCUE (SDK), OpenRGB (MSI Mystic Light, Gigabyte RGB Fusion,
 /// ASUS Aura e outras marcas) e Razer Chroma. Todos os dispositivos aparecem numa lista só e recebem o mesmo efeito.
 /// </summary>
 public partial class MainWindow

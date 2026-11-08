@@ -12,7 +12,7 @@
     <AssemblyName>FortKnox</AssemblyName>
     <Product>Fort Knox</Product>
     <Version>0.16.0</Version>
-    <!-- Sempre otimizado: o RESET BENCH e os stress tests precisam do JIT otimizado também em Debug -->
+    <!-- Sempre otimizado: a Forja (benchmarks) e os stress tests precisam do JIT otimizado também em Debug -->
     <Optimize>true</Optimize>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
@@ -29,6 +29,9 @@
     <Resource Include="Assets\app.ico" />
     <Resource Include="Assets\logo-badge.png" />
     <Resource Include="Assets\logo-dark.png" />
+    <!-- Identidade visual: fontes da marca embutidas (SIL OFL 1.1, ver Assets\Fonts\OFL.txt) -->
+    <Resource Include="Assets\Fonts\*.ttf" />
+    <None Include="Assets\Fonts\OFL.txt" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
   <!-- Drivers seriais oficiais embutidos (RESET MAKER): cada pasta Drivers\<chip> vira recurso e é extraída na hora de instalar.

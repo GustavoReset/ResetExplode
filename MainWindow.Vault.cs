@@ -2,7 +2,7 @@ using System.Windows.Interop;
 
 namespace FortKnox;
 
-/// <summary>RESET FERRAMENTAS · Vault de senhas: liga a página VaultView à janela. Mesmo padrão dos outros MainWindow.*.cs.</summary>
+/// <summary>COFRE · senhas: liga a página VaultView à janela. Mesmo padrão dos outros MainWindow.*.cs.</summary>
 public partial class MainWindow
 {
     private readonly PasswordVault _vault = new();

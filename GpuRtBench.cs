@@ -33,7 +33,7 @@ public sealed record GpuRtResult(IReadOnlyList<RtPass> Passes, int Width, int He
 }
 
 /// <summary>
-/// RESET BENCH · Ray tracing (DXR 1.1, Direct3D 12): usa os núcleos de RT da placa (RTX, Radeon RX 6000+, Arc).
+/// FORJA · Ray tracing (DXR 1.1, Direct3D 12): usa os núcleos de RT da placa (RTX, Radeon RX 6000+, Arc).
 /// Cena procedural com ~4 mil objetos (esferas, toros, colunas, caixas) em materiais fosco, metal e espelho, mais luzes
 /// emissivas. Por pixel, um path tracer com raios inline (RayQuery num compute shader): visibilidade, sombra suave do sol,
 /// oclusão de ambiente e rebatidas de reflexo/iluminação global. A estrutura de aceleração do topo (TLAS) é refeita a cada
@@ -454,7 +454,7 @@ void Main(uint3 id : SV_DispatchThreadID)
             const uint style = 0x00CF0000 | 0x10000000;
             AdjustWindowRect(ref rect, style, false);
             int ww = rect.Right - rect.Left, wh = rect.Bottom - rect.Top;
-            hwnd = CreateWindowExW(0, cls, "RESET BENCH · Ray tracing", style, (sw - ww) / 2, (sh - wh) / 2, ww, wh,
+            hwnd = CreateWindowExW(0, cls, "FORJA · Ray tracing", style, (sw - ww) / 2, (sh - wh) / 2, ww, wh,
                                    IntPtr.Zero, IntPtr.Zero, hInst, IntPtr.Zero);
 
             // ---- Dispositivo ----
@@ -707,7 +707,7 @@ void Main(uint3 id : SV_DispatchThreadID)
                         titleFrames = 0; lastTitle = now;
                         double done = phase + now / duration.TotalSeconds;
                         Progress = done / totalPhases;
-                        SetWindowTextW(hwnd, $"RESET BENCH · Ray tracing · {Width}x{Height} · {Preset} · {Phase} · {CurrentFps:0} FPS");
+                        SetWindowTextW(hwnd, $"FORJA · Ray tracing · {Width}x{Height} · {Preset} · {Phase} · {CurrentFps:0} FPS");
                     }
                 }
                 WaitGpu(fenceValue);

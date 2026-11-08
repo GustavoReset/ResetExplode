@@ -130,7 +130,7 @@ public partial class OverlayWindow : Window
         if (ft == null || ft.Count < 2) return;
 
         double max = Math.Max(ft.Max(), ft.Average() * 2); // escala que mostra picos sem achatar o normal
-        var line = new Polyline { Stroke = Brushes.White, StrokeThickness = 1 };
+        var line = new Polyline { Stroke = new SolidColorBrush(Color.FromRgb(0xD4, 0xA1, 0x3A)), StrokeThickness = 1 }; // frametime em ouro
         double step = w / (ft.Count - 1);
         for (int i = 0; i < ft.Count; i++)
             line.Points.Add(new Point(i * step, h - 1 - (h - 2) * Math.Min(1, ft[i] / max)));

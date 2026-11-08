@@ -19,7 +19,7 @@ public sealed class HelperProgram
     public string Display => System.IO.Path.GetFileName(Path) + (string.IsNullOrWhiteSpace(Args) ? "" : " " + Args);
 }
 
-/// <summary>Perfil de um jogo na aba RESET JOGOS: desempenho, argumentos de gráficos e programas auxiliares.</summary>
+/// <summary>Perfil de um jogo na aba ARENA: desempenho, argumentos de gráficos e programas auxiliares.</summary>
 public sealed class GameProfile
 {
     public string Priority { get; set; } = "normal";   // normal | above | high
@@ -52,18 +52,18 @@ public sealed class AppSettings
 
     public string? HowManyFpsKeyProtected { get; set; }
 
-    // RESET BENCH: últimos resultados (mais recente primeiro)
+    // FORJA: últimos resultados (mais recente primeiro)
     public List<BenchRun> BenchRuns { get; set; } = new();
     public List<BenchRecord> BenchRecords { get; set; } = new();
 
-    // RESET OTIMIZA: valores originais dos ajustes do Windows antes da primeira alteração ("<ausente>" = não existia)
+    // ARSENAL · OTIMIZAÇÃO: valores originais dos ajustes do Windows antes da primeira alteração ("<ausente>" = não existia)
     public Dictionary<string, string?> TweakBackup { get; set; } = new();
     /// <summary>ComDB original (reservas de números COM) antes da primeira "liberação".</summary>
     public byte[]? ComDbBackup { get; set; }
     /// <summary>Programas de inicialização removidos, para "Restaurar removidos".</summary>
     public List<StartupBackup> StartupRemoved { get; set; } = new();
 
-    // RESET JOGOS
+    // ARENA
     public Dictionary<string, GameProfile> GameProfiles { get; set; } = new();
     public List<CustomGame> CustomGames { get; set; } = new();
 

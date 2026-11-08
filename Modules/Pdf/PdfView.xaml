@@ -16,13 +16,13 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel x:Name="PdfRoot" Margin="36,30,36,30">
 
-            <TextBlock Text="PDF" Style="{StaticResource H1}"/>
+            <TextBlock Text="PRENSA · PDF" Style="{StaticResource H1}"/>
             <TextBlock Text="Mesclar, dividir, comprimir e extrair texto · tudo local, seus arquivos não saem do computador · arraste PDFs para esta tela"
                        Style="{StaticResource Sub}" TextWrapping="Wrap" Margin="0,4,0,18"/>
 
             <!-- Progresso -->
             <Grid Height="3" Margin="0,0,0,8" Background="{DynamicResource Line}">
-                <Border Background="{DynamicResource Fg}" RenderTransformOrigin="0,0.5">
+                <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
                     <Border.RenderTransform><ScaleTransform x:Name="PBar" ScaleX="0"/></Border.RenderTransform>
                 </Border>
             </Grid>

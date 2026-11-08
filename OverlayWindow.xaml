@@ -4,18 +4,18 @@
         Title="Fort Knox overlay" WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         Topmost="True" ShowInTaskbar="False" ShowActivated="False" ResizeMode="NoResize" Focusable="False"
         SizeToContent="WidthAndHeight" UseLayoutRounding="True" TextOptions.TextFormattingMode="Display">
-    <Border x:Name="Box" Background="#C8000000" BorderBrush="#33FFFFFF" BorderThickness="1" CornerRadius="4" Padding="12,9">
+    <Border x:Name="Box" Background="#D90B0C0E" BorderBrush="#66D4A13A" BorderThickness="1" CornerRadius="4" Padding="12,9">
         <Border.LayoutTransform>
             <ScaleTransform x:Name="Scale" ScaleX="1" ScaleY="1"/>
         </Border.LayoutTransform>
-        <StackPanel TextElement.FontFamily="Cascadia Mono, Consolas" TextElement.FontSize="12" TextElement.Foreground="#F5F5F5">
+        <StackPanel TextElement.FontFamily="{StaticResource Mono}" TextElement.FontSize="12" TextElement.Foreground="#F6F5F1">
             <!-- FPS em destaque (cada parte aparece só se escolhida na aba Overlay) -->
             <StackPanel x:Name="OFpsRow" Orientation="Horizontal">
-                <TextBlock x:Name="OFps" Text="—" FontSize="24" FontWeight="Bold"/>
-                <TextBlock x:Name="OFpsUnit" Text=" FPS" Foreground="#8C8C8C" VerticalAlignment="Bottom" Margin="0,0,0,4"/>
-                <TextBlock x:Name="OFrameTime" Text="" Foreground="#8C8C8C" VerticalAlignment="Bottom" Margin="12,0,0,4"/>
+                <TextBlock x:Name="OFps" Text="—" FontSize="24" FontWeight="Bold" Foreground="{StaticResource GoldMetal}"/>
+                <TextBlock x:Name="OFpsUnit" Text=" FPS" Foreground="#9AA0A9" VerticalAlignment="Bottom" Margin="0,0,0,4"/>
+                <TextBlock x:Name="OFrameTime" Text="" Foreground="#9AA0A9" VerticalAlignment="Bottom" Margin="12,0,0,4"/>
             </StackPanel>
-            <TextBlock x:Name="OLow" Text="1% low —" Foreground="#8C8C8C"/>
+            <TextBlock x:Name="OLow" Text="1% low —" Foreground="#9AA0A9"/>
             <!-- Gráfico de frametime -->
             <Canvas x:Name="OGraph" Width="190" Height="30" Margin="0,6,0,4" ClipToBounds="True"/>
             <!-- Linhas de sensores: GPU, VRAM, CPU, RAM... montadas pelo que foi escolhido -->
@@ -27,13 +27,13 @@
                                 <ColumnDefinition Width="44"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding Label}" Foreground="#8C8C8C"/>
+                            <TextBlock Text="{Binding Label}" Foreground="#9AA0A9"/>
                             <TextBlock Grid.Column="1" Text="{Binding Value}"/>
                         </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-            <TextBlock x:Name="OGame" Text="" Foreground="#5A5A5A" FontSize="10" Margin="0,5,0,0"/>
+            <TextBlock x:Name="OGame" Text="" Foreground="#8C6A2A" FontSize="10" Margin="0,5,0,0"/>
         </StackPanel>
     </Border>
 </Window>

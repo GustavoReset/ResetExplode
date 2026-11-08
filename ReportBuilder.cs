@@ -155,22 +155,24 @@ public static class ReportBuilder
         sb.Append("</table>");
     }
 
+    // Paleta e tipografia da identidade Fort Knox (v3): preto/grafite, ouro em foco, vermelho para alertas.
     private const string Css = @"
-:root{--bg:#fff;--fg:#111;--muted:#666;--line:#e3e3e3;--card:#fafafa;--ok:#111;--badbg:#111;--badfg:#fff}
-@media (prefers-color-scheme:dark){:root{--bg:#000;--fg:#f2f2f2;--muted:#8c8c8c;--line:#222;--card:#0c0c0c;--ok:#f2f2f2;--badbg:#f2f2f2;--badfg:#000}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 'Segoe UI',system-ui,sans-serif}
+:root{--bg:#f6f5f1;--fg:#0b0c0e;--muted:#4a5058;--line:#dcdad3;--card:#fff;--gold:#8c6a2a;--goldbg:#f5ead0;--bad:#b81f33}
+@media (prefers-color-scheme:dark){:root{--bg:#0b0c0e;--fg:#f6f5f1;--muted:#9aa0a9;--line:#262a31;--card:#17191d;--gold:#f0c766;--goldbg:#2a2414;--bad:#d7263d}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 Inter,'Segoe UI',system-ui,sans-serif}
 .wrap{max-width:980px;margin:0 auto;padding:32px 20px 60px}
-header{display:flex;gap:16px;align-items:center;margin-bottom:6px}.logo{width:44px;height:44px}
-h1{margin:0;font-size:26px;letter-spacing:.5px}h2{margin:34px 0 12px;font-size:17px;letter-spacing:.4px}h3{margin:0 0 8px;font-size:14px}
+header{display:flex;gap:16px;align-items:center;margin-bottom:6px;padding-bottom:14px;border-bottom:2px solid #d4a13a}.logo{width:44px;height:44px}
+h1{margin:0;font:400 22px Michroma,'Segoe UI',sans-serif;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold)}
+h2{margin:34px 0 12px;font:400 14px Michroma,'Segoe UI',sans-serif;letter-spacing:1.2px;text-transform:uppercase;color:var(--gold)}h3{margin:0 0 8px;font-size:14px}
 .sub,.muted{color:var(--muted)}.sub{margin:2px 0 0}.note{color:var(--muted);font-size:12px;margin:0 0 4px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin:0 0 12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin:0 0 12px}
 .row{display:flex;justify-content:space-between;gap:12px;align-items:center}
-.badge{font-size:11px;font-weight:600;letter-spacing:.6px;padding:3px 10px;border-radius:3px;border:1px solid var(--ok);color:var(--ok)}
-.badge.bad,.badge.na{background:var(--badbg);color:var(--badfg);border-color:var(--badbg)}.badge.na{opacity:.6}
+.badge{font:700 11px 'JetBrains Mono',Consolas,monospace;letter-spacing:.6px;padding:3px 10px;border-radius:3px;border:1px solid var(--gold);color:var(--gold);background:var(--goldbg)}
+.badge.bad,.badge.na{background:var(--bad);color:#f6f5f1;border-color:var(--bad)}.badge.na{opacity:.6}
 table{width:100%;border-collapse:collapse}td,th{padding:5px 8px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
-th{color:var(--muted);font-weight:600;font-size:12px}.k{color:var(--muted);width:38%}.num{font-family:Consolas,monospace;text-align:right;white-space:nowrap}
+th{color:var(--gold);font:700 11px 'JetBrains Mono',Consolas,monospace;letter-spacing:.6px;text-transform:uppercase}.k{color:var(--muted);width:38%}.num{font-family:'JetBrains Mono',Consolas,monospace;text-align:right;white-space:nowrap}
 .grp{font-weight:600;padding-top:12px}.inner{padding:0 0 0 14px;border-bottom:0}.nested td{font-size:13px}
-footer{margin-top:40px;color:var(--muted);font-size:12px}
+footer{margin-top:40px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:12px}
 @media print{body{background:#fff;color:#000}.card{break-inside:avoid}}
 ";
 }

@@ -51,7 +51,7 @@ public partial class MainWindow : Window
     private bool _overlayReady;
     private const int HotkeyId = 0x5245; // "RE"
 
-    // RESET BENCH
+    // FORJA
     private readonly BenchRenderer _bench = new();
     private System.Windows.Media.Imaging.WriteableBitmap? _benchBitmap;
     private CancellationTokenSource? _benchCts;
@@ -60,7 +60,7 @@ public partial class MainWindow : Window
     private string _benchPhase = "";
     private DateTime _benchPhaseStart;
 
-    // RESET OTIMIZA
+    // ARSENAL · OTIMIZAÇÃO
     private List<BackgroundApp> _apps = new();
     private readonly List<Tweak> _tweaks = WindowsTweaks.All(); // só as definições; o estado é lido ao abrir a página
     private bool _optInit;
@@ -95,7 +95,7 @@ public partial class MainWindow : Window
         InitBench();
         SnapshotUsb();
         RefreshDrives();
-        TitlePage.Text = "Visão geral";
+        TitlePage.Text = "Painel";
         UpdateDashboard();
 
         // A janela aparece já; as coletas pesadas (WMI, sensores, GPU) rodam em paralelo fora da thread da janela.
@@ -687,7 +687,7 @@ public partial class MainWindow : Window
         BnResult.Visibility = Visibility.Visible;
     }
 
-    // ---------------- RESET BENCH ----------------
+    // ---------------- FORJA ----------------
 
     private void InitBench()
     {
@@ -764,7 +764,7 @@ public partial class MainWindow : Window
                               $"({Environment.ProcessorCount / 2} núcleos com SMT costumam render 8–12x).";
 
         _settings.BenchRuns.Insert(0, new BenchRun(DateTime.Now, mt, st, sustained, GameCatalog.ShortCpuName(_cpuName)));
-        AddEvent("", "RESET BENCH", "Render de CPU", mt is double mte ? $"{mte:N0} pts" : st is double ste ? $"{ste:N0} pts" : "");
+        AddEvent("", "FORJA", "Render de CPU", mt is double mte ? $"{mte:N0} pts" : st is double ste ? $"{ste:N0} pts" : "");
         if (_settings.BenchRuns.Count > 10) _settings.BenchRuns.RemoveRange(10, _settings.BenchRuns.Count - 10);
         _settings.Save();
         UpdateBenchHistory();
@@ -782,7 +782,7 @@ public partial class MainWindow : Window
         {
             if (b < 0) continue;
             var (x, y, w, h) = _bench.Buckets[b];
-            var rect = new Rectangle { Width = w, Height = h, Stroke = Brushes.White, StrokeThickness = 1.5 };
+            var rect = new Rectangle { Width = w, Height = h, Stroke = (Brush)FindResource("Accent"), StrokeThickness = 1.5 };
             Canvas.SetLeft(rect, x); Canvas.SetTop(rect, y);
             BenchBuckets.Children.Add(rect);
         }
@@ -830,9 +830,9 @@ public partial class MainWindow : Window
         }).ToList();
     }
 
-    // ---------------- RESET OTIMIZA ----------------
+    // ---------------- ARSENAL · OTIMIZAÇÃO ----------------
 
-    /// <summary>Carrega a página RESET OTIMIZA quando ela é aberta (os ajustes do Windows só na primeira vez).</summary>
+    /// <summary>Carrega a página ARSENAL · OTIMIZAÇÃO quando ela é aberta (os ajustes do Windows só na primeira vez).</summary>
     private void InitOptimize()
     {
         if (!_optInit)
@@ -868,11 +868,11 @@ public partial class MainWindow : Window
         var toClose = _apps.Where(a => a.Selected).ToList();
         string list = toClose.Count == 0 ? "nenhum programa marcado"
                                          : string.Join("\n", toClose.Select(a => $"  • {a.Title}"));
-        var r = MessageBox.Show("O RESET OTIMIZA vai:\n\n" +
+        var r = MessageBox.Show("O ARSENAL vai:\n\n" +
                                 "1. Limpar a memória em espera e enxugar a RAM dos programas.\n" +
                                 $"2. Fechar os programas marcados:\n{list}\n\n" +
                                 "Salve o que estiver aberto nesses programas antes. Continuar?",
-                                "RESET OTIMIZA", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                                "Arsenal · Otimização", MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (r != MessageBoxResult.Yes) return;
 
         BtnOptimize.IsEnabled = false;
@@ -881,7 +881,7 @@ public partial class MainWindow : Window
         var closeResult = await Task.Run(() => Optimizer.CloseApps(toClose));
         var mem = await Task.Run(Optimizer.CleanMemory); // depois de fechar, para contar a memória liberada por eles também
         BtnOptimize.IsEnabled = true;
-        BtnOptimize.Content = "RESET OTIMIZA";
+        BtnOptimize.Content = "OTIMIZAR AGORA";
 
         var parts = new List<string> { $"Memória liberada: {mem.FreedBytes / 1048576.0:N0} MB" };
         parts.Add(mem.StandbyPurged ? "memória em espera limpa" : $"memória em espera não limpa ({mem.StandbyError})");
@@ -968,7 +968,7 @@ public partial class MainWindow : Window
                        + (sel.Count > 12 ? $"\n  … e mais {sel.Count - 12}" : "");
         var r = MessageBox.Show($"Remover {sel.Count} registros de dispositivos que não estão conectados?\n\n{names}\n\n" +
                                 "Se plugar algum deles de novo, o Windows reinstala automaticamente.",
-                                "RESET MAKER", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                                "OFICINA", MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (r != MessageBoxResult.Yes) return;
 
         BtnUsbRemove.IsEnabled = false;
@@ -992,7 +992,7 @@ public partial class MainWindow : Window
                                 $"Mantidos (em uso): {(inUse.Count > 0 ? string.Join(", ", inUse.Select(n => $"COM{n}")) : "nenhum")}\n\n" +
                                 "A próxima placa plugada vai receber um número baixo (COM3, COM4…). " +
                                 "O valor atual fica guardado para \"Desfazer liberação\".",
-                                "RESET MAKER", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                                "OFICINA", MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (r != MessageBoxResult.Yes) return;
         try
         {
@@ -1023,20 +1023,20 @@ public partial class MainWindow : Window
     {
         if (_settings.TweakBackup.Count == 0)
         {
-            MessageBox.Show("Nenhum ajuste foi alterado pelo Fort Knox ainda.", "RESET OTIMIZA",
+            MessageBox.Show("Nenhum ajuste foi alterado pelo Fort Knox ainda.", "Arsenal · Otimização",
                             MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
         var r = MessageBox.Show("Voltar todos os ajustes do Windows para como estavam antes do Fort Knox alterá-los?",
-                                "RESET OTIMIZA", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                                "Arsenal · Otimização", MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (r != MessageBoxResult.Yes) return;
         bool restart = _tweaks.Any(t => t.NeedsRestart && _settings.TweakBackup.ContainsKey(t.Id));
         WindowsTweaks.RestoreAll(_tweaks, _settings);
         foreach (var t in _tweaks) { t.Refresh(); t.Status = "Restaurado."; }
-        if (restart) MessageBox.Show("Alguns ajustes só voltam ao original depois de reiniciar o PC.", "RESET OTIMIZA");
+        if (restart) MessageBox.Show("Alguns ajustes só voltam ao original depois de reiniciar o PC.", "Arsenal · Otimização");
     }
 
-    // ---------------- RESET BENCH: benchmarks de jogo ----------------
+    // ---------------- FORJA: benchmarks de jogo ----------------
 
     public sealed record MemRow(string Label, string Value, string Hint);
     private bool _gameBenchRunning;
@@ -1639,7 +1639,7 @@ public partial class MainWindow : Window
 
     private void TempChart_SizeChanged(object sender, SizeChangedEventArgs e) => DrawChart();
 
-    /// <summary>Desenha o histórico de temperatura da CPU (branco) e da GPU (cinza) com as linhas de limite.</summary>
+    /// <summary>Desenha o histórico de temperatura da CPU (ouro) e da GPU (aço) com as linhas de limite.</summary>
     private void DrawChart()
     {
         TempChart.Children.Clear();
@@ -1666,7 +1666,7 @@ public partial class MainWindow : Window
             X1 = left, X2 = w, Y1 = Y(v), Y2 = Y(v),
             Stroke = b, StrokeThickness = 1, StrokeDashArray = new DoubleCollection { 4, 3 }
         });
-        LimitLine(_tempLimit, Muted);
+        LimitLine(_tempLimit, (Brush)FindResource("Danger"));
         if (ChkGpu.IsChecked == true) LimitLine(_gpuTempLimit, (Brush)FindResource("Faint"));
 
         double step = plotW / (HistoryLength - 1);
@@ -1679,7 +1679,8 @@ public partial class MainWindow : Window
                 line.Points.Add(new Point(left + (offset + i) * step, Y(data[i])));
             if (fill)
             {
-                var area = new Polygon { Fill = new SolidColorBrush(Color.FromArgb(0x16, ((SolidColorBrush)FindResource("Fg")).Color.R, ((SolidColorBrush)FindResource("Fg")).Color.G, ((SolidColorBrush)FindResource("Fg")).Color.B)) };
+                var gold = ((SolidColorBrush)FindResource("Accent")).Color;
+                var area = new Polygon { Fill = new SolidColorBrush(Color.FromArgb(0x22, gold.R, gold.G, gold.B)) };
                 foreach (var p in line.Points) area.Points.Add(p);
                 area.Points.Add(new Point(line.Points[^1].X, top + plotH));
                 area.Points.Add(new Point(line.Points[0].X, top + plotH));
@@ -1688,6 +1689,6 @@ public partial class MainWindow : Window
             TempChart.Children.Add(line);
         }
         Series(_gpuTempHistory, Muted, fill: false);
-        Series(_tempHistory, Fg, fill: true);
+        Series(_tempHistory, (Brush)FindResource("Accent"), fill: true);
     }
 }

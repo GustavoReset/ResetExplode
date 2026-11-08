@@ -9,7 +9,7 @@ using PdfPigDocument = UglyToad.PdfPig.PdfDocument;
 namespace FortKnox;
 
 // =====================================================================================================
-//  RESET FERRAMENTAS · PDF — camada de serviço (sem controles de tela).
+//  PRENSA · PDF — camada de serviço (sem controles de tela).
 //
 //  Regras que valem para todas as operações:
 //   • Tudo é assíncrono (Task.Run), cancelável e reporta progresso; nada roda na thread da interface.

@@ -6,7 +6,7 @@ using System.Text.Json;
 namespace FortKnox;
 
 // =====================================================================================================
-//  RESET FERRAMENTAS · Vault de senhas — camada de dados (sem nenhuma referência a WPF).
+//  COFRE · senhas — camada de dados (sem nenhuma referência a WPF).
 //
 //  Armazenamento: %AppData%\FortKnox\vault.dat
 //      [ "FKV1" (4 bytes) ][ ProtectedData.Protect(JSON UTF-8, entropia do app, CurrentUser) ]

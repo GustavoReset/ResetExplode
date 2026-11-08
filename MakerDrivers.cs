@@ -54,7 +54,7 @@ public sealed class SerialDriverPackage
 }
 
 /// <summary>
-/// RESET MAKER · drivers de CH340, CP210x, FTDI, Prolific e Arduino: diagnóstico pelo código de problema do Gerenciador de
+/// OFICINA · drivers de CH340, CP210x, FTDI, Prolific e Arduino: diagnóstico pelo código de problema do Gerenciador de
 /// Dispositivos, reinstalação do dispositivo, remoção de versões do driver (com backup) e instalação dos drivers oficiais embutidos no app.
 /// Tudo via pnputil e SetupAPI, que já vêm no Windows. Requer administrador.
 /// </summary>

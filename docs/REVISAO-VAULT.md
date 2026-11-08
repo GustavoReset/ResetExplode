@@ -71,7 +71,7 @@ Escopo: `Modules/Vault/*` e `MainWindow.Vault.cs`. PDF e Rede ainda não existem
 
 ## 5. Roteiro de teste manual (antes de dar a Etapa 1 por validada)
 
-1. `dotnet build` sem erros novos; abrir o app: a aba Vault aparece em RESET FERRAMENTAS e a abertura do app não ficou mais lenta.
+1. `dotnet build` sem erros novos; abrir o app: a aba Vault aparece em ARSENAL e a abertura do app não ficou mais lenta.
 2. Criar 3 registros, fechar e reabrir o app: persistem. Confirmar que `vault.dat` não mostra texto legível (abrir no Bloco de Notas).
 3. Buscar por parte do nome/usuário/site. Editar e excluir.
 4. Copiar SENHA, colar em outro app, esperar 30 s: a área de transferência esvazia. Copiar, depois copiar outra coisa: **não** pode ser apagada.

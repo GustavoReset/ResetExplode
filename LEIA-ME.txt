@@ -2,8 +2,8 @@ Fort Knox
 =============
 
 Ferramenta de diagnóstico de hardware: informações do sistema, sensores, placa de vídeo,
-FPS estimado em jogos, detector de gargalo, overlay de FPS, RESET BENCH (benchmarks de CPU, GPU, memória e disco)
-RESET OTIMIZA (limpeza de memória e ajustes para jogos) e stress test de CPU / RAM / GPU.
+FPS estimado em jogos, detector de gargalo, overlay de FPS, FORJA (benchmarks de CPU, GPU, memória e disco)
+ARSENAL · OTIMIZAÇÃO (limpeza de memória e ajustes para jogos) e stress test de CPU / RAM / GPU.
 
 REQUISITOS
 - Windows 10 (versão 2004 ou mais nova) ou 11, 64 bits. Não precisa instalar o .NET (já vem dentro do .exe). O Vault de senhas pede o Windows Hello (PIN, digital ou rosto) para abrir.

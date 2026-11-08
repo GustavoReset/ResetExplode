@@ -33,7 +33,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <StackPanel>
-                <TextBlock Text="Vault de senhas" Style="{StaticResource H1}"/>
+                <TextBlock Text="COFRE · SENHAS" Style="{StaticResource H1}"/>
                 <TextBlock x:Name="VStatus" Text="Abrindo o cofre…" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">

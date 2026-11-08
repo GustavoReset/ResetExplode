@@ -3,7 +3,7 @@ using System.Windows;
 
 namespace FortKnox;
 
-/// <summary>Aba RESET MAKER · Drivers seriais: CH340, CP210x, FTDI, Prolific, Arduino e Arduino IDE.</summary>
+/// <summary>Aba OFICINA · Drivers seriais: CH340, CP210x, FTDI, Prolific, Arduino e Arduino IDE.</summary>
 public partial class MainWindow
 {
     private bool _makerInit, _makerBusy;
@@ -122,7 +122,7 @@ public partial class MainWindow
                                 (p.InUse ? "Ele está EM USO por uma placa conectada: o Windows troca para outra versão guardada, " +
                                            "ou a placa fica sem driver se esta for a única.\n\n" : "") +
                                 "Um backup é feito antes; dá para desfazer em \"Restaurar removidos\".",
-                                "RESET MAKER", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                                "OFICINA", MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (r != MessageBoxResult.Yes) return;
         MakerBusy(true, $"Removendo {p.Title}…");
         try { MakerStatus.Text = await MakerDrivers.RemovePackageAsync(p); }
@@ -136,7 +136,7 @@ public partial class MainWindow
     private async void BtnMakerRestore_Click(object sender, RoutedEventArgs e)
     {
         if (_makerBusy || !RequireAdmin()) return;
-        var r = MessageBox.Show("Devolver ao Windows todos os drivers seriais removidos pelo RESET MAKER?", "RESET MAKER",
+        var r = MessageBox.Show("Devolver ao Windows todos os drivers seriais removidos pela OFICINA?", "OFICINA",
                                 MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (r != MessageBoxResult.Yes) return;
         MakerBusy(true, "Restaurando drivers…");
@@ -152,7 +152,7 @@ public partial class MainWindow
         if (_makerBusy) return;
         if (!AppInstaller.WingetAvailable)
         {
-            MakerIdeResult.Text = "O winget não foi encontrado: abra RESET FERRAMENTAS › Instalar apps para ver como resolver, ou baixe a IDE no site.";
+            MakerIdeResult.Text = "O winget não foi encontrado: abra Arsenal › Instalar apps para ver como resolver, ou baixe a IDE no site.";
             return;
         }
         if (MakerDrivers.IdeRunning)
@@ -181,7 +181,7 @@ public partial class MainWindow
         if (procs.Count == 0) { MakerIdeResult.Text = "Nenhum programa conhecido prendendo portas COM."; RefreshMakerIde(); return; }
         var names = procs.Select(p => p.ProcessName).Distinct().ToList();
         var r = MessageBox.Show("Fechar estes programas? Trabalho não salvo neles pode ser perdido.\n\n" + string.Join("\n", names.Select(n => "  • " + n)),
-                                "RESET MAKER", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                                "OFICINA", MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (r != MessageBoxResult.Yes) return;
         int closed = 0;
         foreach (var p in procs)
