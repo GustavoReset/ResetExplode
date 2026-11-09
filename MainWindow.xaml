@@ -186,6 +186,12 @@
                                     <TextBlock Text="Limpeza" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
+                            <RadioButton x:Name="NavUninstall" Style="{StaticResource NavItem}" Tag="PageUninstall" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE7A6;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Desinstalar" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
                             <RadioButton x:Name="NavStartup" Style="{StaticResource NavItem}" Tag="PageStartup" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE823;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
@@ -322,6 +328,9 @@
                 <!-- ===== INICIALIZAÇÃO (programas que abrem com o Windows) ===== -->
                 <!-- ===== ARSENAL · LIMPEZA (Fase 3.4b) ===== -->
                 <local:CleanupView x:Name="PageCleanup" Visibility="Collapsed"/>
+
+                <!-- ===== ARSENAL · DESINSTALAR (Fase 3.4c) ===== -->
+                <local:UninstallView x:Name="PageUninstall" Visibility="Collapsed"/>
 
                 <local:StartupView x:Name="PageStartup" Visibility="Collapsed"/>
 

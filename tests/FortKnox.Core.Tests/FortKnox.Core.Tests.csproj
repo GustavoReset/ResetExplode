@@ -12,6 +12,7 @@
   <ItemGroup>
     <!-- Serviços sem WPF do app testados aqui (o projeto FortKnox.Tests tem alterações locais em andamento) -->
     <Compile Include="..\..\Modules\Arsenal\CleanupService.cs" Link="App\CleanupService.cs" />
+    <Compile Include="..\..\Modules\Arsenal\UninstallService.cs" Link="App\UninstallService.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />

@@ -177,6 +177,38 @@ public static class CleanupService
 
     private const uint SHERB_NOCONFIRMATION = 0x1, SHERB_NOPROGRESSUI = 0x2, SHERB_NOSOUND = 0x4;
 
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    private struct SHFILEOPSTRUCT
+    {
+        public IntPtr hwnd;
+        public uint wFunc;
+        public string pFrom;
+        public string? pTo;
+        public ushort fFlags;
+        public bool fAnyOperationsAborted;
+        public IntPtr hNameMappings;
+        public string? lpszProgressTitle;
+    }
+
+    [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
+    private static extern int SHFileOperation(ref SHFILEOPSTRUCT lpFileOp);
+
+    private const uint FO_DELETE = 3;
+    private const ushort FOF_SILENT = 0x4, FOF_NOCONFIRMATION = 0x10, FOF_ALLOWUNDO = 0x40, FOF_NOERRORUI = 0x400;
+
+    /// <summary>Move um arquivo ou pasta para a Lixeira (dá para restaurar pela própria Lixeira).</summary>
+    public static bool SendToRecycleBin(string path)
+    {
+        if (!File.Exists(path) && !Directory.Exists(path)) return true;
+        var op = new SHFILEOPSTRUCT
+        {
+            wFunc = FO_DELETE,
+            pFrom = Path.GetFullPath(path) + "\0\0", // lista terminada em dois nulos
+            fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_SILENT | FOF_NOERRORUI,
+        };
+        return SHFileOperation(ref op) == 0 && !op.fAnyOperationsAborted && !File.Exists(path) && !Directory.Exists(path);
+    }
+
     /// <summary>Tamanho e itens na Lixeira de todas as unidades.</summary>
     public static (long Bytes, long Items) RecycleBin()
     {
