@@ -117,7 +117,6 @@ public interface IModule
     IReadOnlyList<NavEntry> Pages { get; }   // entradas do menu: rota, título, ícone, ordem
     ModuleCapabilities Capabilities { get; } // precisa de admin? de rede? roda no Guarda?
 
-    void Register(IServiceCollection services);           // registra serviços e ViewModels do módulo
     Task InitializeAsync(IModuleContext ctx, CancellationToken ct); // leve; roda ao abrir a 1ª página
     Task OnPageActivatedAsync(string route, CancellationToken ct);
     Task OnPageDeactivatedAsync(string route);            // ex.: COFRE bloqueia, RADAR para o ETW
@@ -443,3 +442,23 @@ Nenhum desses entra sem o seu "sim" explícito.
 Equivalência com as ferramentas de referência: **Driver Booster** → ALICERCE; **Smart Defrag** → SENTINELA · Discos (saúde) + otimização de unidade pela API do Windows (`defrag /O`, que faz TRIM em SSD), sem motor próprio de desfragmentação; **Advanced SystemCare / Ultimate** → PAINEL (Lastro) + ARSENAL + MURALHA.
 
 Cada sub-etapa termina com revisão de assincronia, segurança e memória (como nas etapas do Vault, PDF e Rede) e um PR próprio.
+
+## 14. Notas de implementação
+
+### Fase 3.1 · Núcleo (`src/FortKnox.Core`)
+
+| Peça | Arquivo | Observação |
+|---|---|---|
+| Barramento | `Events/EventBus.cs` | entrega `UiThread` (pelo `SynchronizationContext` do WPF), `Background` ou `Synchronous`; handler com erro vai para o log e não bloqueia os outros |
+| Estado global | `State/StateStore.cs` | fatias `record` imutáveis; `Update` serializado; mudança sem diferença não avisa ninguém |
+| Trabalhos | `Jobs/JobRunner.cs` | dono, título, progresso, cancelamento; `Exclusive` recusa com mensagem clara; erro vira `Failed`, nunca derruba o app |
+| Preferências | `Config/SettingsStore.cs` | `%AppData%\FortKnox\modules.json` (`schema: 2`), uma seção por módulo, gravação atômica com `.bak`, arquivo corrompido é guardado à parte. **Convive com o `settings.json` antigo**: cada módulo migra a sua parte com `Migrate<T>` quando passar a usar o núcleo (3.2/3.3) |
+| Diário de Ferrolhos | `Changes/ChangeJournal.cs` | SQLite `history.db`; grava `Pending` antes de aplicar, `Applied` + dados de desfazer depois; desfazer funciona depois de reiniciar. Primeiro tipo pronto: `registry.value` (`RegistryValueChange`), que inclui "o valor não existia" |
+| Log | `Log.cs` | `%AppData%\FortKnox\logs\fortknox-AAAAMMDD.log`, 5 MB/dia, 14 dias, nunca enviado |
+| Módulos e Lastro | `Modules/*.cs` | `IModule`, `NavEntry`, `ModuleRegistry` (init na 1ª visita, ativar/desativar, `PageChanged`), `Lastro` (média ponderada; qualquer Ruim limita a 59) |
+| Composição | `FortKnoxHost.cs` | criado em `App.OnStartup`, exposto em `App.Core`, encerrado em `OnExit` (cancela trabalhos até 3 s) |
+
+Diferença em relação à §5.1: **sem contêiner de DI de terceiros**. O `IModuleContext` entrega as peças do núcleo prontas,
+e `IModule.Register(IServiceCollection)` saiu do contrato. Se um dia fizer falta, `Microsoft.Extensions.DependencyInjection` entra com a sua aprovação.
+
+Testes: `tests/FortKnox.Core.Tests` (27 testes: barramento, estado concorrente, trabalhos, preferências, ferrolhos no registro real em `HKCU\Software\FortKnoxTests`, Lastro e registro de módulos).

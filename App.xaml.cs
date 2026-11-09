@@ -43,6 +43,23 @@ public partial class App : Application
             return;
         }
         base.OnStartup(e);
+
+        // Núcleo (Fase 3.1): log, barramento, estado, trabalhos, preferências por módulo e Diário de Ferrolhos.
+        // Abre em milissegundos; os módulos passam a usá-lo a partir da Fase 3.2. Nada muda na tela.
+        Core = new global::FortKnox.Core.FortKnoxHost(AppSettings.Folder, SynchronizationContext.Current);
+        Core.Log.Info($"Fort Knox {typeof(App).Assembly.GetName().Version} iniciado");
+        DispatcherUnhandledException += (_, ex) => Core.Log.Error("Exceção não tratada na interface", ex.Exception);
+
         new MainWindow().Show();
+    }
+
+    /// <summary>Núcleo do app. Null só no modo --catalogo.</summary>
+    public static global::FortKnox.Core.FortKnoxHost? Core { get; private set; }
+
+    protected override void OnExit(ExitEventArgs e)
+    {
+        // Cancela trabalhos e encerra módulos (até 3 s) antes de o processo terminar.
+        if (Core is { } core) Task.Run(() => core.DisposeAsync().AsTask()).Wait(TimeSpan.FromSeconds(5));
+        base.OnExit(e);
     }
 }

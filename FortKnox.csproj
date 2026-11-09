@@ -22,6 +22,15 @@
     <Compile Remove="tests\**" />
     <EmbeddedResource Remove="tests\**" />
     <None Remove="tests\**" />
+    <!-- Projetos da arquitetura modular (docs/ARQUITETURA.md §4) moram em src\ e entram por ProjectReference -->
+    <Compile Remove="src\**" />
+    <EmbeddedResource Remove="src\**" />
+    <None Remove="src\**" />
+    <Page Remove="src\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="src\FortKnox.Core\FortKnox.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

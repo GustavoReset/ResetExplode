@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Núcleo do Fort Knox (docs/ARQUITETURA.md §6 e §7): SEM WPF. Barramento de eventos, estado global, trabalhos longos,
+       configurações por módulo, Diário de Ferrolhos, log local e contrato de módulos. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>FortKnox.Core</RootNamespace>
+    <AssemblyName>FortKnox.Core</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Mesma versão que o app já usa (MIT). -->
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="FortKnox.Core.Tests" />
+  </ItemGroup>
+
+</Project>
