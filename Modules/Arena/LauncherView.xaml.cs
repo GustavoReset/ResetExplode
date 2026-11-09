@@ -1,12 +1,13 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using FortKnox.Core.Config;
 using Microsoft.Win32;
 
 namespace FortKnox;
 
-/// <summary>Aba ARENA: lista os jogos instalados, guarda um perfil por jogo e inicia aplicando o perfil.</summary>
-public partial class MainWindow
+/// <summary>ARENA · Biblioteca como View (Fase 3.3e, antigo MainWindow.Launcher.cs): lista os jogos instalados, guarda um perfil por jogo e inicia aplicando o perfil.</summary>
+public partial class LauncherView : UserControl
 {
     private List<LibGame> _libGames = new();
     private LibGame? _lg;
@@ -14,6 +15,21 @@ public partial class MainWindow
     private bool _lLoading, _launcherInited;
     private CancellationTokenSource? _launchCts;
     private readonly Dictionary<string, string?> _exeGuess = new();
+    private ISettings<ArenaSettings>? _prefs;
+
+    public LauncherView() => InitializeComponent();
+
+    /// <summary>Perfis por jogo e jogos adicionados à mão (seção "arena" do modules.json). Ligado pelo ArenaModule.</summary>
+    public void Attach(ISettings<ArenaSettings> prefs) => _prefs = prefs;
+
+    private static string? CheckedTag(Panel panel)
+        => panel.Children.OfType<RadioButton>().FirstOrDefault(r => r.IsChecked == true)?.Tag as string;
+
+    private ArenaSettings Prefs => _prefs?.Value ?? new ArenaSettings();
+    private void SavePrefs() { try { _prefs?.Update(_ => { }); } catch (IOException) { } }
+
+    /// <summary>Ao fechar o app: para de acompanhar o jogo (o que for temporário no perfil é desfeito pelo GameLauncher).</summary>
+    public void CancelLaunch() { try { _launchCts?.Cancel(); } catch (ObjectDisposedException) { } }
 
     private static readonly (string Label, string Token, string? Hint)[] ExtraPresets =
     {
@@ -24,7 +40,7 @@ public partial class MainWindow
          "Atenção: a Valve diz que usar esta opção pode reduzir o seu Fator de Confiança (Trust Factor) no matchmaking."),
     };
 
-    private void InitLauncher()
+    public void Activate()
     {
         if (_launcherInited) return;
         _launcherInited = true;
@@ -55,7 +71,7 @@ public partial class MainWindow
         LGameCount.Text = "Procurando seus jogos…";
         try
         {
-            var custom = _settings.CustomGames.ToList();
+            var custom = Prefs.CustomGames.ToList();
             _libGames = await Task.Run(() => GameLibrary.Scan(custom));
             ApplyGameFilter();
             var byStore = _libGames.GroupBy(g => g.Store).Select(x => $"{x.Key} {x.Count()}");
@@ -87,11 +103,11 @@ public partial class MainWindow
     private async void BtnAddExe_Click(object sender, RoutedEventArgs e)
     {
         var dlg = new OpenFileDialog { Filter = "Programas (*.exe)|*.exe", Title = "Escolha o .exe do jogo" };
-        if (dlg.ShowDialog(this) != true) return;
-        if (!_settings.CustomGames.Any(c => c.Exe.Equals(dlg.FileName, StringComparison.OrdinalIgnoreCase)))
+        if (dlg.ShowDialog(Window.GetWindow(this)) != true) return;
+        if (!Prefs.CustomGames.Any(c => c.Exe.Equals(dlg.FileName, StringComparison.OrdinalIgnoreCase)))
         {
-            _settings.CustomGames.Add(new CustomGame { Name = Path.GetFileNameWithoutExtension(dlg.FileName), Exe = dlg.FileName });
-            _settings.Save();
+            Prefs.CustomGames.Add(new CustomGame { Name = Path.GetFileNameWithoutExtension(dlg.FileName), Exe = dlg.FileName });
+            SavePrefs();
         }
         await ScanGamesAsync();
         LGameList.SelectedItem = (LGameList.ItemsSource as IEnumerable<LibGame>)?.FirstOrDefault(g => g.Store == "Manual" && g.Id == dlg.FileName);
@@ -114,7 +130,7 @@ public partial class MainWindow
         LEmpty.Visibility = Visibility.Collapsed;
 
         var g = _lg;
-        if (!_settings.GameProfiles.TryGetValue(g.Key, out var p)) { p = new GameProfile(); _settings.GameProfiles[g.Key] = p; }
+        if (!Prefs.GameProfiles.TryGetValue(g.Key, out var p)) { p = new GameProfile(); Prefs.GameProfiles[g.Key] = p; }
         _lLoading = true;
         _lp = p;
         LTitle.Text = g.Name;
@@ -173,7 +189,7 @@ public partial class MainWindow
         _lp.Hz = int.TryParse(CheckedTag(LHzPanel), out int hz) ? hz : 0;
         _lp.Style = CheckedTag(LStylePanel) ?? "source";
         _lp.Extra = LExtra.Text.Trim();
-        try { _settings.Save(); } catch { }
+        SavePrefs();
         UpdateLauncherPreview();
     }
 
@@ -208,9 +224,9 @@ public partial class MainWindow
             Filter = "Programas (*.exe)|*.exe", Title = "Escolha o .exe do jogo",
             InitialDirectory = Directory.Exists(_lg.InstallDir) ? _lg.InstallDir : "",
         };
-        if (dlg.ShowDialog(this) != true) return;
+        if (dlg.ShowDialog(Window.GetWindow(this)) != true) return;
         _lp.ExePath = dlg.FileName;
-        try { _settings.Save(); } catch { }
+        SavePrefs();
         await ShowExeAsync(_lg, _lp);
     }
 
@@ -220,9 +236,9 @@ public partial class MainWindow
     {
         if (_lp == null) return;
         var dlg = new OpenFileDialog { Filter = "Programas e scripts|*.exe;*.bat;*.cmd;*.lnk", Title = "Programa para abrir junto com o jogo" };
-        if (dlg.ShowDialog(this) != true) return;
+        if (dlg.ShowDialog(Window.GetWindow(this)) != true) return;
         _lp.Helpers.Add(new HelperProgram { Path = dlg.FileName, CloseWithGame = LHelperClose.IsChecked == true });
-        try { _settings.Save(); } catch { }
+        SavePrefs();
         LHelpers.ItemsSource = null;
         LHelpers.ItemsSource = _lp.Helpers;
     }
@@ -231,7 +247,7 @@ public partial class MainWindow
     {
         if (_lp == null || ((FrameworkElement)sender).Tag is not HelperProgram h) return;
         _lp.Helpers.Remove(h);
-        try { _settings.Save(); } catch { }
+        SavePrefs();
         LHelpers.ItemsSource = null;
         LHelpers.ItemsSource = _lp.Helpers;
     }
@@ -248,7 +264,7 @@ public partial class MainWindow
         {
             if (SteamInfo.IsRunning)
             {
-                var ask = MessageBox.Show(this,
+                var ask = MessageBox.Show(Window.GetWindow(this)!,
                     "A Steam precisa ser fechada para gravar as opções de inicialização (senão ela as sobrescreve ao sair).\n\n" +
                     "Fechar a Steam agora? Jogos abertos serão encerrados. Feito um backup do arquivo antes de alterar.",
                     "ARENA · Steam", MessageBoxButton.YesNo, MessageBoxImage.Question);
@@ -283,7 +299,7 @@ public partial class MainWindow
                     if (!string.Equals(p.ExePath, exe, StringComparison.OrdinalIgnoreCase))
                     {
                         p.ExePath = exe;
-                        try { _settings.Save(); } catch { }
+                        SavePrefs();
                         if (_lg == g) LExeText.Text = "Executável: " + exe;
                     }
                 })),

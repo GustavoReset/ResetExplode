@@ -19,6 +19,7 @@ public partial class MainWindow
         ["PageMakerDrv"] = OficinaModule.RouteDrivers,
         ["PageDriver"] = AlicerceModule.RouteDrivers,
         ["PageInteg"] = PrismaModule.RouteLuzes,
+        ["PageLauncher"] = ArenaModule.RouteBiblioteca,
     };
 
     private FortKnoxHost? Core => App.Core;
@@ -33,6 +34,7 @@ public partial class MainWindow
         Core.Modules.Add(new OficinaModule(PageMakerPorts, PageMakerDrv, () => _settings.ComDbBackup, () => { _settings.ComDbBackup = null; try { _settings.Save(); } catch (System.IO.IOException) { } }));
         Core.Modules.Add(new AlicerceModule(PageDriver));
         Core.Modules.Add(new PrismaModule(PageInteg, _monitor));
+        Core.Modules.Add(new ArenaModule(PageLauncher, () => _settings, () => { try { _settings.Save(); } catch (System.IO.IOException) { } }));
     }
 
     /// <summary>Chamado por Nav_Checked. Erros do módulo vão para o log e para a barra de status, sem derrubar o app.</summary>
