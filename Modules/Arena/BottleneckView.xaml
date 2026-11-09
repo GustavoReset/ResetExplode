@@ -1,0 +1,105 @@
+<UserControl x:Class="FortKnox.BottleneckView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- ARENA · Gargalo (Fase 3.3j: extraído do MainWindow.xaml, sem mudança visual) -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="36,30,36,30">
+            <StackPanel Margin="0,0,0,20">
+                <TextBlock Text="ARENA · GARGALO" Style="{StaticResource H1}"/>
+                <TextBlock Text="Descobre o que está limitando o seu FPS: GPU, CPU, memória ou temperatura" Style="{StaticResource Sub}"/>
+            </StackPanel>
+
+            <Grid Margin="0,0,0,14">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="14"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Equilíbrio teórico -->
+                <Border Style="{StaticResource CardBorder}">
+                    <StackPanel>
+                        <TextBlock Text="EQUILÍBRIO DO HARDWARE" Style="{StaticResource Label}"/>
+                        <Grid Margin="0,4,0,0">
+                            <TextBlock x:Name="BnCpuName" Foreground="{DynamicResource Muted}"/>
+                            <TextBlock x:Name="BnGpuName" Foreground="{DynamicResource Muted}" HorizontalAlignment="Right"/>
+                        </Grid>
+                        <!-- Escala: esquerda = GPU fraca para a CPU; centro = equilibrado; direita = CPU fraca para a GPU -->
+                        <Grid Height="22" Margin="0,8,0,4">
+                            <Border Height="4" Background="{DynamicResource Line}" VerticalAlignment="Center"/>
+                            <Border Width="2" Height="10" Background="{DynamicResource Faint}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Canvas x:Name="BnBalanceCanvas" SizeChanged="BnBalanceCanvas_SizeChanged">
+                                <Ellipse x:Name="BnBalanceDot" Width="14" Height="14" Fill="{StaticResource GoldGradient}" Canvas.Top="4"/>
+                            </Canvas>
+                        </Grid>
+                        <Grid>
+                            <TextBlock Text="limita a GPU" Foreground="{DynamicResource Faint}" FontSize="11"/>
+                            <TextBlock Text="equilibrado" Foreground="{DynamicResource Faint}" FontSize="11" HorizontalAlignment="Center"/>
+                            <TextBlock Text="limita a CPU" Foreground="{DynamicResource Faint}" FontSize="11" HorizontalAlignment="Right"/>
+                        </Grid>
+                        <TextBlock x:Name="BnBalanceText" TextWrapping="Wrap" Margin="0,12,0,0"/>
+                        <TextBlock Text="Estimativa pelo desempenho relativo típico; o detector ao vivo mostra a realidade de cada jogo."
+                                   Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Veredito ao vivo -->
+                <Border x:Name="BnLiveCard" Grid.Column="2" Style="{StaticResource CardBorder}">
+                    <StackPanel>
+                        <TextBlock x:Name="BnLiveLabel" Text="AGORA" Style="{StaticResource Label}"/>
+                        <TextBlock x:Name="BnLiveTitle" Text="—" FontSize="24" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="BnLiveGame" Foreground="{DynamicResource Muted}" Margin="0,4,0,10" TextWrapping="Wrap"/>
+                        <TextBlock x:Name="BnLiveAdvice" TextWrapping="Wrap" Foreground="{DynamicResource Muted}"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Leituras ao vivo -->
+            <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14" Padding="18,16,18,6">
+                <StackPanel>
+                    <TextBlock Text="LEITURAS AO VIVO" Style="{StaticResource Label}"/>
+                    <ItemsControl x:Name="BnMeters" ItemTemplate="{StaticResource Meter}" Margin="0,4,0,0">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="3"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemContainerStyle>
+                            <Style TargetType="ContentPresenter">
+                                <Setter Property="Margin" Value="0,0,24,0"/>
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- Sessão -->
+            <Border Style="{StaticResource CardBorder}">
+                <StackPanel>
+                    <Grid>
+                        <StackPanel>
+                            <TextBlock Text="ANÁLISE DE SESSÃO" Style="{StaticResource Label}"/>
+                            <TextBlock Text="Clique em iniciar, abra o jogo e jogue normalmente. Ao final você recebe o diagnóstico."
+                                       Foreground="{DynamicResource Muted}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <StackPanel x:Name="BnDurationPanel" Orientation="Horizontal" Margin="0,0,14,0" VerticalAlignment="Center">
+                                <RadioButton Style="{StaticResource Chip}" GroupName="BnDur" Content="1 min" Tag="1" Margin="0,0,6,0" IsChecked="True"/>
+                                <RadioButton Style="{StaticResource Chip}" GroupName="BnDur" Content="3 min" Tag="3" Margin="0,0,6,0"/>
+                                <RadioButton Style="{StaticResource Chip}" GroupName="BnDur" Content="5 min" Tag="5" Margin="0"/>
+                            </StackPanel>
+                            <Button x:Name="BtnBnSession" Style="{StaticResource PrimaryButton}" Content="INICIAR ANÁLISE" Click="BtnBnSession_Click"/>
+                        </StackPanel>
+                    </Grid>
+                    <TextBlock x:Name="BnSessionStatus" Foreground="{DynamicResource Muted}" Margin="0,14,0,0"/>
+                    <StackPanel x:Name="BnResult" Visibility="Collapsed" Margin="0,16,0,0">
+                        <TextBlock x:Name="BnResultTitle" FontSize="22" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="BnResultSummary" Foreground="{DynamicResource Muted}" Margin="0,4,0,14" TextWrapping="Wrap"/>
+                        <ItemsControl x:Name="BnDistribution" ItemTemplate="{StaticResource Meter}"/>
+                        <TextBlock x:Name="BnResultAdvice" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

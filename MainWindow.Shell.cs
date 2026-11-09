@@ -20,6 +20,8 @@ public partial class MainWindow
         ["PageDriver"] = AlicerceModule.RouteDrivers,
         ["PageInteg"] = PrismaModule.RouteLuzes,
         ["PageLauncher"] = ArenaModule.RouteBiblioteca,
+        ["PageGames"] = ArenaModule.RouteFps,
+        ["PageBottleneck"] = ArenaModule.RouteGargalo,
         ["PageOverlay"] = VigiaModule.RouteOverlay,
         ["PageStress"] = ForjaModule.RouteStress,
         ["PageOc"] = ForjaModule.RouteOc,
@@ -68,7 +70,7 @@ public partial class MainWindow
         Core.Modules.Add(new OficinaModule(PageMakerPorts, PageMakerDrv, () => _settings.ComDbBackup, () => { _settings.ComDbBackup = null; try { _settings.Save(); } catch (System.IO.IOException) { } }));
         Core.Modules.Add(new AlicerceModule(PageDriver));
         Core.Modules.Add(new PrismaModule(PageInteg, _monitor));
-        Core.Modules.Add(new ArenaModule(PageLauncher, () => _settings, () => { try { _settings.Save(); } catch (System.IO.IOException) { } }));
+        Core.Modules.Add(new ArenaModule(PageLauncher, PageGames, PageBottleneck, () => _settings, () => { try { _settings.Save(); } catch (System.IO.IOException) { } }));
         Core.Modules.Add(new VigiaModule(PageOverlay));
 
         Core.Modules.Add(new ForjaModule(PageStress, PageOc, PageBench));
