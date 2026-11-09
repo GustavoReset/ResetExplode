@@ -1,0 +1,155 @@
+<UserControl x:Class="FortKnox.OcView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- FORJA · Overclock (Fase 3.3h: extraído do MainWindow.xaml, sem mudança visual) -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="36,30,36,30">
+            <StackPanel Margin="0,0,0,20">
+                <TextBlock Text="FORJA · OVERCLOCK" Style="{StaticResource H1}"/>
+                <TextBlock Text="Ajustes da GPU, verificador de estabilidade e guia de overclock na BIOS" Style="{StaticResource Sub}"/>
+            </StackPanel>
+
+            <!-- GPU: limite de energia e teto de clock -->
+            <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+                <StackPanel>
+                    <TextBlock x:Name="OcGpuTitle" Style="{StaticResource Label}"/>
+                    <TextBlock x:Name="OcGpuState" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,16"/>
+
+                    <Grid>
+                        <TextBlock Text="LIMITE DE ENERGIA" Style="{StaticResource Label}"/>
+                        <TextBlock x:Name="OcPowerValue" FontFamily="{StaticResource Mono}" HorizontalAlignment="Right"/>
+                    </Grid>
+                    <Slider x:Name="OcPower" Minimum="175" Maximum="300" Value="250" TickFrequency="5"
+                            IsSnapToTickEnabled="True" ValueChanged="OcPower_Changed"/>
+                    <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,16">
+                        Mais energia = clocks mais altos sustentados (e mais calor). Menos energia = PC mais frio e silencioso.
+                    </TextBlock>
+
+                    <TextBlock Text="TETO DE CLOCK (UNDERVOLT)" Style="{StaticResource Label}"/>
+                    <WrapPanel x:Name="OcClockPanel" Margin="0,4,0,0"/>
+                    <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,8,0,16">
+                        Limitar o clock máximo faz a placa usar menos tensão: costuma perder 1–3% de FPS e economizar bastante
+                        energia e calor. "Sem teto" é o comportamento normal.
+                    </TextBlock>
+
+                    <WrapPanel>
+                        <Button x:Name="BtnOcApply" Style="{StaticResource PrimaryButton}" Content="APLICAR"
+                                Padding="20,9" Margin="0,0,10,8" Click="BtnOcApply_Click"/>
+                        <Button Style="{StaticResource OutlineButton}" Content="RESTAURAR PADRÃO"
+                                Padding="20,9" Margin="0,0,10,8" Click="BtnOcReset_Click"/>
+                    </WrapPanel>
+                    <TextBlock x:Name="OcGpuResult" TextWrapping="Wrap"/>
+                    <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,8,0,0">
+                        Ajustes temporários: voltam ao padrão ao reiniciar o PC. Usa só os controles oficiais do driver NVIDIA (NVML);
+                        offset de clock/memória não é liberado por essa via no Windows.
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+
+            <!-- Verificador de estabilidade -->
+            <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+                <StackPanel>
+                    <TextBlock Text="VERIFICADOR DE ESTABILIDADE" Style="{StaticResource Label}"/>
+                    <TextBlock Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,12">
+                        Depois de mudar algo (aqui ou na BIOS): mede a nota, roda stress, vigia temperatura e procura erros de
+                        hardware (WHEA) e reinícios do driver de vídeo no registro do Windows.
+                    </TextBlock>
+
+                    <TextBlock Text="CONFIGURAÇÃO TESTADA" Style="{StaticResource Label}"/>
+                    <TextBox x:Name="OcLabel" Tag="ex.: PBO + Curve Optimizer -15, GPU 220 W" Margin="0,0,0,12"/>
+
+                    <WrapPanel>
+                        <StackPanel Margin="0,0,36,0">
+                            <TextBlock Text="TESTAR" Style="{StaticResource Label}"/>
+                            <StackPanel x:Name="OcTargetPanel" Orientation="Horizontal">
+                                <RadioButton Style="{StaticResource Chip}" GroupName="OcTarget" Content="CPU + RAM" Tag="cpu" Margin="0,0,6,0" IsChecked="True"/>
+                                <RadioButton Style="{StaticResource Chip}" GroupName="OcTarget" Content="GPU" Tag="gpu" Margin="0,0,6,0"/>
+                                <RadioButton Style="{StaticResource Chip}" GroupName="OcTarget" Content="Ambos" Tag="both" Margin="0"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel>
+                            <TextBlock Text="DURAÇÃO" Style="{StaticResource Label}"/>
+                            <StackPanel x:Name="OcDurPanel" Orientation="Horizontal">
+                                <RadioButton Style="{StaticResource Chip}" GroupName="OcDur" Content="5 min" Tag="5" Margin="0,0,6,0"/>
+                                <RadioButton Style="{StaticResource Chip}" GroupName="OcDur" Content="15 min" Tag="15" Margin="0,0,6,0" IsChecked="True"/>
+                                <RadioButton Style="{StaticResource Chip}" GroupName="OcDur" Content="30 min" Tag="30" Margin="0"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </WrapPanel>
+
+                    <Button x:Name="BtnOcCheck" Style="{StaticResource PrimaryButton}" Content="INICIAR VERIFICAÇÃO"
+                            HorizontalAlignment="Left" Padding="24,10" Margin="0,14,0,0" Click="BtnOcCheck_Click"/>
+
+                    <Grid Height="4" Margin="0,12,0,8" Background="{DynamicResource Line}">
+                        <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
+                            <Border.RenderTransform>
+                                <ScaleTransform x:Name="OcProgress" ScaleX="0"/>
+                            </Border.RenderTransform>
+                        </Border>
+                    </Grid>
+                    <TextBlock x:Name="OcStatus" Foreground="{DynamicResource Muted}" TextWrapping="Wrap"/>
+
+                    <Border x:Name="OcVerdictCard" Background="{DynamicResource Card}" BorderBrush="{DynamicResource LineStrong}"
+                            BorderThickness="1" Padding="14,10" Margin="0,12,0,0" Visibility="Collapsed">
+                        <StackPanel>
+                            <TextBlock x:Name="OcVerdict" FontSize="22" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="OcVerdictWhy" TextWrapping="Wrap" Margin="0,3,0,8"/>
+                            <ItemsControl x:Name="OcResult">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding Key}" Opacity="0.7" Margin="0,0,16,0"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding Value}" FontFamily="{StaticResource Mono}"
+                                                       HorizontalAlignment="Right" TextWrapping="Wrap"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Text="ERROS DE HARDWARE RECENTES" Style="{StaticResource Label}" Margin="0,16,0,4"/>
+                    <TextBlock x:Name="OcRecentErrors" Foreground="{DynamicResource Muted}" TextWrapping="Wrap"/>
+
+                    <TextBlock Text="HISTÓRICO" Style="{StaticResource Label}" Margin="0,16,0,8"/>
+                    <ItemsControl x:Name="OcHistory" ItemTemplate="{StaticResource Meter}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Guia de overclock na BIOS -->
+            <Border Style="{StaticResource CardBorder}">
+                <StackPanel>
+                    <TextBlock x:Name="OcGuideTitle" Text="GUIA: OVERCLOCK NA BIOS" Style="{StaticResource Label}"/>
+                    <TextBlock x:Name="OcGuideIntro" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                    <ItemsControl x:Name="OcGuide">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,12,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="36"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Width="24" Height="24" BorderBrush="{DynamicResource LineStrong}" BorderThickness="1"
+                                            VerticalAlignment="Top" HorizontalAlignment="Left">
+                                        <TextBlock Text="{Binding Number}" FontFamily="{StaticResource Mono}" FontWeight="SemiBold"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="{Binding Title}" FontWeight="SemiBold"/>
+                                        <TextBlock Text="{Binding Where}" FontFamily="{StaticResource Mono}" FontSize="11.5"
+                                                   Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                        <TextBlock Text="{Binding Text}" FontSize="12.5" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -166,7 +166,7 @@ public partial class MainWindow : Window
             // Dependem do nome da GPU/CPU
             InitGames();
             InitBottleneckAndOverlay();
-            InitOc();
+            PageOc.Init();
             UpdateDashboard();
         }
 
@@ -255,7 +255,6 @@ public partial class MainWindow : Window
             case "PageDash": UpdateDashboard(); break;
             case "PageDisks": RefreshDiskHealth(); break;
             case "PageEnergy": RefreshEnergy(); break;
-            case "PageOc": UpdateOcGpuState(); UpdateRecentErrors(); break;
             case "PageOptimize": InitOptimize(); break;
         }
     }
