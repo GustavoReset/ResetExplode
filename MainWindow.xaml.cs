@@ -92,6 +92,7 @@ public partial class MainWindow : Window
         SystemSub.Text = "Lendo informações do sistema…";
         StatusText.Text = "Detectando o hardware…";
 
+        RegisterModules();
         InitBench();
         SnapshotUsb();
         RefreshDrives();
@@ -135,9 +136,7 @@ public partial class MainWindow : Window
             _frames.Dispose();
             UnregisterHotKey(new System.Windows.Interop.WindowInteropHelper(this).Handle, HotkeyId);
             ShutdownInteg();
-            ShutdownVault();
-            ShutdownPdf();
-            StopNetTools();
+            ShutdownModules(); // COFRE, PRENSA e RADAR (Fase 3.2)
             _launchCts?.Cancel();
             _monitor.Dispose();
         };
@@ -255,8 +254,7 @@ public partial class MainWindow : Window
         var item = (FrameworkElement)sender;
         string page = (string)item.Tag;
         ShowPage(page);
-        if (page != "PageVault") LockVault(); // sair do Vault tira as senhas da memória
-        if (page != "PageNet") StopNetTools(); // sair da Rede para o monitor de consumo (sessão ETW) e o rastreio
+        NavigateModules(page); // módulos do núcleo: o COFRE sai da memória, o RADAR para o ETW etc.
 
         // Abre a categoria da página (ex.: quando o painel pula direto para o Benchmark)
         // e mostra "CATEGORIA · página" na barra de título.
@@ -285,8 +283,6 @@ public partial class MainWindow : Window
             case "PageMakerPorts": ScanUsb(); break;
             case "PageMakerDrv": InitMakerDrivers(); break;
             case "PageOptimize": InitOptimize(); break;
-            case "PageVault": InitVault(); break;
-            case "PagePdf": InitPdf(); break;
         }
     }
 
