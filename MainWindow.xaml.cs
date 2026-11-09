@@ -200,7 +200,7 @@ public partial class MainWindow : Window
 
     private void ShowPage(string name)
     {
-        foreach (var p in new FrameworkElement[] { PageDash, PageSystem, PageSensors, PageGpu, PageGames, PageBottleneck, PageOverlay, PageBench, PageOptimize, PageOc, PageInteg, PageLauncher, PageDriver, PageCleanup, PageUninstall, PageStartup, PageApps, PageMakerPorts, PageMakerDrv, PageDisks, PageEnergy, PageNet, PageStress, PageVault, PagePdf })
+        foreach (var p in new FrameworkElement[] { PageDash, PageSystem, PageSensors, PageGpu, PageGames, PageBottleneck, PageOverlay, PageBench, PageOptimize, PageOc, PageInteg, PageLauncher, PageDriver, PageCleanup, PageUninstall, PageStartup, PageApps, PageUpdates, PageMakerPorts, PageMakerDrv, PageDisks, PageEnergy, PageNet, PageStress, PageVault, PagePdf })
             p.Visibility = p.Name == name ? Visibility.Visible : Visibility.Collapsed;
     }
 
