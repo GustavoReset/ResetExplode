@@ -7,8 +7,10 @@
         <StackPanel Margin="36,30,36,30">
             <Grid Margin="0,0,0,20">
                 <StackPanel Margin="0,0,260,0">
-                    <TextBlock Text="ARSENAL · LIMPEZA" Style="{StaticResource H1}"/>
-                    <TextBlock Text="Temporários, caches que se recriam sozinhos e a Lixeira · veja o tamanho antes de apagar" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="ARSENAL · LIMPEZA" Style="{StaticResource H1}"/>
+                        <TextBlock Style="{StaticResource InfoTip}" ToolTip="Temporários, caches que se recriam sozinhos e a Lixeira · veja o tamanho antes de apagar"/>
+                    </StackPanel>
                 </StackPanel>
                 <Button x:Name="BtnClean" Style="{StaticResource PrimaryButton}" Content="Limpar selecionados" Padding="20,9"
                         HorizontalAlignment="Right" VerticalAlignment="Top" IsEnabled="False" Click="BtnClean_Click"/>
@@ -16,19 +18,18 @@
 
             <ui:ScannerPanel x:Name="Scanner" Title="ARSENAL · VERIFICAÇÃO" StartText="Verificar" Margin="0,0,0,16"/>
 
-            <Border Style="{StaticResource CardBorder}" Margin="0,0,0,16">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,16">
                 <StackPanel>
                     <Grid Margin="0,0,0,6">
-                        <TextBlock x:Name="CatSummary" Text="O QUE PODE SAIR" Style="{StaticResource Label}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="CatSummary" Text="O QUE PODE SAIR" Style="{StaticResource Label}"/>
+                            <TextBlock Style="{StaticResource InfoTip}" FontSize="12" VerticalAlignment="Top" Margin="8,-1,0,0" ToolTip="Só caches e temporários: senhas, cookies, histórico, favoritos e documentos nunca entram. Arquivos usados nas últimas horas e arquivos abertos por algum programa ficam. Tudo aqui é recriado sozinho quando o programa precisar."/>
+                        </StackPanel>
                         <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Top">
                             <Button Style="{StaticResource OutlineButtonSm}" Content="Marcar todos" Margin="0,0,8,0" Click="BtnAll_Click"/>
                             <Button Style="{StaticResource OutlineButtonSm}" Content="Desmarcar" Click="BtnNone_Click"/>
                         </WrapPanel>
                     </Grid>
-                    <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,10">
-                        Só caches e temporários: senhas, cookies, histórico, favoritos e documentos nunca entram. Arquivos usados nas
-                        últimas horas e arquivos abertos por algum programa ficam. Tudo aqui é recriado sozinho quando o programa precisar.
-                    </TextBlock>
                     <ItemsControl x:Name="CatList">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -42,9 +43,15 @@
                                         <CheckBox IsChecked="{Binding Selected}" VerticalAlignment="Top" Margin="0,1,12,0"
                                                   AutomationProperties.Name="{Binding Title}"/>
                                         <StackPanel Grid.Column="1">
-                                            <TextBlock Text="{Binding Title}" FontWeight="SemiBold"/>
-                                            <TextBlock Text="{Binding Description}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0"/>
-                                            <TextBlock Text="{Binding Note}" Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                                            <!-- Descrição e observação ficam na dica: a linha mostra só o nome e o tamanho -->
+                                            <TextBlock Text="{Binding Title}" FontWeight="SemiBold" Cursor="Help">
+                                                <TextBlock.ToolTip>
+                                                    <StackPanel MaxWidth="320">
+                                                        <TextBlock Text="{Binding Description}" TextWrapping="Wrap"/>
+                                                        <TextBlock Text="{Binding Note}" TextWrapping="Wrap" Foreground="{DynamicResource Muted}" Margin="0,4,0,0"/>
+                                                    </StackPanel>
+                                                </TextBlock.ToolTip>
+                                            </TextBlock>
                                         </StackPanel>
                                         <TextBlock Grid.Column="2" Text="{Binding SizeText}" FontFamily="{StaticResource Mono}" FontSize="13"
                                                    Foreground="{DynamicResource AccentText}" VerticalAlignment="Top" Margin="14,1,0,0"/>
@@ -55,20 +62,21 @@
                     </ItemsControl>
                     <TextBlock x:Name="CleanResult" TextWrapping="Wrap" Margin="0,10,0,0"/>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
 
-            <Border Style="{StaticResource CardBorder}">
+            <ui:ChamferBorder Style="{StaticResource FkCard}">
                 <Grid>
                     <StackPanel Margin="0,0,200,0">
                         <TextBlock Text="LIXEIRA" Style="{StaticResource Label}"/>
-                        <TextBlock x:Name="BinText" Text="Lendo a Lixeira…" FontSize="14" FontWeight="SemiBold"/>
-                        <TextBlock Text="Esvaziar a Lixeira apaga de vez o que você já mandou para ela. Não tem volta."
-                                   Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="BinText" Text="Lendo a Lixeira…" FontSize="14" FontWeight="SemiBold"/>
+                            <TextBlock Style="{StaticResource InfoTip}" FontSize="12" VerticalAlignment="Top" Margin="8,-1,0,0" ToolTip="Esvaziar a Lixeira apaga de vez o que você já mandou para ela. Não tem volta."/>
+                        </StackPanel>
                     </StackPanel>
                     <Button x:Name="BtnBin" Style="{StaticResource DangerButtonSm}" Content="Esvaziar Lixeira"
                             HorizontalAlignment="Right" VerticalAlignment="Center" IsEnabled="False" Click="BtnBin_Click"/>
                 </Grid>
-            </Border>
+            </ui:ChamferBorder>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

@@ -60,7 +60,13 @@ public partial class DashView : UserControl
 
     public DashView() => InitializeComponent();
 
-    public void Attach(Host host) => _host = host;
+    public void Attach(Host host)
+    {
+        _host = host;
+        // Mandala: a ferramenta escolhida abre pela mesma navegação do menu lateral
+        Mandala.Navigate += page => host.Navigate(page);
+        IsVisibleChanged += (_, e) => { if (!(bool)e.NewValue) Mandala.ResetClosed(); };
+    }
 
     private static string? CheckedTag(Panel panel)
         => panel.Children.OfType<RadioButton>().FirstOrDefault(r => r.IsChecked == true)?.Tag as string;
@@ -306,10 +312,10 @@ public partial class DashView : UserControl
         var dot = new Ellipse { Width = 11, Height = 11, Stroke = fg, StrokeThickness = 2, Fill = (Brush)FindResource("Card") };
         Canvas.SetLeft(dot, last.X - 5.5); Canvas.SetTop(dot, last.Y - 5.5);
         DashChart.Children.Add(dot);
-        var bubble = new Border
+        var bubble = new FortKnox.UI.ChamferBorder
         {
             Background = (Brush)FindResource("Hover"), BorderBrush = fg, BorderThickness = new Thickness(1),
-            CornerRadius = new CornerRadius(4), Padding = new Thickness(10, 5, 10, 5),
+            Cut = 4, Padding = new Thickness(10, 5, 10, 5),
             Child = new TextBlock { Text = DashChartValue.Text, FontFamily = mono, FontWeight = FontWeights.SemiBold, Foreground = text }
         };
         bubble.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));

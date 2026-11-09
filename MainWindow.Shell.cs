@@ -56,6 +56,41 @@ public partial class MainWindow
     /// <summary>"Eventos recentes" do PAINEL (benchmarks, testes, dispositivos conectados).</summary>
     private void AddEvent(string icon, string title, string detail, string value) => PageDash.AddEvent(icon, title, detail, value);
 
+    /// <summary>
+    /// Modo de revisão visual (--capturas): abre cada página do menu, espera carregar e grava um PNG da janela.
+    /// Inclui a mandala do PAINEL aberta e com um módulo escolhido. Não altera nada no sistema além de ler sensores.
+    /// </summary>
+    public async Task CaptureTourAsync(string dir, bool light)
+    {
+        System.IO.Directory.CreateDirectory(dir);
+        if (light != ThemeManager.IsLight) ThemeManager.Apply(light);
+        WindowState = System.Windows.WindowState.Normal; Width = 1440; Height = 900; Left = 0; Top = 0; Topmost = true;
+        await Task.Delay(2500);
+        async Task Shot(string name)
+        {
+            await Task.Delay(1600);
+            UpdateLayout();
+            // Copia os pixels da tela (o que a pessoa vê). RenderTargetBitmap desenha a Michroma grande quase apagada.
+            var src = ScreenCopy.Of(this);
+            var enc = new System.Windows.Media.Imaging.PngBitmapEncoder();
+            enc.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(src));
+            await using var fs = System.IO.File.Create(System.IO.Path.Combine(dir, name + ".png"));
+            enc.Save(fs);
+        }
+        NavigateTo("PageDash");
+        await Shot("00-painel");
+        PageDash.Mandala.Expand();
+        await Shot("01-painel-mandala");
+        PageDash.Mandala.SelectForCapture(3);
+        await Shot("02-painel-mandala-arsenal");
+        PageDash.Mandala.ResetClosed();
+        foreach (var page in ModuleRoutes.Keys.Where(p => p != "PageDash"))
+        {
+            NavigateTo(page);
+            await Shot(page);
+        }
+    }
+
     /// <summary>Abre uma página do menu pelo nome da página (Tag do item), como se a pessoa tivesse clicado.</summary>
     private void NavigateTo(string page)
     {
@@ -186,5 +221,37 @@ public partial class MainWindow
         if (Core == null) return;
         var t = Core.Modules.ShutdownAsync();
         if (!t.IsCompleted) Core.Log.Warn("Algum módulo terminou de encerrar em segundo plano");
+    }
+}
+
+/// <summary>Captura da janela pela tela (GDI BitBlt), usada só no modo --capturas.</summary>
+internal static class ScreenCopy
+{
+    [System.Runtime.InteropServices.DllImport("user32.dll")] private static extern IntPtr GetDC(IntPtr h);
+    [System.Runtime.InteropServices.DllImport("user32.dll")] private static extern int ReleaseDC(IntPtr h, IntPtr dc);
+    [System.Runtime.InteropServices.DllImport("gdi32.dll")] private static extern IntPtr CreateCompatibleDC(IntPtr dc);
+    [System.Runtime.InteropServices.DllImport("gdi32.dll")] private static extern IntPtr CreateCompatibleBitmap(IntPtr dc, int w, int h);
+    [System.Runtime.InteropServices.DllImport("gdi32.dll")] private static extern IntPtr SelectObject(IntPtr dc, IntPtr o);
+    [System.Runtime.InteropServices.DllImport("gdi32.dll")] private static extern bool BitBlt(IntPtr dst, int x, int y, int w, int h, IntPtr src, int sx, int sy, int rop);
+    [System.Runtime.InteropServices.DllImport("gdi32.dll")] private static extern bool DeleteObject(IntPtr o);
+    [System.Runtime.InteropServices.DllImport("gdi32.dll")] private static extern bool DeleteDC(IntPtr dc);
+
+    public static System.Windows.Media.Imaging.BitmapSource Of(System.Windows.Window w)
+    {
+        var dpi = System.Windows.Media.VisualTreeHelper.GetDpi(w);
+        var tl = w.PointToScreen(new System.Windows.Point(0, 0));
+        int x = (int)tl.X, y = (int)tl.Y, wd = (int)(w.ActualWidth * dpi.DpiScaleX), ht = (int)(w.ActualHeight * dpi.DpiScaleY);
+        IntPtr screen = GetDC(IntPtr.Zero), mem = CreateCompatibleDC(screen), bmp = CreateCompatibleBitmap(screen, wd, ht);
+        IntPtr old = SelectObject(mem, bmp);
+        BitBlt(mem, 0, 0, wd, ht, screen, x, y, 0x00CC0020);
+        SelectObject(mem, old);
+        try
+        {
+            var src = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(bmp, IntPtr.Zero, System.Windows.Int32Rect.Empty,
+                System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
+            src.Freeze();
+            return src;
+        }
+        finally { DeleteObject(bmp); DeleteDC(mem); ReleaseDC(IntPtr.Zero, screen); }
     }
 }

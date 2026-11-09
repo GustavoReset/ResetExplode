@@ -1,56 +1,55 @@
 <UserControl x:Class="FortKnox.PrismaView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="clr-namespace:FortKnox.UI">
     <!-- PRISMA · Iluminação (Fase 3.3d: extraído do MainWindow.xaml, sem mudança visual) -->
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="36,30,36,30">
             <Grid Margin="0,0,0,20">
                 <StackPanel Margin="0,0,190,0">
-                    <TextBlock Text="PRISMA · ILUMINAÇÃO" Style="{StaticResource H1}"/>
-                    <TextBlock Text="Iluminação e efeitos do PC · Corsair iCUE, OpenRGB (MSI, Gigabyte, ASUS...) e Razer Chroma (em teste)" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="PRISMA · ILUMINAÇÃO" Style="{StaticResource H1}"/>
+                        <TextBlock Style="{StaticResource InfoTip}" ToolTip="Iluminação e efeitos do PC · Corsair iCUE, OpenRGB (MSI, Gigabyte, ASUS...) e Razer Chroma (em teste)"/>
+                    </StackPanel>
                 </StackPanel>
                 <Button x:Name="BtnLightConnect" Style="{StaticResource OutlineButton}" Content="CONECTAR TUDO" Padding="20,9"
                         HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnLightConnect_Click"/>
             </Grid>
 
-            <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                 <StackPanel>
                     <TextBlock Text="INTEGRAÇÕES" Style="{StaticResource Label}"/>
 
-                    <TextBlock Text="Corsair iCUE / iCUE LINK" FontSize="14" FontWeight="SemiBold" Margin="0,8,0,2"/>
-                    <TextBlock x:Name="LightStatus" Text="Aguardando…" TextWrapping="Wrap" Foreground="{DynamicResource Muted}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Corsair iCUE / iCUE LINK" FontSize="14" FontWeight="SemiBold" Margin="0,8,0,2"/>
+                        <TextBlock Style="{StaticResource InfoTip}" FontSize="12" VerticalAlignment="Top" Margin="8,-1,0,0" ToolTip="Requer o iCUE aberto com o SDK ativado nas configurações (manual, dentro do iCUE). A DLL do SDK é baixada pelo botão acima."/>
+                    </StackPanel>
+                    <ui:StatusLine x:Name="LightStatus" Text="Aguardando…" TextWrapping="Wrap" Foreground="{DynamicResource Muted}"/>
                     <Button x:Name="BtnLightSdk" Style="{StaticResource OutlineButton}" Content="BAIXAR O SDK DA CORSAIR" Visibility="Collapsed"
                             HorizontalAlignment="Left" Padding="20,9" Margin="0,10,0,0" Click="BtnLightSdk_Click"/>
-                    <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0">
-                        Requer o iCUE aberto com o SDK ativado nas configurações (manual, dentro do iCUE). A DLL do SDK é baixada pelo botão acima.
-                    </TextBlock>
-
                     <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0" Margin="0,14,0,0" Padding="0,12,0,0">
                         <StackPanel>
-                            <TextBlock Text="OpenRGB · MSI Mystic Light, Gigabyte RGB Fusion, ASUS Aura, RAM, Razer, Logitech e outras" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,2"/>
-                            <TextBlock x:Name="OrgbStatus" Text="Aguardando…" TextWrapping="Wrap" Foreground="{DynamicResource Muted}"/>
+                            <TextBlock Text="OpenRGB" ToolTip="MSI Mystic Light, Gigabyte RGB Fusion, ASUS Aura, RAM, Razer, Logitech e outras" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,2"/>
+                            <ui:StatusLine x:Name="OrgbStatus" Text="Aguardando…" TextWrapping="Wrap" Foreground="{DynamicResource Muted}"/>
                             <Button x:Name="BtnOrgbOpen" Style="{StaticResource OutlineButton}" Content="ABRIR O OPENRGB"
                                     HorizontalAlignment="Left" Padding="20,9" Margin="0,10,0,0" Click="BtnOrgbOpen_Click"/>
-                            <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0">
-                                A MSI, a Gigabyte e a ASUS não oferecem SDK público; o OpenRGB (gratuito, openrgb.org) conversa com os controladores delas.
-                                Ele precisa estar aberto com o servidor SDK ligado, e o MSI Center, o Armoury Crate e o RGB Fusion devem estar fechados.
-                            </TextBlock>
+                            <TextBlock Style="{StaticResource InfoTip}" HorizontalAlignment="Right" Margin="0,0,0,4" ToolTip="A MSI, a Gigabyte e a ASUS não oferecem SDK público; o OpenRGB (gratuito, openrgb.org) conversa com os controladores delas. Ele precisa estar aberto com o servidor SDK ligado, e o MSI Center, o Armoury Crate e o RGB Fusion devem estar fechados."/>
                         </StackPanel>
                     </Border>
 
                     <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0" Margin="0,14,0,0" Padding="0,12,0,0">
                         <StackPanel>
-                            <TextBlock Text="Razer Chroma" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,2"/>
-                            <TextBlock x:Name="RazerStatus" Text="Aguardando…" TextWrapping="Wrap" Foreground="{DynamicResource Muted}"/>
-                            <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0">
-                                Requer o Razer Synapse instalado e aberto. Controla cada categoria (teclado, mouse, headset...) com uma cor só.
-                            </TextBlock>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Razer Chroma" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,2"/>
+                                <TextBlock Style="{StaticResource InfoTip}" FontSize="12" VerticalAlignment="Top" Margin="8,-1,0,0" ToolTip="Requer o Razer Synapse instalado e aberto. Controla cada categoria (teclado, mouse, headset...) com uma cor só."/>
+                            </StackPanel>
+                            <ui:StatusLine x:Name="RazerStatus" Text="Aguardando…" TextWrapping="Wrap" Foreground="{DynamicResource Muted}"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
 
-            <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                 <StackPanel>
                     <TextBlock Text="DISPOSITIVOS" Style="{StaticResource Label}"/>
                     <TextBlock x:Name="LightDevicesHint" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,8"/>
@@ -70,11 +69,14 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
 
-            <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                 <StackPanel>
-                    <TextBlock Text="EFEITO" Style="{StaticResource Label}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="EFEITO" Style="{StaticResource Label}"/>
+                        <TextBlock Style="{StaticResource InfoTip}" FontSize="12" VerticalAlignment="Top" Margin="8,-1,0,0" ToolTip="Temperatura e carga mudam a cor sozinhas (azul = frio/ocioso, verde, amarelo, vermelho = quente/carga alta). Cor fixa e Respiração usam a cor escolhida abaixo."/>
+                    </StackPanel>
                     <WrapPanel x:Name="LightFxPanel" Margin="0,4,0,12">
                         <RadioButton Style="{StaticResource Chip}" GroupName="LightFx" Content="Cor fixa" Tag="static" IsChecked="True" Checked="LightFx_Checked"/>
                         <RadioButton Style="{StaticResource Chip}" GroupName="LightFx" Content="Respiração" Tag="breath" Checked="LightFx_Checked"/>
@@ -84,11 +86,6 @@
                         <RadioButton Style="{StaticResource Chip}" GroupName="LightFx" Content="Carga da CPU" Tag="load" Checked="LightFx_Checked"/>
                         <RadioButton Style="{StaticResource Chip}" GroupName="LightFx" Content="Apagar" Tag="off" Checked="LightFx_Checked"/>
                     </WrapPanel>
-                    <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,16">
-                        Temperatura e carga mudam a cor sozinhas (azul = frio/ocioso, verde, amarelo, vermelho = quente/carga alta).
-                        Cor fixa e Respiração usam a cor escolhida abaixo.
-                    </TextBlock>
-
                     <TextBlock Text="COR" Style="{StaticResource Label}"/>
                     <StackPanel Orientation="Horizontal" Margin="0,6,0,8">
                         <Border x:Name="LightPreview" Width="46" Height="46" Margin="0,0,16,0" BorderBrush="{DynamicResource LineStrong}" BorderThickness="1" VerticalAlignment="Top"/>
@@ -121,18 +118,18 @@
                     </WrapPanel>
                     <TextBlock x:Name="LightRunHint" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,10,0,0"/>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
 
-            <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                 <StackPanel>
-                    <TextBlock Text="DIAGNÓSTICO" Style="{StaticResource Label}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="DIAGNÓSTICO" Style="{StaticResource Label}"/>
+                        <TextBlock Style="{StaticResource InfoTip}" FontSize="12" VerticalAlignment="Top" Margin="8,-1,0,0" ToolTip="Se as luzes não mudarem, copie este quadro e me envie."/>
+                    </StackPanel>
                     <TextBox x:Name="LightDiag" IsReadOnly="True" FontFamily="{StaticResource Mono}" FontSize="11" TextWrapping="Wrap"
                              MinHeight="90" MaxHeight="260" VerticalScrollBarVisibility="Auto" AcceptsReturn="True"/>
-                    <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,0">
-                        Se as luzes não mudarem, copie este quadro e me envie.
-                    </TextBlock>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

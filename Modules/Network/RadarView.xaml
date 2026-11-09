@@ -1,29 +1,29 @@
 <UserControl x:Class="FortKnox.RadarView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="clr-namespace:FortKnox.UI"
              xmlns:local="clr-namespace:FortKnox">
     <!-- RADAR · Rede (Fase 3.3m: extraído do MainWindow.xaml, sem mudança visual) -->
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="36,30,36,30">
             <Grid Margin="0,0,0,20">
                 <StackPanel Margin="0,0,160,0">
-                    <TextBlock Text="RADAR · REDE" Style="{StaticResource H1}"/>
-                    <TextBlock Text="Descubra se o lag vem do seu PC, do Wi-Fi ou do provedor" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="RADAR · REDE" Style="{StaticResource H1}"/>
+                        <TextBlock Style="{StaticResource InfoTip}" ToolTip="Descubra se o lag vem do seu PC, do Wi-Fi ou do provedor"/>
+                    </StackPanel>
                 </StackPanel>
                 <Button x:Name="BtnNetTest" Style="{StaticResource PrimaryButton}" Content="TESTAR" Padding="22,9"
                         HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnNetTest_Click"/>
             </Grid>
             <Grid Height="3" Margin="0,0,0,8" Background="{DynamicResource Line}">
-                <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
+                <Border Background="{StaticResource GoldGradient}" RenderTransformOrigin="0,0.5">
                     <Border.RenderTransform><ScaleTransform x:Name="NetProgress" ScaleX="0"/></Border.RenderTransform>
                 </Border>
             </Grid>
-            <TextBlock x:Name="NetStatus" Text="Pronto. O teste leva cerca de 30 segundos." Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,16"/>
+            <ui:StatusLine x:Name="NetStatus" Text="Pronto. O teste leva cerca de 30 segundos." Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,16"/>
             <ItemsControl x:Name="NetCards" ItemTemplate="{StaticResource CardTemplate}"/>
-            <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap">
-                O teste envia pacotes de ping ao roteador e aos DNS públicos 1.1.1.1 e 8.8.8.8 e baixa/envia dados de teste do servidor público
-                speed.cloudflare.com (cerca de 100 MB no total). Feche downloads, streaming e jogos antes para um resultado fiel.
-            </TextBlock>
+            <TextBlock Style="{StaticResource InfoTip}" HorizontalAlignment="Right" Margin="0,0,0,4" ToolTip="O teste envia pacotes de ping ao roteador e aos DNS públicos 1.1.1.1 e 8.8.8.8 e baixa/envia dados de teste do servidor público speed.cloudflare.com (cerca de 100 MB no total). Feche downloads, streaming e jogos antes para um resultado fiel."/>
             <!-- Traceroute e consumo por programa (UserControl em Modules\Network) -->
             <local:NetToolsView x:Name="NetTools" Margin="0,24,0,0"/>
         </StackPanel>

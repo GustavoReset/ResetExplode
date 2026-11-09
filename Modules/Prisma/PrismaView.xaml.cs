@@ -86,11 +86,12 @@ public partial class PrismaView : UserControl
 
     private static ControlTemplate SwatchTemplate()
     {
-        var border = new FrameworkElementFactory(typeof(Border));
-        border.SetValue(Border.CornerRadiusProperty, new CornerRadius(15));
-        border.SetBinding(Border.BackgroundProperty, new System.Windows.Data.Binding("Background") { RelativeSource = System.Windows.Data.RelativeSource.TemplatedParent });
-        border.SetBinding(Border.BorderBrushProperty, new System.Windows.Data.Binding("BorderBrush") { RelativeSource = System.Windows.Data.RelativeSource.TemplatedParent });
-        border.SetValue(Border.BorderThicknessProperty, new Thickness(1));
+        // Amostra de cor chanfrada (Brandbook v3: sem círculos/cantos arredondados genéricos)
+        var border = new FrameworkElementFactory(typeof(FortKnox.UI.ChamferBorder));
+        border.SetValue(FortKnox.UI.ChamferBorder.CutProperty, 7.0);
+        border.SetBinding(FortKnox.UI.ChamferBorder.BackgroundProperty, new System.Windows.Data.Binding("Background") { RelativeSource = System.Windows.Data.RelativeSource.TemplatedParent });
+        border.SetBinding(FortKnox.UI.ChamferBorder.BorderBrushProperty, new System.Windows.Data.Binding("BorderBrush") { RelativeSource = System.Windows.Data.RelativeSource.TemplatedParent });
+        border.SetValue(FortKnox.UI.ChamferBorder.BorderThicknessProperty, new Thickness(1));
         return new ControlTemplate(typeof(Button)) { VisualTree = border };
     }
 

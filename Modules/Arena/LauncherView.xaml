@@ -1,6 +1,7 @@
 <UserControl x:Class="FortKnox.LauncherView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="clr-namespace:FortKnox.UI">
     <!-- ARENA · Biblioteca de jogos (Fase 3.3e: extraído do MainWindow.xaml, sem mudança visual) -->
     <Grid Margin="36,30,36,30">
         <Grid.ColumnDefinitions>
@@ -18,7 +19,7 @@
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="0" Margin="0,0,0,14">
                 <TextBlock Text="ARENA · BIBLIOTECA" Style="{StaticResource H1}"/>
-                <TextBlock x:Name="LGameCount" Text="Procurando seus jogos…" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                <ui:StatusLine x:Name="LGameCount" Text="Procurando seus jogos…" FontSize="13" Margin="0,4,0,0"/>
             </StackPanel>
             <StackPanel Grid.Row="1" Margin="0,0,0,10">
                 <TextBox x:Name="LGameSearch" Tag="Buscar jogo…" TextChanged="LGameSearch_Changed" Margin="0,0,0,8"/>
@@ -46,17 +47,20 @@
                 <Grid Margin="0,0,0,6">
                     <StackPanel Margin="0,0,200,0">
                         <TextBlock x:Name="LTitle" Style="{StaticResource H1}" TextWrapping="Wrap"/>
-                        <TextBlock x:Name="LSub" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        <ui:StatusLine x:Name="LSub" Text="" FontSize="13" Margin="0,4,0,0"/>
                     </StackPanel>
                     <Button x:Name="BtnPlay" Style="{StaticResource PrimaryButton}" Content="JOGAR" Padding="40,14" FontSize="16"
                             HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnPlay_Click"/>
                 </Grid>
-                <TextBlock x:Name="LStatus" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,16"/>
+                <ui:StatusLine x:Name="LStatus" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,16"/>
 
                 <!-- Desempenho -->
-                <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+                <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                     <StackPanel>
-                        <TextBlock Text="DESEMPENHO" Style="{StaticResource Label}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="DESEMPENHO" Style="{StaticResource Label}"/>
+                            <TextBlock Style="{StaticResource InfoTip}" FontSize="12" VerticalAlignment="Top" Margin="8,-1,0,0" ToolTip="Prioridade e plano de energia valem só durante o jogo. As opções de GPU e tela cheia são gravadas para o .exe do jogo no Windows (o programa descobre o .exe sozinho; se errar, escolha o certo)."/>
+                        </StackPanel>
                         <TextBlock Text="Prioridade do processo" Foreground="{DynamicResource Muted}" FontSize="12" Margin="0,8,0,0"/>
                         <WrapPanel x:Name="LPriorityPanel" Margin="0,4,0,10">
                         <RadioButton Style="{StaticResource Chip}" GroupName="LPriority" Content="Normal" Tag="normal" IsChecked="True" Checked="LProfile_Changed"/>
@@ -66,20 +70,16 @@
                         <CheckBox x:Name="LChkPlan" Content="Plano de energia Alto desempenho enquanto joga (volta ao normal depois)" Margin="0,0,0,10" Click="LProfile_Changed"/>
                         <CheckBox x:Name="LChkGpu" Content="Forçar a placa de vídeo dedicada (configuração gráfica do Windows)" Margin="0,0,0,10" Click="LProfile_Changed"/>
                         <CheckBox x:Name="LChkFso" Content="Desativar otimizações de tela cheia do Windows" Margin="0,0,0,12" Click="LProfile_Changed"/>
-                        <TextBlock x:Name="LExeText" Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                        <ui:StatusLine x:Name="LExeText" Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,8"/>
                         <WrapPanel>
                             <Button Style="{StaticResource OutlineButton}" Content="ESCOLHER O .EXE" Padding="14,8" Margin="0,0,8,0" Click="BtnPickExe_Click"/>
                             <Button Style="{StaticResource OutlineButton}" Content="PERFIL PARA MAIS FPS" Padding="14,8" Click="BtnRecommended_Click"/>
                         </WrapPanel>
-                        <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,8,0,0">
-                            Prioridade e plano de energia valem só durante o jogo. As opções de GPU e tela cheia são gravadas para o .exe do jogo no Windows
-                            (o programa descobre o .exe sozinho; se errar, escolha o certo).
-                        </TextBlock>
                     </StackPanel>
-                </Border>
+                </ui:ChamferBorder>
 
                 <!-- Gráficos -->
-                <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+                <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                     <StackPanel>
                         <TextBlock Text="GRÁFICOS (ARGUMENTOS DE INICIALIZAÇÃO)" Style="{StaticResource Label}"/>
                         <TextBlock Text="Modo de janela" Foreground="{DynamicResource Muted}" FontSize="12" Margin="0,8,0,0"/>
@@ -124,16 +124,15 @@
                         </StackPanel>
                         <TextBlock x:Name="LGfxNote" Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,8,0,0"/>
                     </StackPanel>
-                </Border>
+                </ui:ChamferBorder>
 
                 <!-- Programas auxiliares -->
-                <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+                <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                     <StackPanel>
-                        <TextBlock Text="PROGRAMAS AUXILIARES" Style="{StaticResource Label}"/>
-                        <TextBlock Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,6,0,10">
-                            Ferramentas de terceiros que abrem antes do jogo (monitoramento, comandos, mixer de áudio, script...). A ARENA as abre
-                            sozinho ao clicar em JOGAR e pode fechá-las junto com o jogo. Nada é escrito nas opções da Steam.
-                        </TextBlock>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="PROGRAMAS AUXILIARES" Style="{StaticResource Label}"/>
+                            <TextBlock Style="{StaticResource InfoTip}" FontSize="12" VerticalAlignment="Top" Margin="8,-1,0,0" ToolTip="Ferramentas de terceiros que abrem antes do jogo (monitoramento, comandos, mixer de áudio, script...). A ARENA as abre sozinho ao clicar em JOGAR e pode fechá-las junto com o jogo. Nada é escrito nas opções da Steam."/>
+                        </StackPanel>
                         <ItemsControl x:Name="LHelpers">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -150,7 +149,7 @@
                             <CheckBox x:Name="LHelperClose" Content="Fechar junto com o jogo" IsChecked="True" VerticalAlignment="Center"/>
                         </WrapPanel>
                     </StackPanel>
-                </Border>
+                </ui:ChamferBorder>
             </StackPanel>
         </ScrollViewer>
     </Grid>

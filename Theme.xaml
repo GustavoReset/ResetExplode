@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="clr-namespace:FortKnox.UI">
 
     <!-- Marca (degradês, símbolo e logotipo vetoriais) -->
     <ResourceDictionary.MergedDictionaries>
@@ -83,7 +84,15 @@
         <Setter Property="Background" Value="{DynamicResource CardFill}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource Line}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="CornerRadius" Value="0"/>
+        <Setter Property="Padding" Value="20"/>
+    </Style>
+    <!-- Cartão da marca: canto chanfrado a 45° (Brandbook v3). Use com ui:ChamferBorder. -->
+    <Style x:Key="FkCard" TargetType="ui:ChamferBorder">
+        <Setter Property="Background" Value="{DynamicResource CardFill}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Line}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Cut" Value="12"/>
         <Setter Property="Padding" Value="20"/>
     </Style>
 
@@ -101,10 +110,10 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="b" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                    <ui:ChamferBorder x:Name="b" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" Cut="6" Padding="{TemplateBinding Padding}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" TextElement.FontWeight="SemiBold"/>
-                    </Border>
+                    </ui:ChamferBorder>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="b" Property="Opacity" Value="0.85"/>
@@ -193,10 +202,10 @@
                 <ControlTemplate TargetType="RadioButton">
                     <!-- Item selecionado: fundo dourado sutil, texto em ouro e barra de ouro à esquerda (a "muralha") -->
                     <Grid>
-                        <Border x:Name="bg" Background="Transparent" Height="36" CornerRadius="6">
+                        <ui:ChamferBorder x:Name="bg" Background="Transparent" Height="36" Cut="6">
                             <ContentPresenter Margin="14,0,10,0" VerticalAlignment="Center"/>
-                        </Border>
-                        <Border x:Name="bar" Width="3" Height="18" CornerRadius="1.5" HorizontalAlignment="Left" Margin="0,0,0,0"
+                        </ui:ChamferBorder>
+                        <Border x:Name="bar" Width="3" Height="18" HorizontalAlignment="Left" Margin="0,0,0,0"
                                 Background="{StaticResource GoldMetal}" Visibility="Hidden"/>
                     </Grid>
                     <ControlTemplate.Triggers>
@@ -242,7 +251,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ToggleButton">
-                    <Border x:Name="bg" Background="Transparent" Height="34" CornerRadius="6">
+                    <ui:ChamferBorder x:Name="bg" Background="Transparent" Height="34" Cut="6">
                         <DockPanel Margin="14,0,12,0">
                             <TextBlock x:Name="chev" DockPanel.Dock="Right" Text="&#xE70D;" FontFamily="{StaticResource Icons}" FontSize="10"
                                        VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
@@ -250,7 +259,7 @@
                             </TextBlock>
                             <ContentPresenter VerticalAlignment="Center"/>
                         </DockPanel>
-                    </Border>
+                    </ui:ChamferBorder>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="bg" Property="Background" Value="{DynamicResource Hover}"/>
@@ -312,10 +321,10 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="RadioButton">
-                    <Border x:Name="b" BorderBrush="{DynamicResource LineStrong}" BorderThickness="1" CornerRadius="6"
+                    <ui:ChamferBorder x:Name="b" BorderBrush="{DynamicResource LineStrong}" BorderThickness="1" Cut="6"
                             Padding="13,5" Background="Transparent">
                         <ContentPresenter VerticalAlignment="Center"/>
-                    </Border>
+                    </ui:ChamferBorder>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="b" Property="BorderBrush" Value="{DynamicResource Accent}"/>
@@ -344,11 +353,11 @@
             <Setter.Value>
                 <ControlTemplate TargetType="CheckBox">
                     <StackPanel x:Name="root" Orientation="Horizontal" Background="Transparent">
-                        <Border x:Name="track" Width="36" Height="20" CornerRadius="10" BorderThickness="1"
+                        <ui:ChamferBorder x:Name="track" Width="36" Height="20" BorderThickness="1" Cut="5"
                                 BorderBrush="{DynamicResource LineStrong}" Background="Transparent" VerticalAlignment="Center">
-                            <Ellipse x:Name="knob" Width="12" Height="12" Margin="4,0" HorizontalAlignment="Left"
-                                     Fill="{DynamicResource Muted}"/>
-                        </Border>
+                            <Rectangle x:Name="knob" Width="11" Height="11" Margin="3,0" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                       Fill="{DynamicResource Muted}"/>
+                        </ui:ChamferBorder>
                         <ContentPresenter Margin="10,0,0,0" VerticalAlignment="Center"/>
                     </StackPanel>
                     <ControlTemplate.Triggers>
@@ -383,15 +392,15 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
-                    <Border x:Name="b" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6">
+                    <ui:ChamferBorder x:Name="b" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" Cut="6">
                         <Grid>
                             <TextBlock x:Name="ph" Text="{TemplateBinding Tag}" Foreground="{DynamicResource Faint}"
                                        Margin="{TemplateBinding Padding}" Padding="2,0,0,0" Visibility="Collapsed"
                                        VerticalAlignment="Center" IsHitTestVisible="False"/>
                             <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" VerticalAlignment="Center"/>
                         </Grid>
-                    </Border>
+                    </ui:ChamferBorder>
                     <ControlTemplate.Triggers>
                         <Trigger Property="Text" Value="">
                             <Setter TargetName="ph" Property="Visibility" Value="Visible"/>
@@ -421,10 +430,10 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="PasswordBox">
-                    <Border x:Name="b" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6">
+                    <ui:ChamferBorder x:Name="b" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" Cut="6">
                         <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" VerticalAlignment="Center"/>
-                    </Border>
+                    </ui:ChamferBorder>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsKeyboardFocused" Value="True">
                             <Setter TargetName="b" Property="BorderBrush" Value="{DynamicResource Accent}"/>
@@ -440,7 +449,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Thumb">
-                    <Border x:Name="t" Background="{DynamicResource ThumbBrush}" CornerRadius="3"/>
+                    <Border x:Name="t" Background="{DynamicResource ThumbBrush}"/>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="t" Property="Background" Value="{DynamicResource ThumbHover}"/>
@@ -514,7 +523,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
-                    <Border x:Name="b" Background="Transparent" Padding="14,10" CornerRadius="6" Margin="0,0,0,2"
+                    <Border x:Name="b" Background="Transparent" Padding="14,10" Margin="0,0,0,2"
                             BorderThickness="2,0,0,0" BorderBrush="Transparent">
                         <ContentPresenter/>
                     </Border>
@@ -601,7 +610,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="RepeatButton">
                     <Grid Background="Transparent">
-                        <Border Height="4" CornerRadius="2" Background="{StaticResource GoldGradient}" VerticalAlignment="Center"/>
+                        <Border Height="4" Background="{StaticResource GoldGradient}" VerticalAlignment="Center"/>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
@@ -625,7 +634,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Thumb">
-                    <Border Background="{StaticResource GoldMetal}" CornerRadius="2" BorderBrush="{DynamicResource Bg}" BorderThickness="1"/>
+                    <Border Background="{StaticResource GoldMetal}" BorderBrush="{DynamicResource Bg}" BorderThickness="1"/>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -661,16 +670,16 @@
 
     <!-- Cartão com selo de veredito, motivos e métricas (Energia, Rede) -->
     <DataTemplate x:Key="CardTemplate">
-        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+        <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
             <StackPanel>
                 <Grid>
                     <StackPanel Margin="0,0,130,0">
                         <TextBlock Text="{Binding Title}" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap"/>
                         <TextBlock Text="{Binding Meta}" Foreground="{DynamicResource Muted}" FontSize="12" Margin="0,3,0,0" TextWrapping="Wrap"/>
                     </StackPanel>
-                    <Border HorizontalAlignment="Right" VerticalAlignment="Top" BorderBrush="{DynamicResource Accent}" BorderThickness="1" CornerRadius="4" Padding="12,4">
-                        <Border.Style>
-                            <Style TargetType="Border">
+                    <ui:ChamferBorder HorizontalAlignment="Right" VerticalAlignment="Top" BorderBrush="{DynamicResource Accent}" BorderThickness="1" Cut="4" Padding="12,4">
+                        <ui:ChamferBorder.Style>
+                            <Style TargetType="ui:ChamferBorder">
                                 <Setter Property="Background" Value="Transparent"/>
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsAlert}" Value="True">
@@ -679,7 +688,7 @@
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
-                        </Border.Style>
+                        </ui:ChamferBorder.Style>
                         <TextBlock Text="{Binding VerdictText}" FontSize="11" FontWeight="SemiBold">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
@@ -692,7 +701,7 @@
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
-                    </Border>
+                    </ui:ChamferBorder>
                 </Grid>
                 <TextBlock Text="{Binding Reasons}" TextWrapping="Wrap" Margin="0,12,0,12"/>
                 <ItemsControl ItemsSource="{Binding Metrics}">
@@ -713,7 +722,7 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </StackPanel>
-        </Border>
+        </ui:ChamferBorder>
     </DataTemplate>
 
 </ResourceDictionary>

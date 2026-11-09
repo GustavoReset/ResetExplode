@@ -50,7 +50,17 @@ public partial class App : Application
         Core.Log.Info($"Fort Knox {typeof(App).Assembly.GetName().Version} iniciado");
         DispatcherUnhandledException += (_, ex) => Core.Log.Error("Exceção não tratada na interface", ex.Exception);
 
-        new MainWindow().Show();
+        var main = new MainWindow();
+        main.Show();
+
+        // Revisão visual: FortKnox.exe --capturas <pasta> [--claro] percorre as páginas, grava um PNG de cada e fecha.
+        int cap = Array.IndexOf(e.Args, "--capturas");
+        if (cap >= 0 && cap + 1 < e.Args.Length)
+        {
+            string dir = e.Args[cap + 1];
+            bool light = e.Args.Contains("--claro");
+            main.ContentRendered += async (_, _) => { await main.CaptureTourAsync(dir, light); Shutdown(); };
+        }
     }
 
     /// <summary>Núcleo do app. Null só no modo --catalogo.</summary>

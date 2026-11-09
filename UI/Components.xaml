@@ -19,9 +19,9 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="b" Background="{TemplateBinding Background}" CornerRadius="{StaticResource RadiusControl}" Padding="{TemplateBinding Padding}">
+                    <ui:ChamferBorder x:Name="b" Background="{TemplateBinding Background}" Cut="6" Padding="{TemplateBinding Padding}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
+                    </ui:ChamferBorder>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="b" Property="Background" Value="{DynamicResource AccentSoft}"/>
@@ -50,10 +50,10 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="b" Background="{TemplateBinding Background}" CornerRadius="{StaticResource RadiusControl}"
+                    <ui:ChamferBorder x:Name="b" Background="{TemplateBinding Background}" Cut="6"
                             BorderThickness="1" BorderBrush="Transparent">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
+                    </ui:ChamferBorder>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="b" Property="Background" Value="{DynamicResource Hover}"/>
@@ -97,11 +97,11 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ProgressBar">
                     <Grid ClipToBounds="True">
-                        <Border x:Name="PART_Track" Background="{DynamicResource Line}" CornerRadius="3"/>
-                        <Border x:Name="PART_Indicator" Background="{StaticResource GoldGradient}" CornerRadius="3" HorizontalAlignment="Left"/>
+                        <Border x:Name="PART_Track" Background="{DynamicResource Line}"/>
+                        <Border x:Name="PART_Indicator" Background="{StaticResource GoldGradient}" HorizontalAlignment="Left"/>
                         <Canvas x:Name="indet" Visibility="Collapsed">
                             <Border x:Name="runner" Width="90" Height="{Binding ActualHeight, RelativeSource={RelativeSource TemplatedParent}}"
-                                    Background="{StaticResource GoldGradient}" CornerRadius="3" Canvas.Left="-90"/>
+                                    Background="{StaticResource GoldGradient}" Canvas.Left="-90"/>
                         </Canvas>
                     </Grid>
                     <ControlTemplate.Triggers>
@@ -135,14 +135,13 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ToolTip">
-                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1"
-                            CornerRadius="{StaticResource RadiusControl}" Padding="10,6" MaxWidth="320">
+                    <ui:ChamferBorder Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" Cut="6" Padding="10,6" MaxWidth="320">
                         <ContentPresenter TextElement.Foreground="{TemplateBinding Foreground}">
                             <ContentPresenter.Resources>
                                 <Style TargetType="TextBlock"><Setter Property="TextWrapping" Value="Wrap"/></Style>
                             </ContentPresenter.Resources>
                         </ContentPresenter>
-                    </Border>
+                    </ui:ChamferBorder>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -176,14 +175,13 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ui:StatusBadge">
-                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1"
-                            CornerRadius="{StaticResource RadiusBadge}" Padding="9,3,10,3">
+                    <ui:ChamferBorder Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" Cut="4" Padding="9,3,10,3">
                         <StackPanel Orientation="Horizontal">
                             <Ellipse Width="6" Height="6" Fill="{TemplateBinding Foreground}" VerticalAlignment="Center" Margin="0,0,7,0"/>
                             <TextBlock Text="{TemplateBinding DisplayText}" Foreground="{TemplateBinding Foreground}"
                                        FontFamily="{StaticResource Mono}" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
-                    </Border>
+                    </ui:ChamferBorder>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -219,11 +217,11 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ui:EmptyState">
                     <StackPanel HorizontalAlignment="Center" MaxWidth="400" Margin="0,24">
-                        <Border Width="56" Height="56" CornerRadius="28" Background="{DynamicResource AccentSoft}"
+                        <ui:ChamferBorder Width="56" Height="56" Background="{DynamicResource AccentSoft}"
                                 BorderBrush="{DynamicResource Accent}" BorderThickness="1" HorizontalAlignment="Center">
                             <TextBlock Text="{TemplateBinding Glyph}" FontFamily="{StaticResource Icons}" FontSize="22"
                                        Foreground="{DynamicResource AccentText}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
+                        </ui:ChamferBorder>
                         <TextBlock Text="{TemplateBinding Title}" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource Fg}"
                                    HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="0,14,0,0"/>
                         <TextBlock Text="{TemplateBinding Message}" FontSize="13" Foreground="{DynamicResource Muted}"
@@ -247,17 +245,16 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ui:DialogCard">
-                    <Border Background="{DynamicResource CardFill}" BorderBrush="{DynamicResource LineStrong}" BorderThickness="1"
-                            CornerRadius="{StaticResource RadiusCard}" Padding="24,22">
-                        <Border.Effect>
+                    <ui:ChamferBorder Background="{DynamicResource CardFill}" BorderBrush="{DynamicResource LineStrong}" BorderThickness="1" ClipContent="False" Padding="24,22">
+                        <ui:ChamferBorder.Effect>
                             <DropShadowEffect BlurRadius="28" ShadowDepth="6" Opacity="0.45" Color="#000000"/>
-                        </Border.Effect>
+                        </ui:ChamferBorder.Effect>
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <Border x:Name="ico" Width="34" Height="34" CornerRadius="{StaticResource RadiusBadge}" Background="{StaticResource GoldButton}" Margin="0,0,14,0">
+                                <ui:ChamferBorder x:Name="ico" Width="34" Height="34" Cut="4" Background="{StaticResource GoldButton}" Margin="0,0,14,0">
                                     <TextBlock x:Name="glyph" Text="&#xE946;" FontFamily="{StaticResource Icons}" FontSize="16"
                                                Foreground="#0B0C0E" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
+                                </ui:ChamferBorder>
                                 <TextBlock Text="{TemplateBinding Title}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Fg}"
                                            VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="330"/>
                             </StackPanel>
@@ -268,7 +265,7 @@
                                 <Button x:Name="PART_Confirm" Style="{StaticResource PrimaryButtonSm}" Content="{TemplateBinding ConfirmText}"/>
                             </StackPanel>
                         </StackPanel>
-                    </Border>
+                    </ui:ChamferBorder>
                     <ControlTemplate.Triggers>
                         <Trigger Property="Kind" Value="Destructive">
                             <Setter TargetName="ico" Property="Background" Value="{StaticResource RedGradient}"/>
@@ -290,7 +287,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ui:ScannerPanel">
-                    <Border Style="{StaticResource CardBorder}">
+                    <ui:ChamferBorder Style="{StaticResource FkCard}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -377,7 +374,7 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </Grid>
-                    </Border>
+                    </ui:ChamferBorder>
                     <ControlTemplate.Triggers>
                         <Trigger Property="State" Value="Running">
                             <Setter TargetName="start" Property="Visibility" Value="Collapsed"/>
@@ -388,6 +385,101 @@
                         </Trigger>
                         <Trigger Property="FindingsCount" Value="0">
                             <Setter TargetName="list" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!-- ===== Linha de status com indicador (processo ativo = texto terminando em "…") ===== -->
+    <Style TargetType="ui:StatusLine">
+        <Setter Property="Foreground" Value="{DynamicResource Muted}"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ui:StatusLine">
+                    <DockPanel>
+                        <ui:FkActivity x:Name="spin" DockPanel.Dock="Left" Width="14" Height="14" Margin="0,1,8,0" VerticalAlignment="Top"
+                                       IsActive="{Binding Active, RelativeSource={RelativeSource TemplatedParent}}" Visibility="Collapsed"/>
+                        <TextBlock Text="{TemplateBinding Text}" TextWrapping="{TemplateBinding TextWrapping}" VerticalAlignment="Center"
+                                   Foreground="{TemplateBinding Foreground}" FontSize="{TemplateBinding FontSize}" FontWeight="{TemplateBinding FontWeight}"/>
+                    </DockPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Active" Value="True">
+                            <Setter TargetName="spin" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                        <Trigger Property="Text" Value="">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ===== Dica contextual: ícone ⓘ discreto no lugar de parágrafos explicativos (texto vai no ToolTip) ===== -->
+    <Style x:Key="InfoTip" TargetType="TextBlock">
+        <Setter Property="Text" Value="&#xE946;"/>
+        <Setter Property="FontFamily" Value="{StaticResource Icons}"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="{DynamicResource Faint}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="8,0,0,0"/>
+        <Setter Property="Cursor" Value="Help"/>
+        <Setter Property="ToolTipService.InitialShowDelay" Value="150"/>
+        <Setter Property="ToolTipService.ShowDuration" Value="20000"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource AccentText}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <!-- ===== Mandala de módulos (PAINEL): nós chanfrados; ouro acende no hover/foco ===== -->
+    <Style x:Key="MandalaNode" TargetType="Button">
+        <Setter Property="Foreground" Value="{DynamicResource Muted}"/>
+        <Setter Property="Background" Value="{DynamicResource CardFill}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource LineStrong}"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <ui:ChamferBorder x:Name="b" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                      BorderThickness="1" Cut="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </ui:ChamferBorder>
+                    <ControlTemplate.Triggers>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions><Condition Property="IsMouseOver" Value="True"/></MultiTrigger.Conditions>
+                            <Setter Property="Foreground" Value="{DynamicResource AccentText}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                            <Setter Property="Background" Value="{DynamicResource AccentSoft}"/>
+                        </MultiTrigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter Property="Foreground" Value="{DynamicResource AccentText}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!-- Núcleo da mandala: octógono (chanfro nos quatro cantos), logotipo fixo -->
+    <Style x:Key="MandalaCore" TargetType="Button" BasedOn="{StaticResource MandalaNode}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <ui:ChamferBorder x:Name="b" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                      BorderThickness="1" Cut="52" AllCorners="True">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </ui:ChamferBorder>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                            <Setter Property="Background" Value="{DynamicResource AccentSoft}"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter Property="BorderBrush" Value="{DynamicResource Accent}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
