@@ -406,6 +406,16 @@ public sealed class LastroAndRegistryTests
             Assert.Equal(80, host.Modules.RecalculateLastro().Lastro);
             Assert.Equal(80, host.State.Get<HealthState>().Lastro);
             Assert.Throws<InvalidOperationException>(() => host.Modules.Add(new FakeModule("cofre")));
+
+            // Página que ainda não virou módulo: só desativa a anterior
+            await host.Modules.NavigateAsync("legado/PageDash");
+            Assert.Equal("off:radar/a", radar.Calls[^1]);
+            Assert.Equal("legado/PageDash", host.Modules.ActiveRoute);
+
+            // Encerrar duas vezes (janela e depois o host) chama cada módulo uma vez só
+            await host.Modules.ShutdownAsync();
+            await host.Modules.ShutdownAsync();
+            Assert.Single(cofre.Calls, c => c == "shutdown");
         }
         finally
         {

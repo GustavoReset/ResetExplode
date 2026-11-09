@@ -462,3 +462,10 @@ Diferença em relação à §5.1: **sem contêiner de DI de terceiros**. O `IMod
 e `IModule.Register(IServiceCollection)` saiu do contrato. Se um dia fizer falta, `Microsoft.Extensions.DependencyInjection` entra com a sua aprovação.
 
 Testes: `tests/FortKnox.Core.Tests` (27 testes: barramento, estado concorrente, trabalhos, preferências, ferrolhos no registro real em `HKCU\Software\FortKnoxTests`, Lastro e registro de módulos).
+
+### Fase 3.2 · COFRE, PRENSA e RADAR como módulos
+
+- `Modules/Vault/CofreModule.cs`, `Modules/Pdf/PrensaModule.cs`, `Modules/Network/RadarModule.cs` implementam `IModule` (via `ModuleBase`) e substituem `MainWindow.Vault.cs`, `MainWindow.Pdf.cs` e o `StopNetTools` de `MainWindow.Net.cs`. As Views e os serviços não mudaram.
+- `MainWindow.Shell.cs` é a ponte: registra os módulos e, a cada clique no menu, chama `ModuleRegistry.NavigateAsync`. Páginas já migradas têm rota (`cofre/senhas`, `prensa/pdf`, `radar/conexao`); as outras navegam como `legado/PageX` só para desativar o módulo anterior.
+- Comportamento preservado: sair do COFRE tira as senhas da memória (tolerância do Windows Hello de 60 s), sair da Rede para o ETW, fechar o app limpa a área de transferência e cancela o PDF em andamento.
+- `ModuleRegistry.ShutdownAsync` roda uma vez só (a janela chama na thread da interface; o host chama de novo no fim sem efeito).
