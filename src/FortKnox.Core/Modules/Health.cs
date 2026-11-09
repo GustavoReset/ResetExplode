@@ -26,6 +26,8 @@ public sealed record HealthState : IStateSlice
     public int Lastro { get; init; } = -1; // -1 = ainda não calculado
     public HealthLevel Level { get; init; } = HealthLevel.Bom;
     public IReadOnlyList<IndicatorResult> Worst { get; init; } = Array.Empty<IndicatorResult>();
+    /// <summary>Todas as leituras da última conta (a lista "Saúde do PC" do PAINEL).</summary>
+    public IReadOnlyList<IndicatorResult> All { get; init; } = Array.Empty<IndicatorResult>();
     public DateTime? CalculatedAt { get; init; }
 }
 
@@ -63,6 +65,7 @@ public static class Lastro
             Lastro = score,
             Level = level,
             Worst = results.OrderByDescending(r => r.Reading.Level).ThenBy(r => r.Reading.Score).Take(3).ToList(),
+            All = results,
             CalculatedAt = now ?? DateTime.Now,
         };
     }

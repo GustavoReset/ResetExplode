@@ -101,6 +101,7 @@ public partial class MainWindow : Window
             _monitor.Refresh();
             UpdateCpuSensorWarning();
             PageSensors.BuildChips(_monitor);
+            _sentinela?.PrimeDiskHealth(); // Lastro: saúde dos discos sem precisar abrir a página
             PageDash.Refresh();
         }
 

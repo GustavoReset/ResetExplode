@@ -13,6 +13,9 @@ public partial class DisksView : UserControl
 
     public void Attach(SensorMonitor monitor) => _monitor = monitor;
 
+    /// <summary>Último resultado lido (o Lastro usa; vazio até a página Discos ser aberta ou o Lastro pedir a primeira leitura).</summary>
+    public IReadOnlyList<DiskHealthCard> LastCards { get; private set; } = Array.Empty<DiskHealthCard>();
+
     public async void Refresh()
     {
         if (_busy) return;
@@ -23,6 +26,7 @@ public partial class DisksView : UserControl
         {
             var sensors = _monitor.Rows.ToList();
             var cards = await Task.Run(() => DiskHealth.Read(sensors));
+            LastCards = cards;
             DiskCards.ItemsSource = cards;
             int bad = cards.Count(c => c.Verdict is DiskVerdict.Warning or DiskVerdict.Critical);
             DiskHealthStatus.Text = cards.Count == 0

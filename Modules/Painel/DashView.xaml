@@ -1,6 +1,7 @@
 <UserControl x:Class="FortKnox.DashView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="clr-namespace:FortKnox.UI">
     <!-- PAINEL (Fase 3.3n: extraído do MainWindow.xaml, sem mudança visual) -->
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="20,6,24,20">
@@ -231,7 +232,17 @@
                         <Button DockPanel.Dock="Bottom" Style="{StaticResource PrimaryButton}" Content="OTIMIZAR AGORA" Padding="20,13"
                                 Margin="0,14,0,0" Click="DashOptimize_Click"/>
                         <StackPanel>
-                            <TextBlock Text="Saúde do PC" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                            <!-- Lastro (Fase 3.4): nota de 0 a 100 somando os indicadores de saúde de cada módulo -->
+                            <Grid Margin="0,0,0,10">
+                                <StackPanel>
+                                    <TextBlock Text="Saúde do PC" FontSize="20" FontWeight="SemiBold"/>
+                                    <TextBlock x:Name="DashLastroSub" Text="Lastro: nota de 0 a 100" Foreground="{DynamicResource Muted}" FontSize="12" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top">
+                                    <TextBlock x:Name="DashLastro" Text="—" FontFamily="{StaticResource Mono}" FontSize="30" Foreground="{DynamicResource AccentText}" HorizontalAlignment="Right"/>
+                                    <ui:StatusBadge x:Name="DashLastroBadge" Status="Neutro" Text="Calculando" HorizontalAlignment="Right" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Grid>
                             <ItemsControl x:Name="DashHealth">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -246,6 +257,8 @@
                                                 <StackPanel Grid.Column="1">
                                                     <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap"/>
                                                     <TextBlock Text="{Binding Detail}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                                                    <Button x:Name="fix" Style="{StaticResource GhostButton}" Content="Resolver" Padding="0,4" HorizontalAlignment="Left"
+                                                            Tag="{Binding FixRoute}" Click="DashFix_Click" Visibility="Collapsed"/>
                                                 </StackPanel>
                                             </Grid>
                                         </Border>
@@ -253,6 +266,9 @@
                                         <DataTrigger Binding="{Binding Ok}" Value="True">
                                             <Setter TargetName="chk" Property="Text" Value="&#xE73D;"/>
                                             <Setter TargetName="chk" Property="Foreground" Value="{DynamicResource Fg}"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding CanFix}" Value="True">
+                                            <Setter TargetName="fix" Property="Visibility" Value="Visible"/>
                                         </DataTrigger>
                                     </DataTemplate.Triggers>
                                 </DataTemplate>
