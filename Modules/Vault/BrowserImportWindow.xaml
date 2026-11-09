@@ -1,0 +1,30 @@
+<Window x:Class="FortKnox.BrowserImportWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Importar senhas" Width="620" Height="460"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Background="{DynamicResource Bg}">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <TextBlock Text="IMPORTAR SENHAS" Style="{StaticResource H1}"/>
+            <TextBlock Text="Selecione o navegador. A leitura acontece somente no seu computador e exige confirmação antes de gravar no Vault."
+                       Style="{StaticResource Sub}" TextWrapping="Wrap" Margin="0,4,0,16"/>
+        </StackPanel>
+
+        <WrapPanel Grid.Row="1" x:Name="BrowserGrid"/>
+
+        <StackPanel Grid.Row="2" Margin="0,16,0,0">
+            <TextBlock Text="OU IMPORTAR UM ARQUIVO EXPORTADO" Style="{StaticResource Label}" Margin="0,0,0,8"/>
+            <TextBlock Text="Use CSV exportado pelo gerenciador de senhas do navegador (Chrome, Edge, Firefox, Opera, Opera GX ou Brave)."
+                       Style="{StaticResource Sub}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+            <Button Style="{StaticResource OutlineButton}" Content="ESCOLHER ARQUIVO CSV" Padding="14,8"
+                    HorizontalAlignment="Left" Click="ChooseCsv_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -29,6 +29,9 @@ public partial class VaultView : UserControl
     /// <summary>Disparado quando o usuário clica em BLOQUEAR: a janela deve esquecer a verificação do Hello.</summary>
     public event Action? ManualLock;
 
+    /// <summary>Texto mostrado enquanto a trava (Windows Hello ou senha mestra) é pedida. Definido pelo CofreModule.</summary>
+    public string GateMessage { get; set; } = "Confirme no Windows Hello para abrir o Vault…";
+
     private bool _authenticating;
     private int _epoch; // sobe a cada Lock(): uma abertura que terminou depois de bloquear é descartada
 
@@ -48,7 +51,7 @@ public partial class VaultView : UserControl
         {
             _locked = true;
             VBtnLock.Content = "DESBLOQUEAR";
-            VStatus.Text = "Confirme no Windows Hello para abrir o Vault…";
+            VStatus.Text = GateMessage;
             UpdateButtons();
             _authenticating = true;
             HelloResult result;
@@ -146,6 +149,7 @@ public partial class VaultView : UserControl
         bool ready = _vault is { State: VaultState.Ready } && !_locked;
         VBtnNew.IsEnabled = ready;
         VBtnExport.IsEnabled = ready && _vault!.Count > 0;
+        VBtnBrowserImport.IsEnabled = ready;
         VBtnImport.IsEnabled = _vault != null && !_locked && _vault.State != VaultState.NotLoaded;
         VSearch.IsEnabled = ready;
         VBtnLock.IsEnabled = _vault != null;
@@ -300,6 +304,61 @@ public partial class VaultView : UserControl
     }
 
     // ------------------------------------------------------------------ Backup (plano B se o DPAPI falhar)
+
+    private async void VBrowserImport_Click(object sender, RoutedEventArgs e)
+    {
+        if (_vault == null || _busy) return;
+        HideEditor();
+
+        var selector = new BrowserImportWindow { Owner = Window.GetWindow(this) };
+        if (selector.ShowDialog() != true) return;
+
+        try
+        {
+            IReadOnlyList<VaultEntry> entries;
+            string source;
+            if (!string.IsNullOrEmpty(selector.SelectedCsv))
+            {
+                entries = BrowserPasswordImporter.ImportCsv(selector.SelectedCsv);
+                source = "arquivo CSV";
+            }
+            else if (selector.SelectedBrowser != null)
+            {
+                if (selector.SelectedBrowser.Id == "firefox")
+                    throw new InvalidDataException("O Firefox protege as senhas com o sistema NSS/Firefox. Selecione o arquivo CSV exportado pelo gerenciador de senhas do Firefox.");
+
+                SetBusy(true);
+                VStatus.Text = $"Lendo senhas do {selector.SelectedBrowser.Name}… Feche o navegador para obter os dados mais recentes.";
+                entries = await BrowserPasswordImporter.ImportChromiumAsync(selector.SelectedBrowser, selector.SelectedExecutable);
+                source = selector.SelectedBrowser.Name;
+            }
+            else return;
+
+            if (entries.Count == 0)
+            {
+                Refresh("nenhuma credencial encontrada");
+                return;
+            }
+
+            var confirm = MessageBox.Show(
+                $"Encontradas {entries.Count} credencial(is) em {source}.\n\nDeseja gravá-las no Vault?",
+                "Importar senhas", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
+            if (confirm != MessageBoxResult.Yes) { Refresh("importação cancelada"); return; }
+
+            SetBusy(true);
+            VStatus.Text = "Importando e cifrando as credenciais…";
+            int changed = await _vault.ImportEntriesAsync(entries);
+            Refresh($"{changed} credencial(is) importada(s) ou atualizada(s) de {source}");
+        }
+        catch (Exception ex) when (ex is ArgumentException or InvalidDataException or IOException or UnauthorizedAccessException or System.Security.Cryptography.CryptographicException)
+        {
+            Refresh("não foi possível importar: " + ex.Message);
+        }
+        finally
+        {
+            if (_busy) SetBusy(false);
+        }
+    }
 
     private void VExport_Click(object sender, RoutedEventArgs e)
     {

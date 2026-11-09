@@ -22,6 +22,15 @@
     <Compile Remove="tests\**" />
     <EmbeddedResource Remove="tests\**" />
     <None Remove="tests\**" />
+    <!-- Projetos da arquitetura modular (docs/ARQUITETURA.md §4) moram em src\ e entram por ProjectReference -->
+    <Compile Remove="src\**" />
+    <EmbeddedResource Remove="src\**" />
+    <None Remove="src\**" />
+    <Page Remove="src\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="src\FortKnox.Core\FortKnox.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,17 +49,58 @@
     <EmbeddedResource Include="Drivers\**\*" Exclude="Drivers\*.md;Drivers\*.txt" LogicalName="Drivers/%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
+  <!-- Regras YARA da MURALHA: entram comprimidas (GZip) para o texto delas não aparecer dentro do FortKnox.dll
+       (senão o próprio Fort Knox, ou uma cópia dele, bateria nas regras). Lidas por YaraLayer.EmbeddedRules(). -->
+  <UsingTask TaskName="FkGzipFiles" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Files ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <OutDir ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.IO.Compression" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        Directory.CreateDirectory(OutDir);
+        foreach (var f in Files)
+        {
+            string dst = Path.Combine(OutDir, Path.GetFileName(f.ItemSpec) + ".gz");
+            using var input = File.OpenRead(f.ItemSpec);
+            using var output = File.Create(dst);
+            using var gz = new GZipStream(output, CompressionLevel.Optimal);
+            input.CopyTo(gz);
+        }
+      ]]></Code>
+    </Task>
+  </UsingTask>
+  <ItemGroup>
+    <None Remove="Modules\Muralha\Regras\*.yar" />
+    <FkYaraRule Include="Modules\Muralha\Regras\*.yar" />
+  </ItemGroup>
+  <Target Name="FkEmbedYaraRules" BeforeTargets="PrepareForBuild" Inputs="@(FkYaraRule)" Outputs="@(FkYaraRule->'$(IntermediateOutputPath)yara\%(Filename)%(Extension).gz')">
+    <FkGzipFiles Files="@(FkYaraRule)" OutDir="$(IntermediateOutputPath)yara" />
+  </Target>
+  <Target Name="FkAddYaraResources" BeforeTargets="PrepareForBuild" AfterTargets="FkEmbedYaraRules">
+    <ItemGroup>
+      <EmbeddedResource Include="@(FkYaraRule->'$(IntermediateOutputPath)yara\%(Filename)%(Extension).gz')" LogicalName="Muralha/Regras/%(Filename)%(Extension)" />
+    </ItemGroup>
+  </Target>
+
   <!-- iCUE SDK da Corsair (RESET INTEGRAÇÃO): se a DLL estiver em Native\, ela vai junto do .exe. Não é versionada no git. -->
   <ItemGroup>
     <None Include="Native\iCUESDK.x64_2019.dll" Condition="Exists('Native\iCUESDK.x64_2019.dll')" Link="iCUESDK.x64_2019.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
+    <!-- MURALHA (Modules\Muralha\YaraLayer.cs): dnYara = Apache-2.0 (binding); NativePack traz o libyara.dll x64 (YARA = BSD-3). -->
+    <PackageReference Include="dnYara" Version="2.1.0" />
+    <PackageReference Include="dnYara.NativePack" Version="2.1.0.3" />
     <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.6" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.11" />
     <!-- PDF (Modules\Pdf): PDFsharp = MIT (mesclar, dividir, comprimir); PdfPig = Apache-2.0 (extrair texto). Versões fixas de propósito. -->
     <PackageReference Include="PDFsharp" Version="6.2.4" />
     <PackageReference Include="PdfPig" Version="0.1.16" />
     <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.2.8" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.11" />
     <PackageReference Include="System.Management" Version="10.0.2" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.2" />
     <PackageReference Include="Vortice.D3DCompiler" Version="3.8.3" />

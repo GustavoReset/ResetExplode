@@ -56,11 +56,11 @@ public sealed class AppSettings
     public List<BenchRun> BenchRuns { get; set; } = new();
     public List<BenchRecord> BenchRecords { get; set; } = new();
 
-    // ARSENAL · OTIMIZAÇÃO: valores originais dos ajustes do Windows antes da primeira alteração ("<ausente>" = não existia)
+    // Legado: até a Fase 3.4e os originais dos ajustes ficavam aqui. O ARSENAL migra para o Diário de Ferrolhos e esvazia.
     public Dictionary<string, string?> TweakBackup { get; set; } = new();
     /// <summary>ComDB original (reservas de números COM) antes da primeira "liberação".</summary>
     public byte[]? ComDbBackup { get; set; }
-    /// <summary>Programas de inicialização removidos, para "Restaurar removidos".</summary>
+    /// <summary>Legado: removidos da inicialização (versões antigas). O ARSENAL migra para o Diário de Ferrolhos e esvazia.</summary>
     public List<StartupBackup> StartupRemoved { get; set; } = new();
 
     // ARENA

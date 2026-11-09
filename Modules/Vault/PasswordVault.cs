@@ -194,6 +194,48 @@ public sealed class PasswordVault
     public async Task<bool> DeleteAsync(Guid id, CancellationToken ct = default)
         => await MutateAsync(list => list.RemoveAll(x => x.Id == id) > 0, ct);
 
+    /// <summary>
+    /// Importa registros externos, mesclando por URL + usuário e preservando a versão mais recentemente
+    /// alterada. Os dados são gravados uma única vez.
+    /// </summary>
+    public async Task<int> ImportEntriesAsync(IEnumerable<VaultEntry> entries, CancellationToken ct = default)
+    {
+        var imported = entries.Select(Normalize).ToList();
+        return await MutateAsync(list =>
+        {
+            int changed = 0;
+            foreach (var importedEntry in imported)
+            {
+                if (string.IsNullOrWhiteSpace(importedEntry.Password)) continue;
+
+                int existing = list.FindIndex(existingEntry =>
+                    string.Equals(existingEntry.Url.Trim().TrimEnd('/'), importedEntry.Url.Trim().TrimEnd('/'), StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(existingEntry.Username, importedEntry.Username, StringComparison.OrdinalIgnoreCase));
+
+                if (existing >= 0)
+                {
+                    if (string.Equals(list[existing].Password, importedEntry.Password, StringComparison.Ordinal)) continue;
+                    var merge = list[existing].Clone();
+                    merge.Password = importedEntry.Password;
+                    merge.Title = string.IsNullOrWhiteSpace(merge.Title) ? importedEntry.Title : merge.Title;
+                    merge.Category = string.IsNullOrWhiteSpace(merge.Category) ? importedEntry.Category : merge.Category;
+                    merge.Modified = DateTime.UtcNow;
+                    list[existing] = merge;
+                    changed++;
+                }
+                else
+                {
+                    var e = importedEntry.Clone();
+                    e.Id = Guid.NewGuid();
+                    e.Created = e.Modified = DateTime.UtcNow;
+                    list.Add(e);
+                    changed++;
+                }
+            }
+            return changed;
+        }, ct);
+    }
+
     private static VaultEntry Normalize(VaultEntry e)
     {
         e.Title = e.Title.Trim();

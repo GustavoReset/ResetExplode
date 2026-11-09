@@ -159,6 +159,7 @@
                            HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" IsHitTestVisible="False"/>
                 <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="12,10,0,6">
                     <Button x:Name="VBtnExport" Style="{StaticResource OutlineButton}" Content="EXPORTAR BACKUP" Padding="12,6" FontSize="11" Margin="0,0,8,0" Click="VExport_Click"/>
+                    <Button x:Name="VBtnBrowserImport" Style="{StaticResource OutlineButton}" Content="IMPORTAR NAVEGADOR" Padding="12,6" FontSize="11" Margin="0,0,8,0" Click="VBrowserImport_Click"/>
                     <Button x:Name="VBtnImport" Style="{StaticResource OutlineButton}" Content="IMPORTAR BACKUP" Padding="12,6" FontSize="11" Click="VImport_Click"/>
                 </StackPanel>
             </Grid>

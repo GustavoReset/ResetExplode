@@ -1,0 +1,283 @@
+<UserControl x:Class="FortKnox.DashView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="clr-namespace:FortKnox.UI">
+    <!-- PAINEL (Fase 3.3n: extraído do MainWindow.xaml, sem mudança visual) -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="20,6,24,20">
+
+            <!-- Cabeçalho do Painel: nome do módulo + assinatura da marca -->
+            <Grid Margin="4,2,0,18">
+                <StackPanel>
+                    <TextBlock Text="PAINEL" Style="{StaticResource H1}"/>
+                    <TextBlock Text="Seu PC, blindado. Inviolável, offline e tudo em um só lugar." Style="{StaticResource Sub}"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Border BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="4" Padding="10,4" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="6" Height="6" Fill="{DynamicResource Ok}" VerticalAlignment="Center" Margin="0,0,7,0"/>
+                            <TextBlock Text="OFFLINE · SEM TELEMETRIA" FontFamily="{StaticResource Mono}" FontSize="10" Foreground="{DynamicResource Muted}"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <!-- Linha 1: gráfico grande + desempenho -->
+            <Grid Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="330"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Style="{StaticResource CardBorder}" Padding="24,20">
+                    <StackPanel>
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock x:Name="DashChartLabel" Text="CPU · TEMPERATURA" Style="{StaticResource Label}" Margin="0,0,0,4"/>
+                                <TextBlock x:Name="DashChartDelta" Foreground="{DynamicResource Muted}" FontSize="12"/>
+                                <TextBlock x:Name="DashChartValue" Text="—" Style="{StaticResource Hero}" FontFamily="{StaticResource Mono}" Margin="0,6,0,0"/>
+                            </StackPanel>
+                            <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,0,6">
+                                <TextBlock Text="GPU" Style="{StaticResource Label}" HorizontalAlignment="Right" Margin="0,0,0,2"/>
+                                <TextBlock x:Name="DashChartValue2" Text="—" FontFamily="{StaticResource Mono}" FontSize="22"
+                                           Foreground="{DynamicResource Muted}" HorizontalAlignment="Right"/>
+                            </StackPanel>
+                        </Grid>
+                        <Grid Margin="0,16,0,8">
+                            <StackPanel x:Name="DashRangePanel" Orientation="Horizontal">
+                                <RadioButton Style="{StaticResource Chip}" GroupName="DashRange" Content="1 MIN" Tag="60" Checked="DashOption_Checked"/>
+                                <RadioButton Style="{StaticResource Chip}" GroupName="DashRange" Content="5 MIN" Tag="300" IsChecked="True" Checked="DashOption_Checked"/>
+                                <RadioButton Style="{StaticResource Chip}" GroupName="DashRange" Content="15 MIN" Tag="900" Checked="DashOption_Checked"/>
+                            </StackPanel>
+                            <StackPanel x:Name="DashMetricPanel" Orientation="Horizontal" HorizontalAlignment="Right">
+                                <RadioButton Style="{StaticResource Chip}" GroupName="DashMetric" Content="Temperatura" Tag="temp" IsChecked="True" Checked="DashOption_Checked"/>
+                                <RadioButton Style="{StaticResource Chip}" GroupName="DashMetric" Content="Carga" Tag="load" Checked="DashOption_Checked"/>
+                                <RadioButton Style="{StaticResource Chip}" GroupName="DashMetric" Content="Consumo" Tag="power" Checked="DashOption_Checked"/>
+                            </StackPanel>
+                        </Grid>
+                        <Canvas x:Name="DashChart" Height="210" ClipToBounds="True" SizeChanged="DashChart_SizeChanged"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <Rectangle Width="14" Height="2" Fill="{DynamicResource Accent}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBlock Text="CPU" Foreground="{DynamicResource Muted}" FontSize="11" Margin="0,0,16,0"/>
+                            <Line X1="0" X2="14" Stroke="{DynamicResource Muted}" StrokeDashArray="3 2" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBlock Text="GPU" Foreground="{DynamicResource Muted}" FontSize="11"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Desempenho (como o "Total Balance" da referência) -->
+                <Border Grid.Column="2" Style="{StaticResource CardBorder}" Padding="22,20">
+                    <DockPanel>
+                        <Button DockPanel.Dock="Bottom" Style="{StaticResource PrimaryButton}" Content="RODAR BENCHMARK" Margin="0,14,0,0"
+                                Padding="20,13" Click="DashBench_Click"/>
+                        <StackPanel>
+                            <TextBlock Text="DESEMPENHO · FORJA" Style="{StaticResource Label}" Margin="0,0,0,4"/>
+                            <Grid>
+                                <TextBlock x:Name="DashScore" Text="—" Style="{StaticResource Hero}"/>
+                                <TextBlock x:Name="DashScoreDelta" Foreground="{DynamicResource Muted}" FontSize="12"
+                                           HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            </Grid>
+                            <TextBlock x:Name="DashScoreSub" Text="multi-core · nenhum teste ainda" Foreground="{DynamicResource Faint}" FontSize="11" Margin="0,2,0,0"/>
+                            <Border Height="1" Background="{DynamicResource Line}" Margin="0,16"/>
+                            <ItemsControl x:Name="DashScores" ItemTemplate="{StaticResource KeyValueRow}"/>
+                            <!-- Caixa interna, como o widget de troca da referência -->
+                            <Border Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="8"
+                                    Padding="14,4" Margin="0,14,0,0">
+                                <StackPanel>
+                                    <Grid Margin="0,10">
+                                        <TextBlock Text="CPU" Foreground="{DynamicResource Muted}"/>
+                                        <TextBlock x:Name="DashCpuName" HorizontalAlignment="Right" TextTrimming="CharacterEllipsis" Margin="50,0,0,0"/>
+                                    </Grid>
+                                    <Border Height="1" Background="{DynamicResource Line}"/>
+                                    <Grid Margin="0,10">
+                                        <TextBlock Text="GPU" Foreground="{DynamicResource Muted}"/>
+                                        <TextBlock x:Name="DashGpuName" HorizontalAlignment="Right" TextTrimming="CharacterEllipsis" Margin="50,0,0,0"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+            </Grid>
+
+            <!-- Linha 2: tabela de componentes -->
+            <Border Style="{StaticResource CardBorder}" Padding="22,14,22,8" Margin="0,0,0,16">
+                <StackPanel>
+                    <Grid Margin="0,4,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2.2*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="56"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="COMPONENTE" Style="{StaticResource Label}" Margin="0"/>
+                        <TextBlock Grid.Column="1" Text="TEMPERATURA" Style="{StaticResource Label}" Margin="0"/>
+                        <TextBlock Grid.Column="2" Text="CARGA" Style="{StaticResource Label}" Margin="0"/>
+                        <TextBlock Grid.Column="3" Text="CLOCK" Style="{StaticResource Label}" Margin="0"/>
+                        <TextBlock Grid.Column="4" Text="CONSUMO / USO" Style="{StaticResource Label}" Margin="0"/>
+                        <TextBlock Grid.Column="5" Text="VER" Style="{StaticResource Label}" Margin="0" HorizontalAlignment="Right"/>
+                    </Grid>
+                    <ItemsControl x:Name="DashComponents">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0" Padding="0,11">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="2.2*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="56"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Border Width="28" Height="28" CornerRadius="8" Background="{DynamicResource Hover}" Margin="0,0,12,0">
+                                                <TextBlock Text="{Binding Icon}" FontFamily="{StaticResource Icons}" FontSize="13"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Name}" FontSize="13"/>
+                                                <TextBlock Text="{Binding Model}" Foreground="{DynamicResource Faint}" FontSize="11" TextTrimming="CharacterEllipsis"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="1" Text="{Binding Temp}" FontFamily="{StaticResource Mono}" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding Load}" FontFamily="{StaticResource Mono}" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="3" Text="{Binding Clock}" FontFamily="{StaticResource Mono}" Foreground="{DynamicResource Muted}" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="4" Text="{Binding Power}" FontFamily="{StaticResource Mono}" Foreground="{DynamicResource Muted}" VerticalAlignment="Center"/>
+                                        <Button Grid.Column="5" Style="{StaticResource CaptionButton}" Width="30" Height="30" Content="&#xE72A;"
+                                                HorizontalAlignment="Right" Tag="{Binding Target}" Click="DashGo_Click" ToolTip="Abrir detalhes"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- Linha 3: anéis de memória, eventos e saúde -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Anéis concêntricos (como o "Annual Profit" da referência) -->
+                <Border Style="{StaticResource CardBorder}" Padding="22,20">
+                    <StackPanel>
+                        <TextBlock Text="MEMÓRIA E DISCO" Style="{StaticResource Label}" Margin="0,0,0,4"/>
+                        <TextBlock x:Name="DashMemHero" Text="—" Style="{StaticResource Hero}" FontFamily="{StaticResource Mono}" FontSize="28"/>
+                        <TextBlock x:Name="DashMemSub" Foreground="{DynamicResource Faint}" FontSize="11" Margin="0,2,0,8"/>
+                        <Canvas x:Name="DashRings" Width="190" Height="190" HorizontalAlignment="Center" Margin="0,4,0,8"/>
+                        <ItemsControl x:Name="DashRingLegend">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,3">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Ellipse Width="8" Height="8" Fill="{Binding Swatch}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding Label}" Foreground="{DynamicResource Muted}" FontSize="12"/>
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding Value}" FontFamily="{StaticResource Mono}" FontSize="12" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- Eventos recentes (como "Transactions") -->
+                <Border Grid.Column="2" Style="{StaticResource CardBorder}" Padding="22,20">
+                    <StackPanel>
+                        <TextBlock Text="Eventos recentes" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                        <TextBlock x:Name="DashEventsEmpty" Text="Nada ainda. Benchmarks, testes e dispositivos conectados aparecem aqui."
+                                   Foreground="{DynamicResource Faint}" TextWrapping="Wrap" FontSize="12"/>
+                        <ItemsControl x:Name="DashEvents">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,0,0,1" Padding="0,12">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Width="34" Height="34" CornerRadius="8" Background="{DynamicResource AccentSoft}" BorderBrush="{DynamicResource Accent}" BorderThickness="1" Margin="0,0,12,0">
+                                                <TextBlock Text="{Binding Icon}" FontFamily="{StaticResource Icons}" FontSize="14" Foreground="{DynamicResource AccentText}"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding Detail}" Foreground="{DynamicResource Muted}" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="10,0,0,0">
+                                                <TextBlock Text="{Binding Value}" FontFamily="{StaticResource Mono}" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                                                <TextBlock Text="{Binding When}" Foreground="{DynamicResource Muted}" FontSize="11" HorizontalAlignment="Right"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- Saúde do PC (como "Rewards"): lista de verificação + ação -->
+                <Border Grid.Column="4" Style="{StaticResource CardBorder}" Padding="22,20">
+                    <DockPanel>
+                        <Button DockPanel.Dock="Bottom" Style="{StaticResource PrimaryButton}" Content="OTIMIZAR AGORA" Padding="20,13"
+                                Margin="0,14,0,0" Click="DashOptimize_Click"/>
+                        <StackPanel>
+                            <!-- Lastro (Fase 3.4): nota de 0 a 100 somando os indicadores de saúde de cada módulo -->
+                            <Grid Margin="0,0,0,10">
+                                <StackPanel>
+                                    <TextBlock Text="Saúde do PC" FontSize="20" FontWeight="SemiBold"/>
+                                    <TextBlock x:Name="DashLastroSub" Text="Lastro: nota de 0 a 100" Foreground="{DynamicResource Muted}" FontSize="12" Margin="0,2,0,0"/>
+                                </StackPanel>
+                                <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top">
+                                    <TextBlock x:Name="DashLastro" Text="—" FontFamily="{StaticResource Mono}" FontSize="30" Foreground="{DynamicResource AccentText}" HorizontalAlignment="Right"/>
+                                    <ui:StatusBadge x:Name="DashLastroBadge" Status="Neutro" Text="Calculando" HorizontalAlignment="Right" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Grid>
+                            <ItemsControl x:Name="DashHealth">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,0,0,1" Padding="0,11">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock x:Name="chk" Text="&#xE739;" FontFamily="{StaticResource Icons}" FontSize="18" Foreground="{DynamicResource Faint}"
+                                                           Margin="0,0,12,0" VerticalAlignment="Top"/>
+                                                <StackPanel Grid.Column="1">
+                                                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                                                    <TextBlock Text="{Binding Detail}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                                                    <Button x:Name="fix" Style="{StaticResource GhostButton}" Content="Resolver" Padding="0,4" HorizontalAlignment="Left"
+                                                            Tag="{Binding FixRoute}" Click="DashFix_Click" Visibility="Collapsed"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                        <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding Ok}" Value="True">
+                                            <Setter TargetName="chk" Property="Text" Value="&#xE73D;"/>
+                                            <Setter TargetName="chk" Property="Foreground" Value="{DynamicResource Fg}"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding CanFix}" Value="True">
+                                            <Setter TargetName="fix" Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

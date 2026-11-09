@@ -25,6 +25,9 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: Testar o núcleo
+        run: dotnet test tests/FortKnox.Core.Tests -c Release -nologo
+
       - name: Publicar (arquivo único, com o .NET embutido)
         run: dotnet publish FortKnox.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -o dist -nologo
 

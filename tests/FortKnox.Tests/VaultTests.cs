@@ -135,6 +135,41 @@ public sealed class VaultTests : IDisposable
     }
 
     [Fact]
+    public void BrowserCsv_ParsesQuotedFields()
+    {
+        string file = Path.Combine(_dir, "passwords.csv");
+        File.WriteAllText(file,
+            "name,url,username,password\r\n" +
+            "\"Conta, pessoal\",\"https://exemplo.com/login\",\"joao@example.com\",\"senha,especial\"\r\n",
+            Encoding.UTF8);
+
+        var entries = BrowserPasswordImporter.ImportCsv(file);
+
+        var entry = Assert.Single(entries);
+        Assert.Equal("Conta, pessoal", entry.Title);
+        Assert.Equal("joao@example.com", entry.Username);
+        Assert.Equal("senha,especial", entry.Password);
+        Assert.Equal("https://exemplo.com/login", entry.Url);
+    }
+
+    [Fact]
+    public async Task ImportEntries_MergesUrlAndUsername()
+    {
+        var v = await OpenAsync();
+        await v.AddAsync(E("Conta antiga", "senha-antiga", "joao", "https://exemplo.com"));
+
+        int changed = await v.ImportEntriesAsync(new[]
+        {
+            E("Conta nova", "senha-nova", "joao", "https://exemplo.com/")
+        });
+
+        Assert.Equal(1, changed);
+        Assert.Equal(1, v.Count);
+        var item = Assert.Single(v.Search(""));
+        Assert.Equal("senha-nova", v.GetPassword(item.Id));
+    }
+
+    [Fact]
     public async Task Concurrent_Adds_AreAllPersisted()
     {
         var v = await OpenAsync();
