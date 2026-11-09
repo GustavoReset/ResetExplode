@@ -3,37 +3,9 @@ using System.Windows.Threading;
 
 namespace FortKnox;
 
-/// <summary>Páginas Energia (bateria e fonte) e Rede (diagnóstico de lag).</summary>
+/// <summary>Rede (diagnóstico de lag, página do RADAR) e tema. Energia foi para Modules/Sentinela/EnergyView.</summary>
 public partial class MainWindow
 {
-    // ================= Energia =================
-
-    private bool _energyBusy;
-
-    private async void RefreshEnergy()
-    {
-        if (_energyBusy) return;
-        _energyBusy = true;
-        BtnEnergyRefresh.IsEnabled = false;
-        EnergyStatus.Text = "Lendo bateria e energia…";
-        try
-        {
-            var sensors = _monitor.Rows.ToList();
-            var cards = await Task.Run(() => BatteryInfo.Read(sensors));
-            EnergyCards.ItemsSource = cards;
-            bool hasBattery = cards.Count > 1;
-            EnergyStatus.Text = (hasBattery ? "Bateria detectada" : "Nenhuma bateria (PC de mesa)") + $" · lido às {DateTime.Now:HH:mm:ss}";
-        }
-        catch (Exception ex) { EnergyStatus.Text = "Falhou: " + ex.Message; }
-        finally
-        {
-            _energyBusy = false;
-            BtnEnergyRefresh.IsEnabled = true;
-        }
-    }
-
-    private void BtnEnergyRefresh_Click(object sender, RoutedEventArgs e) => RefreshEnergy();
-
     // ================= Rede =================
 
     private CancellationTokenSource? _netCts;

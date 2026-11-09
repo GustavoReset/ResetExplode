@@ -15,13 +15,9 @@ public partial class MainWindow : Window
 {
     private readonly SensorMonitor _monitor;
     private readonly DispatcherTimer _timer;
-    private readonly ICollectionView _view;
-    private string? _category;   // filtro por chip (null = todos)
-    private string _search = ""; // filtro por texto
 
     // Placa de vídeo
     private List<GpuInfo> _gpus = new();
-    private GpuInfo? _gpu;
 
     // Jogos
     private readonly AppSettings _settings = AppSettings.Load();
@@ -50,11 +46,9 @@ public partial class MainWindow : Window
         // Sensores: a lista começa vazia e é preenchida quando a detecção do hardware termina (LoadHardwareAsync).
         _monitor = new SensorMonitor();
         _live = new LiveReadings(_monitor, () => _gpus.FirstOrDefault());
-        _view = CollectionViewSource.GetDefaultView(_monitor.Rows);
-        _view.GroupDescriptions.Add(new PropertyGroupDescription(nameof(SensorRow.Hardware)));
-        SensorGrid.ItemsSource = _view;
+        PageSensors.Attach(_monitor);
         SystemSub.Text = "Lendo informações do sistema…";
-        StatusText.Text = "Detectando o hardware…";
+        PageSensors.Status = "Detectando o hardware…";
 
         RegisterModules();
         SnapshotUsb();
@@ -72,7 +66,7 @@ public partial class MainWindow : Window
             // por um instante e aparecia como engasgo no 1% low do benchmark.
             if (_gpuBenchActive) return;
             _monitor.Refresh();
-            if (_monitor.IsOpen) StatusText.Text = $"{_monitor.Rows.Count} sensores · atualizado {DateTime.Now:HH:mm:ss}";
+            if (_monitor.IsOpen) PageSensors.Status = $"{_monitor.Rows.Count} sensores · atualizado {DateTime.Now:HH:mm:ss}";
             PageStress.Tick();
             UpdateSideSensors();
             UpdateGpuLive();
@@ -120,12 +114,10 @@ public partial class MainWindow : Window
         async Task LoadSensors()
         {
             try { await _monitor.OpenAsync(); }
-            catch (Exception ex) { StatusText.Text = $"Sensores indisponíveis: {ex.Message}"; return; }
+            catch (Exception ex) { PageSensors.Status = $"Sensores indisponíveis: {ex.Message}"; return; }
             _monitor.Refresh();
             UpdateCpuSensorWarning();
-            AddChip("Todos", null, isChecked: true);
-            foreach (var c in _monitor.Rows.Select(r => r.Category).Distinct().OrderBy(x => x))
-                AddChip(c, c);
+            PageSensors.BuildChips(_monitor);
             UpdateDashboard();
         }
 
@@ -133,14 +125,7 @@ public partial class MainWindow : Window
         {
             try { _gpus = await Task.Run(GpuInfoCollector.Collect); }
             catch { _gpus = new(); }
-            for (int i = 0; i < _gpus.Count && _gpus.Count > 1; i++)
-            {
-                var g = _gpus[i];
-                var chip = new RadioButton { Content = g.Name, GroupName = "Gpu", Style = (Style)FindResource("Chip"), IsChecked = i == 0 };
-                chip.Checked += (_, _) => ShowGpu(g);
-                GpuChips.Children.Add(chip);
-            }
-            if (_gpus.Count > 0) ShowGpu(_gpus[0]);
+            PageGpu.ShowGpus(_gpus);
 
             // Dependem do nome da GPU/CPU
             DetectCpuGpuAndInitArena();
@@ -231,8 +216,6 @@ public partial class MainWindow : Window
         switch (page)
         {
             case "PageDash": UpdateDashboard(); break;
-            case "PageDisks": RefreshDiskHealth(); break;
-            case "PageEnergy": RefreshEnergy(); break;
         }
     }
 
@@ -370,25 +353,6 @@ public partial class MainWindow : Window
 
     // ---------------- Placa de vídeo ----------------
 
-    private void ShowGpu(GpuInfo g)
-    {
-        _gpu = g;
-        GpuName.Text = g.Name;
-        GpuSubtitle.Text = g.Subtitle;
-        GpuVendor.Text = g.Vendor;
-        GpuSections.ItemsSource = g.Sections;
-
-        // Sensores do LibreHardwareMonitor deste hardware, em ordem fixa (clock, temperatura, carga...).
-        var live = new ListCollectionView(_monitor.Rows)
-        {
-            Filter = o => ((SensorRow)o).Hardware == g.Name
-        };
-        live.SortDescriptions.Add(new SortDescription(nameof(SensorRow.Order), ListSortDirection.Ascending));
-        live.SortDescriptions.Add(new SortDescription(nameof(SensorRow.Name), ListSortDirection.Ascending));
-        GpuLive.ItemsSource = live;
-        GpuExtras.ItemsSource = g.LiveExtras();
-    }
-
     private void UpdateGpuLive()
     {
         // Barra lateral: GPU principal (dedicada = primeira da lista).
@@ -399,7 +363,7 @@ public partial class MainWindow : Window
             SideGpuTemp.Text = MainGpuTemp() is float t ? $"{t:0.#} °C" : "—";
             SideGpuLoad.Text = load?.RawValue is float l ? $"{l:0} %" : "—";
         }
-        if (_gpu != null && PageGpu.IsVisible) GpuExtras.ItemsSource = _gpu.LiveExtras();
+        PageGpu.Tick();
     }
 
     // ---------------- Identidade do hardware (ARENA, FORJA e PAINEL usam) ----------------
@@ -455,41 +419,6 @@ public partial class MainWindow : Window
     private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint modifiers, uint vk);
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
-
-    // ---------------- Sensores ----------------
-
-    private void AddChip(string label, string? category, bool isChecked = false)
-    {
-        var chip = new RadioButton
-        {
-            Content = label,
-            GroupName = "Category",
-            Style = (Style)FindResource("Chip"),
-            IsChecked = isChecked
-        };
-        chip.Checked += (_, _) => { _category = category; ApplySensorFilter(); };
-        CategoryChips.Children.Add(chip);
-    }
-
-    private void SensorSearch_Changed(object sender, TextChangedEventArgs e)
-    {
-        _search = SensorSearch.Text.Trim();
-        ApplySensorFilter();
-    }
-
-    private void ApplySensorFilter()
-    {
-        if (_view == null) return;
-        if (_category == null && _search.Length == 0) { _view.Filter = null; return; }
-        _view.Filter = o =>
-        {
-            var r = (SensorRow)o;
-            return (_category == null || r.Category == _category)
-                && (_search.Length == 0
-                    || r.Name.Contains(_search, StringComparison.OrdinalIgnoreCase)
-                    || r.Hardware.Contains(_search, StringComparison.OrdinalIgnoreCase));
-        };
-    }
 
     // ---------------- Utilidades (o Stress test foi para Modules/Forja/StressView) ----------------
 

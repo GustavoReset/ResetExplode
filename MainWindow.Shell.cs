@@ -27,6 +27,10 @@ public partial class MainWindow
         ["PageStress"] = ForjaModule.RouteStress,
         ["PageOc"] = ForjaModule.RouteOc,
         ["PageBench"] = ForjaModule.RouteBench,
+        ["PageSensors"] = SentinelaModule.RouteSensores,
+        ["PageGpu"] = SentinelaModule.RouteGpu,
+        ["PageDisks"] = SentinelaModule.RouteDiscos,
+        ["PageEnergy"] = SentinelaModule.RouteEnergia,
     };
 
     private FortKnoxHost? Core => App.Core;
@@ -66,7 +70,13 @@ public partial class MainWindow
         // ARSENAL · Otimização: backup dos ajustes do Windows em AppSettings.TweakBackup
         PageOptimize.Attach(_settings, SaveSettings);
 
+        // SENTINELA · Placa de vídeo, Discos e Energia (Sensores é ligado no construtor, junto com o SensorMonitor)
+        PageGpu.Attach(_monitor);
+        PageDisks.Attach(_monitor);
+        PageEnergy.Attach(_monitor);
+
         if (Core == null) return;
+        Core.Modules.Add(new SentinelaModule(PageDisks, PageEnergy));
         Core.Modules.Add(new CofreModule(PageVault, this));
         Core.Modules.Add(new PrensaModule(PagePdf));
         Core.Modules.Add(new RadarModule(NetTools));
@@ -93,7 +103,7 @@ public partial class MainWindow
         catch (Exception ex)
         {
             Core.Log.Error($"Navegação para {route} falhou", ex);
-            StatusText.Text = "Não foi possível abrir esta página: " + ex.Message;
+            PageSensors.Status = "Não foi possível abrir esta página: " + ex.Message;
         }
     }
 
