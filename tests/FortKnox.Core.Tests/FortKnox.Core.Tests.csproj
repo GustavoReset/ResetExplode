@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
@@ -19,11 +19,15 @@
     <Compile Include="..\..\StartupManager.cs" Link="App\StartupManager.cs" />
     <Compile Include="..\..\Modules\Muralha\MuralhaEngine.cs" Link="App\MuralhaEngine.cs" />
     <Compile Include="..\..\Modules\Muralha\Quarantine.cs" Link="App\Quarantine.cs" />
+    <Compile Include="..\..\Modules\Muralha\YaraLayer.cs" Link="App\YaraLayer.cs" />
+    <None Include="..\..\Modules\Muralha\Regras\*.yar" Link="Regras\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageReference Include="dnYara" Version="2.1.0" />
+    <PackageReference Include="dnYara.NativePack" Version="2.1.0.3" />
   </ItemGroup>
 </Project>

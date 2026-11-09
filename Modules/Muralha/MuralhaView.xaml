@@ -1,18 +1,19 @@
-<UserControl x:Class="FortKnox.MuralhaView"
+﻿<UserControl x:Class="FortKnox.MuralhaView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:ui="clr-namespace:FortKnox.UI">
-    <!-- MURALHA · Varredura (Fase 3.5a): motor em camadas + quarentena cifrada. Complementa o Defender. -->
+    <!-- MURALHA · Varredura (Fases 3.5a/3.5b): motor em camadas com YARA, varredura completa, quarentena cifrada. Complementa o Defender. -->
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="36,30,36,30">
             <Grid Margin="0,0,0,20">
-                <StackPanel Margin="0,0,300,0">
+                <StackPanel Margin="0,0,420,0">
                     <TextBlock Text="MURALHA · VARREDURA" Style="{StaticResource H1}"/>
                     <TextBlock x:Name="Summary" Style="{StaticResource Sub}" TextWrapping="Wrap"
                                Text="Proteção complementar ao Microsoft Defender · nada sai do lugar sem você confirmar"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
-                    <Button x:Name="BtnFolder" Style="{StaticResource OutlineButton}" Content="Verificar uma pasta…" Padding="16,9" Click="BtnFolder_Click"/>
+                    <Button x:Name="BtnFolder" Style="{StaticResource OutlineButton}" Content="Verificar uma pasta…" Padding="16,9" Margin="0,0,8,0" Click="BtnFolder_Click"/>
+                    <Button x:Name="BtnFull" Style="{StaticResource OutlineButton}" Content="Varredura completa" Padding="16,9" Click="BtnFull_Click"/>
                 </StackPanel>
             </Grid>
 
@@ -51,6 +52,8 @@
                                         <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Top">
                                             <Button Style="{StaticResource OutlineButtonSm}" Content="Ignorar" Margin="0,0,8,0" Tag="{Binding}" Click="BtnIgnore_Click"
                                                     IsEnabled="{Binding Pending}"/>
+                                            <Button Style="{StaticResource OutlineButtonSm}" Content="Confiar sempre" Margin="0,0,8,0" Tag="{Binding}" Click="BtnTrust_Click"
+                                                    IsEnabled="{Binding Pending}" ToolTip="Não acusar mais este arquivo (enquanto o conteúdo dele não mudar)"/>
                                             <Button Style="{StaticResource DangerButtonSm}" Content="Quarentena" Tag="{Binding}" Click="BtnQuarantine_Click"
                                                     IsEnabled="{Binding Pending}"/>
                                         </StackPanel>
@@ -97,6 +100,8 @@
             </Border>
 
             <TextBlock x:Name="Footer" Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,14,0,0"/>
+            <Button x:Name="BtnForgetTrusted" Style="{StaticResource OutlineButtonSm}" Content="Esquecer arquivos confiáveis" HorizontalAlignment="Left"
+                    Margin="0,8,0,0" Visibility="Collapsed" Click="BtnForgetTrusted_Click"/>
         </StackPanel>
     </ScrollViewer>
 </UserControl>
