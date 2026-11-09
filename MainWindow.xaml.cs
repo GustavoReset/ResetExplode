@@ -14,7 +14,7 @@ namespace FortKnox;
 public partial class MainWindow : Window
 {
     private readonly SensorMonitor _monitor;
-    private readonly DispatcherTimer _timer;
+    private SensorPump? _pump; // ciclo de 1 s dos sensores (Modules/Shared/SensorPump), publicado no barramento
 
     // Placa de vídeo
     private List<GpuInfo> _gpus = new();
@@ -54,29 +54,14 @@ public partial class MainWindow : Window
         SnapshotUsb();
         PageSystem.RefreshDrives();
         TitlePage.Text = "Painel";
-        UpdateDashboard();
+        PageDash.Refresh();
 
         // A janela aparece já; as coletas pesadas (WMI, sensores, GPU) rodam em paralelo fora da thread da janela.
         Loaded += async (_, _) => await LoadHardwareAsync();
 
-        _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-        _timer.Tick += (_, _) =>
-        {
-            // Durante a cena de GPU as leituras de sensores (NVML/driver) ficam pausadas: cada consulta trava o driver
-            // por um instante e aparecia como engasgo no 1% low do benchmark.
-            if (_gpuBenchActive) return;
-            _monitor.Refresh();
-            if (_monitor.IsOpen) PageSensors.Status = $"{_monitor.Rows.Count} sensores · atualizado {DateTime.Now:HH:mm:ss}";
-            PageStress.Tick();
-            UpdateSideSensors();
-            UpdateGpuLive();
-            UpdateCpuSensorWarning();
-            CollectDashSample();
-            PageBottleneck.Tick();
-            PageBench.Tick();
-            PageOptimize.Tick();
-        };
-        _timer.Start();
+        // Ciclo de 1 s: relê os sensores e avisa pelo barramento (cada página assina em MainWindow.Shell.cs).
+        // Durante a cena de GPU as leituras ficam pausadas: cada consulta trava o driver e aparecia como engasgo no 1% low.
+        StartSensorPump();
 
         StateChanged += (_, _) =>
         {
@@ -87,7 +72,7 @@ public partial class MainWindow : Window
         };
         Closed += (_, _) =>
         {
-            _timer.Stop();
+            _pump?.Dispose();
             _toast?.Close();
             _frames.Dispose();
             UnregisterHotKey(new System.Windows.Interop.WindowInteropHelper(this).Handle, HotkeyId);
@@ -116,7 +101,7 @@ public partial class MainWindow : Window
             _monitor.Refresh();
             UpdateCpuSensorWarning();
             PageSensors.BuildChips(_monitor);
-            UpdateDashboard();
+            PageDash.Refresh();
         }
 
         async Task LoadGpu()
@@ -128,7 +113,7 @@ public partial class MainWindow : Window
             // Dependem do nome da GPU/CPU
             DetectCpuGpuAndInitArena();
             PageOc.Init();
-            UpdateDashboard();
+            PageDash.Refresh();
         }
 
         await Task.WhenAll(LoadInfo(), LoadSensors(), LoadGpu());
@@ -210,11 +195,6 @@ public partial class MainWindow : Window
         }
         TitlePage.Text = name;
 
-        // Algumas páginas carregam dados só quando abertas.
-        switch (page)
-        {
-            case "PageDash": UpdateDashboard(); break;
-        }
     }
 
     private void ShowPage(string name)

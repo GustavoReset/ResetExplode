@@ -7,10 +7,10 @@ using LibreHardwareMonitor.Hardware;
 namespace FortKnox;
 
 /// <summary>
-/// Visão geral: painel de blocos com gráfico de área (CPU × GPU), desempenho, tabela de componentes, anéis de
+/// PAINEL (Fase 3.3n; antes MainWindow.Dash.cs): painel de blocos com gráfico de área (CPU × GPU), desempenho, tabela de componentes, anéis de
 /// memória/disco, eventos recentes e lista de verificação da saúde do PC.
 /// </summary>
-public partial class MainWindow
+public partial class DashView : UserControl
 {
     public sealed record DashComponent(string Icon, string Name, string Model, string Temp, string Load, string Clock, string Power, string Target);
     public sealed record DashEvent(string Icon, string Title, string Detail, string Value, DateTime At)
@@ -28,10 +28,36 @@ public partial class MainWindow
     private List<DashCheck> _health = new();
     private DateTime _healthAt = DateTime.MinValue;
 
+    /// <summary>O que o PAINEL lê do resto do app (ele só mostra; nada aqui muda o sistema).</summary>
+    public sealed class Host
+    {
+        public required LiveReadings Live { get; init; }
+        public required Func<IReadOnlyList<GpuInfo>> Gpus { get; init; }
+        public required Func<string> CpuName { get; init; }
+        public required AppSettings Settings { get; init; }
+        public required Func<IReadOnlyList<Tweak>> Tweaks { get; init; }
+        public required Func<IReadOnlyList<DriveCard>> Drives { get; init; }
+        /// <summary>Abre uma página do menu pelo nome (ex.: "PageBench").</summary>
+        public required Action<string> Navigate { get; init; }
+    }
+
+    private Host _host = null!;
+    private SensorMonitor _monitor => _host.Live.Monitor;
+    private AppSettings _settings => _host.Settings;
+    private string _cpuName => _host.CpuName();
+    private IReadOnlyList<GpuInfo> Gpus => _host.Gpus();
+
+    public DashView() => InitializeComponent();
+
+    public void Attach(Host host) => _host = host;
+
+    private static string? CheckedTag(Panel panel)
+        => panel.Children.OfType<RadioButton>().FirstOrDefault(r => r.IsChecked == true)?.Tag as string;
+
     // ---------------- coleta (a cada segundo, mesmo com a página fechada) ----------------
 
-    private float? MainGpuLoad() => _gpus.Count == 0 ? null :
-        _monitor.Rows.FirstOrDefault(r => r.Hardware == _gpus[0].Name && r.Type == SensorType.Load && r.Name == "GPU Core")?.RawValue;
+    private float? MainGpuLoad() => Gpus.Count == 0 ? null :
+        _monitor.Rows.FirstOrDefault(r => r.Hardware == Gpus[0].Name && r.Type == SensorType.Load && r.Name == "GPU Core")?.RawValue;
 
     private float? CpuClockAvg()
     {
@@ -40,20 +66,22 @@ public partial class MainWindow
         return c.Count > 0 ? c.Average() : null;
     }
 
-    private void CollectDashSample()
+    /// <summary>Uma amostra por segundo (mesmo com a página fechada: o gráfico guarda 15 min).</summary>
+    public void Collect()
     {
-        _dash.Add(new DashSample(_monitor.CpuTemperature, MainGpuTemp(), _monitor.CpuLoad, MainGpuLoad(), _monitor.CpuPower, MainGpuPower()));
+        _dash.Add(new DashSample(_monitor.CpuTemperature, _host.Live.MainGpuTemp(), _monitor.CpuLoad, MainGpuLoad(), _monitor.CpuPower, _host.Live.MainGpuPower()));
         if (_dash.Count > DashMax) _dash.RemoveAt(0);
-        if (PageDash.IsVisible) UpdateDashboard(full: false);
+        if (IsVisible) Refresh(full: false);
     }
 
     // ---------------- eventos recentes ----------------
 
-    private void AddEvent(string icon, string title, string detail, string value)
+    /// <summary>Evento para "eventos recentes" (benchmarks, testes, dispositivos conectados).</summary>
+    public void AddEvent(string icon, string title, string detail, string value)
     {
         _events.Insert(0, new DashEvent(icon, title, detail, value, DateTime.Now));
         if (_events.Count > 30) _events.RemoveAt(_events.Count - 1);
-        if (PageDash.IsVisible) ShowEvents();
+        if (IsVisible) ShowEvents();
     }
 
     /// <summary>Eventos já registrados antes desta sessão (resultados de benchmark e verificações salvos).</summary>
@@ -92,17 +120,17 @@ public partial class MainWindow
 
     private void DashOption_Checked(object sender, RoutedEventArgs e) { if (DashChart != null) DrawDashChart(); }
     private void DashChart_SizeChanged(object sender, SizeChangedEventArgs e) => DrawDashChart();
-    private void DashBench_Click(object sender, RoutedEventArgs e) => NavBench.IsChecked = true;
-    private void DashOptimize_Click(object sender, RoutedEventArgs e) => NavOptimize.IsChecked = true;
+    private void DashBench_Click(object sender, RoutedEventArgs e) => _host.Navigate("PageBench");
+    private void DashOptimize_Click(object sender, RoutedEventArgs e) => _host.Navigate("PageOptimize");
 
     private void DashGo_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not FrameworkElement { Tag: string page }) return;
-        var nav = new RadioButton[] { NavSensors, NavGpu, NavSystem, NavDisks }.FirstOrDefault(n => (string)n.Tag == page);
-        if (nav != null) nav.IsChecked = true;
+        _host.Navigate(page);
     }
 
-    private void UpdateDashboard(bool full = true)
+    /// <summary>Redesenha o painel (full = também notas e eventos).</summary>
+    public void Refresh(bool full = true)
     {
         DrawDashChart();
         UpdateDashComponents();
@@ -125,12 +153,12 @@ public partial class MainWindow
                 F(_monitor.CpuTemperature, "0", " °C"), F(_monitor.CpuLoad, "0", " %"), F(CpuClockAvg(), "0", " MHz"),
                 F(_monitor.CpuPower, "0", " W"), "PageSensors"),
         };
-        if (_gpus.Count > 0)
+        if (Gpus.Count > 0)
         {
-            uint? clk = _gpus[0].NvmlHandle != IntPtr.Zero ? Nvml.Clock(_gpus[0].NvmlHandle, Nvml.ClockGraphics) : null;
-            rows.Add(new("", "Placa de vídeo", GameCatalog.ShortGpuName(_gpus[0].Name),
-                         F(MainGpuTemp(), "0", " °C"), F(MainGpuLoad(), "0", " %"), clk is uint c ? $"{c} MHz" : "—",
-                         F(MainGpuPower(), "0", " W"), "PageGpu"));
+            uint? clk = Gpus[0].NvmlHandle != IntPtr.Zero ? Nvml.Clock(Gpus[0].NvmlHandle, Nvml.ClockGraphics) : null;
+            rows.Add(new("", "Placa de vídeo", GameCatalog.ShortGpuName(Gpus[0].Name),
+                         F(_host.Live.MainGpuTemp(), "0", " °C"), F(MainGpuLoad(), "0", " %"), clk is uint c ? $"{c} MHz" : "—",
+                         F(_host.Live.MainGpuPower(), "0", " W"), "PageGpu"));
         }
         var (total, avail) = Optimizer.MemoryStatus();
         if (total > 0)
@@ -139,7 +167,7 @@ public partial class MainWindow
             rows.Add(new("", "Memória RAM", $"{total / 1073741824.0:0} GB instalados", "—", $"{used / total:P0}", "—",
                          $"{used / 1073741824.0:0.0} GB", "PageSystem"));
         }
-        if (PageSystem.Drives.FirstOrDefault(d => d.Letter.StartsWith("C", StringComparison.OrdinalIgnoreCase)) is { } c0)
+        if (_host.Drives().FirstOrDefault(d => d.Letter.StartsWith("C", StringComparison.OrdinalIgnoreCase)) is { } c0)
             rows.Add(new("", $"Disco {c0.Letter}", c0.Disk.Length > 0 ? c0.Disk : c0.Kind, "—", c0.UsedPercent, "—",
                          $"{DriveCard.Fmt(c0.Free)} livres", "PageDisks"));
         DashComponents.ItemsSource = rows;
@@ -170,7 +198,7 @@ public partial class MainWindow
             new KeyValuePair<string, string>("Simulação de jogo", Last("sim")),
         };
         DashCpuName.Text = GameCatalog.ShortCpuName(_cpuName);
-        DashGpuName.Text = _gpus.Count > 0 ? GameCatalog.ShortGpuName(_gpus[0].Name) : "—";
+        DashGpuName.Text = Gpus.Count > 0 ? GameCatalog.ShortGpuName(Gpus[0].Name) : "—";
     }
 
     // ---------------- gráfico de área ----------------
@@ -286,9 +314,9 @@ public partial class MainWindow
         var (total, avail) = Optimizer.MemoryStatus();
         double ram = total > 0 ? (double)(total - avail) / total : 0;
         double? vram = null;
-        if (_gpus.Count > 0 && _gpus[0].NvmlHandle != IntPtr.Zero && Nvml.MemoryInfo(_gpus[0].NvmlHandle) is Nvml.Memory m && m.Total > 0)
+        if (Gpus.Count > 0 && Gpus[0].NvmlHandle != IntPtr.Zero && Nvml.MemoryInfo(Gpus[0].NvmlHandle) is Nvml.Memory m && m.Total > 0)
             vram = (double)m.Used / m.Total;
-        var c0 = PageSystem.Drives.FirstOrDefault(d => d.Letter.StartsWith("C", StringComparison.OrdinalIgnoreCase));
+        var c0 = _host.Drives().FirstOrDefault(d => d.Letter.StartsWith("C", StringComparison.OrdinalIgnoreCase));
 
         DashMemHero.Text = total > 0 ? $"{(total - avail) / 1073741824.0:0.0} GB" : "—";
         DashMemSub.Text = total > 0 ? $"de RAM em uso · {total / 1073741824.0:0} GB instalados" : "";
@@ -356,8 +384,8 @@ public partial class MainWindow
                       errs.Error != null ? "Não foi possível ler o registro do Windows."
                                          : $"{errs.Whea} WHEA · {errs.GpuResets} reinícios do driver em 7 dias."));
 
-        var gm = PageOptimize.Tweaks.FirstOrDefault(t => t.Id == "gamemode");
-        var dvr = PageOptimize.Tweaks.FirstOrDefault(t => t.Id == "gamedvr");
+        var gm = _host.Tweaks().FirstOrDefault(t => t.Id == "gamemode");
+        var dvr = _host.Tweaks().FirstOrDefault(t => t.Id == "gamedvr");
         try { gm?.Refresh(); dvr?.Refresh(); } catch { }
         if (gm != null) list.Add(Item(gm.IsOn, "Modo de Jogo ligado", "O Windows prioriza o jogo.", "Desligado: ligue em Arsenal › Otimização."));
         if (dvr != null) list.Add(Item(dvr.IsOn, "Gravação em segundo plano desligada", "O Game Bar não grava o tempo todo.",

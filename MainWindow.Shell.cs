@@ -1,15 +1,17 @@
 using FortKnox.Core;
+using FortKnox.Core.Events;
 
 namespace FortKnox;
 
 /// <summary>
-/// Ponte entre o menu atual (páginas Page* do MainWindow.xaml) e o registro de módulos do núcleo (Fase 3.2).
-/// Páginas que já viraram módulo têm rota; as outras navegam como "legado/PageX" até migrarem (Fase 3.3).
+/// Shell: liga o menu (páginas Page* do MainWindow.xaml, cada uma uma View de módulo) ao registro de módulos do núcleo,
+/// monta as dependências de cada View e o ciclo de 1 s dos sensores. Desde a Fase 3.3n todas as páginas são módulos.
 /// </summary>
 public partial class MainWindow
 {
     private static readonly Dictionary<string, string> ModuleRoutes = new()
     {
+        ["PageDash"] = PainelModule.RouteVisao,
         ["PageVault"] = CofreModule.RouteSenhas,
         ["PagePdf"] = PrensaModule.RoutePdf,
         ["PageNet"] = RadarModule.RouteConexao,
@@ -44,8 +46,54 @@ public partial class MainWindow
 
     private void SaveSettings() { try { _settings.Save(); } catch (System.IO.IOException) { } }
 
+    /// <summary>"Eventos recentes" do PAINEL (benchmarks, testes, dispositivos conectados).</summary>
+    private void AddEvent(string icon, string title, string detail, string value) => PageDash.AddEvent(icon, title, detail, value);
+
+    /// <summary>Abre uma página do menu pelo nome da página (Tag do item), como se a pessoa tivesse clicado.</summary>
+    private void NavigateTo(string page)
+    {
+        static IEnumerable<System.Windows.Controls.RadioButton> Items(System.Windows.DependencyObject root)
+        {
+            foreach (var child in System.Windows.LogicalTreeHelper.GetChildren(root).OfType<System.Windows.DependencyObject>())
+            {
+                if (child is System.Windows.Controls.RadioButton rb) yield return rb;
+                foreach (var inner in Items(child)) yield return inner;
+            }
+        }
+        if (Items(Sidebar).FirstOrDefault(r => r.Tag as string == page) is { } nav) nav.IsChecked = true;
+    }
+
+    /// <summary>
+    /// Liga o ciclo de 1 s ao barramento: cada página assina <see cref="SensorsRefreshed"/> e se atualiza sozinha.
+    /// Sem núcleo (não acontece fora do modo --catalogo), nada roda.
+    /// </summary>
+    private void StartSensorPump()
+    {
+        if (Core == null) return;
+        var bus = Core.Bus;
+        void On(Action tick) => bus.Subscribe<SensorsRefreshed>(_ => tick(), Delivery.Synchronous);
+        On(() => { if (_monitor.IsOpen) PageSensors.Status = $"{_monitor.Rows.Count} sensores · atualizado {DateTime.Now:HH:mm:ss}"; });
+        On(PageStress.Tick);
+        On(UpdateSideSensors);
+        On(UpdateGpuLive);
+        On(UpdateCpuSensorWarning);
+        On(PageDash.Collect);
+        On(PageBottleneck.Tick);
+        On(PageBench.Tick);
+        On(PageOptimize.Tick);
+        _pump = new SensorPump(_monitor, bus, () => _gpuBenchActive);
+        _pump.Start();
+    }
+
     private void RegisterModules()
     {
+        // PAINEL: lê o resto do app; os botões levam às páginas
+        PageDash.Attach(new DashView.Host
+        {
+            Live = _live, Gpus = () => _gpus, CpuName = () => _cpuName, Settings = _settings,
+            Tweaks = () => PageOptimize.Tweaks, Drives = () => PageSystem.Drives, Navigate = NavigateTo,
+        });
+
         // FORJA · Stress test: ligado já na abertura (o ciclo de 1 s alimenta o gráfico mesmo com a página fechada)
         PageStress.Attach(_live);
         PageStress.RunningChanged += running => SideStress.Text = running ? "rodando" : "parado";
@@ -84,6 +132,7 @@ public partial class MainWindow
         PageNet.Attach(() => AnyBenchRunning || PageStress.IsRunning || PageOc.IsRunning);
 
         if (Core == null) return;
+        Core.Modules.Add(new PainelModule(PageDash));
         Core.Modules.Add(new SentinelaModule(PageDisks, PageEnergy));
         Core.Modules.Add(new CofreModule(PageVault, this));
         Core.Modules.Add(new PrensaModule(PagePdf));
