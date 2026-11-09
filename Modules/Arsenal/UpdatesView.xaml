@@ -1,0 +1,56 @@
+<UserControl x:Class="FortKnox.UpdatesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- ARSENAL · Atualizar apps (Fase 3.4d): winget upgrade com seleção -->
+    <Grid Margin="36,30,36,30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Margin="0,0,0,16">
+            <StackPanel Margin="0,0,380,0">
+                <TextBlock Text="ARSENAL · ATUALIZAR APPS" Style="{StaticResource H1}"/>
+                <TextBlock x:Name="Summary" Text="Procurando atualizações…" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                <Button x:Name="BtnStore" Style="{StaticResource OutlineButtonSm}" Content="Abrir na Microsoft Store" Margin="0,0,10,0"
+                        Visibility="Collapsed" Click="BtnStore_Click"/>
+                <Button x:Name="BtnRefresh" Style="{StaticResource IconButton}" Content="&#xE72C;" ToolTip="Procurar de novo"
+                        AutomationProperties.Name="Procurar de novo" Margin="0,0,10,0" Click="BtnRefresh_Click"/>
+                <Button x:Name="BtnUpdate" Style="{StaticResource PrimaryButtonSm}" Content="Atualizar selecionados" Click="BtnUpdate_Click"/>
+            </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="1" Style="{StaticResource CardBorder}" Padding="20,16">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Bottom" Margin="0,10,0,0">
+                    <ProgressBar x:Name="Progress" Style="{StaticResource FkProgress}" Visibility="Collapsed" Margin="0,0,0,8"/>
+                    <TextBlock x:Name="Status" TextWrapping="Wrap"/>
+                    <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,0"
+                               Text="O winget baixa cada versão do site oficial do fabricante e confere o hash do instalador. Programas abertos podem pedir para fechar; alguns instaladores pedem permissão de administrador."/>
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
+                    <Button Style="{StaticResource OutlineButtonSm}" Content="Marcar todos" Margin="0,0,8,0" Click="BtnAll_Click"/>
+                    <Button Style="{StaticResource OutlineButtonSm}" Content="Desmarcar" Click="BtnNone_Click"/>
+                </StackPanel>
+                <DataGrid x:Name="Grid" Style="{StaticResource FkDataGrid}">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="" Width="40">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding Selected, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanSelect}"
+                                              HorizontalAlignment="Center" AutomationProperties.Name="{Binding Name}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="PROGRAMA" Binding="{Binding Name}" Width="2*"/>
+                        <DataGridTextColumn Header="INSTALADA" Binding="{Binding Version}" Width="*" ElementStyle="{StaticResource MutedMonoCell}"/>
+                        <DataGridTextColumn Header="NOVA" Binding="{Binding Available}" Width="*" ElementStyle="{StaticResource MonoCell}"/>
+                        <DataGridTextColumn Header="SITUAÇÃO" Binding="{Binding Status}" Width="1.6*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+        </Border>
+    </Grid>
+</UserControl>

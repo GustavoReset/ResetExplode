@@ -204,6 +204,12 @@
                                     <TextBlock Text="Instalar apps" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
+                            <RadioButton x:Name="NavUpdates" Style="{StaticResource NavItem}" Tag="PageUpdates" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE895;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Atualizar apps" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
                             </StackPanel>
                             <ToggleButton x:Name="GrpMaker" Style="{StaticResource NavGroup}" Content="OFICINA"/>
                             <StackPanel x:Name="GrpMakerItems" Margin="10,0,0,4" Visibility="{Binding IsChecked, ElementName=GrpMaker, Converter={StaticResource BoolVis}}">
@@ -336,6 +342,7 @@
 
                 <!-- ===== INSTALAR APPS (pós-formatação, via winget) ===== -->
                 <local:AppsView x:Name="PageApps" Visibility="Collapsed"/>
+                <local:UpdatesView x:Name="PageUpdates" Visibility="Collapsed"/>
 
                 <!-- ===== VAULT DE SENHAS (UserControl em Modules\Vault) ===== -->
                 <local:VaultView x:Name="PageVault" Visibility="Collapsed"/>
