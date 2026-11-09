@@ -180,6 +180,12 @@
                                     <TextBlock Text="Otimização" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </RadioButton>
+                            <RadioButton x:Name="NavCleanup" Style="{StaticResource NavItem}" Tag="PageCleanup" Checked="Nav_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Limpeza" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </RadioButton>
                             <RadioButton x:Name="NavStartup" Style="{StaticResource NavItem}" Tag="PageStartup" Checked="Nav_Checked">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="&#xE823;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
@@ -314,6 +320,9 @@
                 <local:OptimizeView x:Name="PageOptimize" Visibility="Collapsed"/>
 
                 <!-- ===== INICIALIZAÇÃO (programas que abrem com o Windows) ===== -->
+                <!-- ===== ARSENAL · LIMPEZA (Fase 3.4b) ===== -->
+                <local:CleanupView x:Name="PageCleanup" Visibility="Collapsed"/>
+
                 <local:StartupView x:Name="PageStartup" Visibility="Collapsed"/>
 
                 <!-- ===== INSTALAR APPS (pós-formatação, via winget) ===== -->

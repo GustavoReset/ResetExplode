@@ -10,6 +10,10 @@
     <ProjectReference Include="..\..\src\FortKnox.Core\FortKnox.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <!-- Serviços sem WPF do app testados aqui (o projeto FortKnox.Tests tem alterações locais em andamento) -->
+    <Compile Include="..\..\Modules\Arsenal\CleanupService.cs" Link="App\CleanupService.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
