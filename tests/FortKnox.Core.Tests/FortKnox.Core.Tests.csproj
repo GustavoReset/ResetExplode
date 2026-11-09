@@ -17,10 +17,13 @@
     <Compile Include="..\..\Modules\Arsenal\ArsenalChanges.cs" Link="App\ArsenalChanges.cs" />
     <Compile Include="..\..\WindowsTweaks.cs" Link="App\WindowsTweaks.cs" />
     <Compile Include="..\..\StartupManager.cs" Link="App\StartupManager.cs" />
+    <Compile Include="..\..\Modules\Muralha\MuralhaEngine.cs" Link="App\MuralhaEngine.cs" />
+    <Compile Include="..\..\Modules\Muralha\Quarantine.cs" Link="App\Quarantine.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
   </ItemGroup>
 </Project>
