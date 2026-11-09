@@ -40,13 +40,6 @@ public partial class StartupView : UserControl
         BtnStartupRestore.Content = removed > 0 ? $"RESTAURAR REMOVIDOS ({removed})" : "RESTAURAR REMOVIDOS";
     }
 
-    private bool RequireAdmin()
-    {
-        if (SensorMonitor.IsElevated) return true;
-        FkDialog.Info(Owner, "Precisa de administrador", "Esta ação precisa do Fort Knox aberto como administrador.");
-        return false;
-    }
-
     private void BtnStartupScan_Click(object sender, RoutedEventArgs e)
     {
         StartupResult.Text = "";
@@ -57,7 +50,7 @@ public partial class StartupView : UserControl
     {
         if (sender is not CheckBox { Tag: StartupEntry item } box) return;
         bool turnOn = box.IsChecked == true;
-        if (item.Machine && !RequireAdmin()) { box.IsChecked = item.Enabled; return; }
+        if (item.Machine && !AdminGuard.Require(this)) { box.IsChecked = item.Enabled; return; }
         try
         {
             StartupManager.SetEnabled(item, turnOn);
@@ -70,7 +63,7 @@ public partial class StartupView : UserControl
     private void StartupRemove_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not FrameworkElement { Tag: StartupEntry item } || _prefs == null) return;
-        if (item.Machine && !RequireAdmin()) return;
+        if (item.Machine && !AdminGuard.Require(this)) return;
         bool yes = FkDialog.Confirm(Owner, $"Remover \"{item.Name}\" da inicialização?",
             "O programa continua instalado, só deixa de abrir sozinho. Dá para desfazer em Restaurar removidos. " +
             "Se só quiser testar, prefira desligar o interruptor.", "Remover", kind: DialogKind.Destructive);
@@ -90,7 +83,7 @@ public partial class StartupView : UserControl
         if (_prefs == null) return;
         var removed = Removed;
         if (removed.Count == 0) return;
-        if (removed.Any(b => b.Machine) && !RequireAdmin()) return;
+        if (removed.Any(b => b.Machine) && !AdminGuard.Require(this)) return;
         string names = string.Join(", ", removed.Take(6).Select(b => b.Name)) + (removed.Count > 6 ? $" e mais {removed.Count - 6}" : "");
         if (!FkDialog.Confirm(Owner, $"Devolver {removed.Count} programas à inicialização?", names, "Restaurar")) return;
 
