@@ -35,6 +35,13 @@ public static class ThemeManager
         ("Danger", "#D7263D", "#B81F33"),
         ("Ok", "#2EBD6B", "#1E8F4F"),
         ("Warn", "#F29D38", "#C77310"),
+        // Design System (UI/Tokens.xaml): Azul Sinal e fundos suaves de status
+        ("Info", "#3E8BFF", "#1F66D1"),
+        ("InfoSoft", "#12203A", "#DCE8FB"),
+        ("OkSoft", "#10281B", "#DDF3E6"),
+        ("WarnSoft", "#2E2112", "#FBEBD6"),
+        ("DangerSoft", "#2E1217", "#F8DCE0"),
+        ("Scrim", "#B30B0C0E", "#800B0C0E"),
         (SystemColors.ControlBrushKey, "#0B0C0E", "#F6F5F1"),
         (SystemColors.HighlightBrushKey, "#22252B", "#E6E4DD"),
         (SystemColors.InactiveSelectionHighlightBrushKey, "#22252B", "#E6E4DD"),

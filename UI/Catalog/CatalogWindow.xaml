@@ -1,0 +1,195 @@
+<Window x:Class="FortKnox.UI.CatalogWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="clr-namespace:FortKnox.UI"
+        Title="Fort Knox · Design System" Width="1240" Height="900" WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource WindowBg}" FontFamily="{StaticResource Text}" Foreground="{DynamicResource Fg}"
+        UseLayoutRounding="True" TextOptions.TextFormattingMode="Display">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Border x:Name="Sheet" Background="{DynamicResource WindowBg}" Padding="40,32">
+            <StackPanel>
+                <!-- Cabeçalho -->
+                <Grid Margin="0,0,0,28">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="{StaticResource BrandSymbol}" Height="44" Margin="0,0,16,0"/>
+                        <StackPanel VerticalAlignment="Center">
+                            <Image Source="{StaticResource BrandWordmark}" Height="15" HorizontalAlignment="Left"/>
+                            <TextBlock Text="DESIGN SYSTEM · COMPONENTES BASE" Style="{StaticResource Label}" Margin="0,8,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel x:Name="ThemeSwitch" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <RadioButton x:Name="DarkChip" Style="{StaticResource Chip}" Content="Escuro" GroupName="t" Checked="Dark_Checked"/>
+                        <RadioButton x:Name="LightChip" Style="{StaticResource Chip}" Content="Claro" GroupName="t" Checked="Light_Checked"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- 1. Cores -->
+                <TextBlock Text="01 · CORES" Style="{StaticResource SectionHeader}"/>
+                <ItemsControl x:Name="Swatches" Margin="0,0,0,28">
+                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="8"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0,0,12,12">
+                                <Border Height="54" CornerRadius="{StaticResource RadiusControl}" Background="{Binding Brush}"
+                                        BorderBrush="{DynamicResource Line}" BorderThickness="1"/>
+                                <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" Margin="0,6,0,0"/>
+                                <TextBlock Text="{Binding Token}" FontFamily="{StaticResource Mono}" FontSize="10.5" Foreground="{DynamicResource Muted}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- 2. Tipografia -->
+                <TextBlock Text="02 · TIPOGRAFIA" Style="{StaticResource SectionHeader}"/>
+                <Border Style="{StaticResource CardBorder}" Margin="0,0,0,28">
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="MICHROMA · TÍTULOS" Style="{StaticResource Label}"/>
+                            <TextBlock Text="SENTINELA" Style="{StaticResource H1}"/>
+                            <TextBlock Text="Só em títulos e na marca. Caixa alta, nunca negrito." Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="24,0">
+                            <TextBlock Text="INTER · TEXTO" Style="{StaticResource Label}"/>
+                            <TextBlock Text="Programas que abrem com o Windows" FontSize="16" FontWeight="SemiBold"/>
+                            <TextBlock Text="Pronto. 6 programas não abrem mais com o Windows. Você pode desfazer em Restaurar." Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="JETBRAINS MONO · DADOS" Style="{StaticResource Label}"/>
+                            <TextBlock Text="83 °C · 4.512 pts" Style="{StaticResource Big}"/>
+                            <TextBlock Text="Números com unidade e espaço, vírgula decimal: 1,4 ms." Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- 3. Botões e status -->
+                <Grid Margin="0,0,0,28">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="24"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="03 · BOTÕES" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <WrapPanel>
+                                    <Button Style="{StaticResource PrimaryButton}" Content="Otimizar agora" Margin="0,0,10,10"/>
+                                    <Button Style="{StaticResource OutlineButton}" Content="Restaurar" Margin="0,0,10,10"/>
+                                    <Button Style="{StaticResource DangerButton}" Content="Remover" Margin="0,0,10,10"/>
+                                    <Button Style="{StaticResource GhostButton}" Content="Ver detalhes" Margin="0,0,10,10"/>
+                                </WrapPanel>
+                                <WrapPanel>
+                                    <Button Style="{StaticResource PrimaryButtonSm}" Content="Instalar" Margin="0,0,10,10"/>
+                                    <Button Style="{StaticResource OutlineButtonSm}" Content="Desfazer" Margin="0,0,10,10"/>
+                                    <Button Style="{StaticResource DangerButtonSm}" Content="Apagar" Margin="0,0,10,10"/>
+                                    <Button Style="{StaticResource PrimaryButtonSm}" Content="Desativado" IsEnabled="False" Margin="0,0,10,10"/>
+                                    <Button Style="{StaticResource IconButton}" Content="&#xE72C;" ToolTip="Atualizar" Margin="0,0,4,10"/>
+                                    <Button Style="{StaticResource IconButton}" Content="&#xE713;" ToolTip="Configurações" Margin="0,0,4,10"/>
+                                    <Button Style="{StaticResource IconButton}" Content="&#xE74D;" ToolTip="Apagar" Margin="0,0,4,10"/>
+                                </WrapPanel>
+                                <TextBlock Text="Um principal por tela. Verbo no imperativo. Destrutivo sempre com confirmação." Style="{StaticResource Sub}"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="04 · STATUS E CAMPOS" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <WrapPanel Margin="0,0,0,14">
+                                    <ui:StatusBadge Status="Bom" Margin="0,0,8,8"/>
+                                    <ui:StatusBadge Status="Atencao" Margin="0,0,8,8"/>
+                                    <ui:StatusBadge Status="Ruim" Margin="0,0,8,8"/>
+                                    <ui:StatusBadge Status="Info" Text="Assinado" Margin="0,0,8,8"/>
+                                    <ui:StatusBadge Status="Neutro" Text="Ignorado" Margin="0,0,8,8"/>
+                                </WrapPanel>
+                                <TextBox Tag="Buscar programa…" Margin="0,0,0,12"/>
+                                <WrapPanel>
+                                    <CheckBox Content="Proteção em tempo real" IsChecked="True" Margin="0,0,20,8"/>
+                                    <CheckBox Content="Agendar" Margin="0,0,0,8"/>
+                                </WrapPanel>
+                                <WrapPanel Margin="0,6,0,0">
+                                    <RadioButton Style="{StaticResource Chip}" Content="Rápida" IsChecked="True" GroupName="scan"/>
+                                    <RadioButton Style="{StaticResource Chip}" Content="Completa" GroupName="scan"/>
+                                    <RadioButton Style="{StaticResource Chip}" Content="Personalizada" GroupName="scan"/>
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+
+                <!-- 5. Scanner -->
+                <TextBlock Text="05 · SCANNER" Style="{StaticResource SectionHeader}"/>
+                <Grid Margin="0,0,0,28">
+                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="24"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                    <ui:ScannerPanel x:Name="DemoScanner" Title="MURALHA · VARREDURA RÁPIDA" StartText="Verificar agora"/>
+                    <ui:ScannerPanel x:Name="DoneScanner" Grid.Column="2" Title="ARSENAL · LIMPEZA" StartText="Limpar 1,8 GB"/>
+                </Grid>
+
+                <!-- 6. Grade de dados -->
+                <TextBlock Text="06 · GRADE DE DADOS" Style="{StaticResource SectionHeader}"/>
+                <Border Style="{StaticResource CardBorder}" Margin="0,0,0,28">
+                    <DataGrid x:Name="DemoGrid" Style="{StaticResource FkDataGrid}" HeadersVisibility="Column">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="PROGRAMA" Binding="{Binding Name}" Width="2*"/>
+                            <DataGridTextColumn Header="FABRICANTE" Binding="{Binding Publisher}" Width="1.5*"/>
+                            <DataGridTextColumn Header="TAMANHO" Binding="{Binding Size}" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock"><Setter Property="FontFamily" Value="{StaticResource Mono}"/></Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTemplateColumn Header="ASSINATURA" Width="1.4*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate><ui:StatusBadge Status="{Binding Status}" Text="{Binding StatusText}"/></DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="" Width="140">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate><Button Style="{StaticResource OutlineButtonSm}" Content="Desinstalar" HorizontalAlignment="Right"/></DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+
+                <!-- 7. Modais, estado vazio e aviso -->
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="24"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="07 · MODAIS" Style="{StaticResource SectionHeader}"/>
+                        <ui:DialogCard Kind="Destructive" HorizontalAlignment="Left" Margin="0,0,0,16"
+                                       Title="Remover o driver CH340 4.0?"
+                                       Message="Guardamos uma cópia para você voltar quando quiser."
+                                       ConfirmText="Remover"/>
+                        <ui:DialogCard Kind="Confirm" HorizontalAlignment="Left"
+                                       Title="Mover 3 itens para a quarentena?"
+                                       Message="Eles ficam cifrados e podem ser restaurados em MURALHA · Quarentena."
+                                       ConfirmText="Mover"/>
+                        <WrapPanel Margin="0,14,0,0">
+                            <Button Style="{StaticResource OutlineButtonSm}" Content="Abrir modal destrutivo" Click="OpenDestructive_Click" Margin="0,0,10,0"/>
+                            <Button Style="{StaticResource OutlineButtonSm}" Content="Abrir modal informativo" Click="OpenInfo_Click"/>
+                        </WrapPanel>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="08 · ESTADO VAZIO E AVISO" Style="{StaticResource SectionHeader}"/>
+                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,16">
+                            <ui:EmptyState Glyph="&#xE7FC;" Title="Nenhum jogo encontrado ainda."
+                                           Message="Adicione um .exe ou abra a Steam uma vez para o Fort Knox encontrar seus jogos."
+                                           ActionText="Adicionar jogo"/>
+                        </Border>
+                        <!-- Aviso (toast): sempre escuro, igual ao ToastWindow -->
+                        <Border Background="#F2111316" BorderBrush="#80D4A13A" BorderThickness="1" CornerRadius="6" Padding="16,12" Width="340" HorizontalAlignment="Left">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
+                                <Border Width="34" Height="34" Background="{StaticResource GoldButton}" CornerRadius="4" VerticalAlignment="Top" Margin="0,2,14,0">
+                                    <TextBlock Text="&#xE88E;" FontFamily="{StaticResource Icons}" FontSize="17" Foreground="#0B0C0E" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="Pendrive conectado (E:)" Foreground="#F6F5F1" FontSize="13.5" FontWeight="SemiBold"/>
+                                    <TextBlock Text="SanDisk Ultra · 57,3 GB livres" Foreground="#9AA0A9" FontSize="12" Margin="0,3,0,0"/>
+                                    <Image Source="{StaticResource BrandWordmark}" Height="7" HorizontalAlignment="Left" Margin="0,8,0,0" Opacity="0.8"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Border>
+    </ScrollViewer>
+</Window>

@@ -6,6 +6,9 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Theme.xaml"/>
+                <!-- Design System (Fase 2): tokens complementares e componentes base -->
+                <ResourceDictionary Source="UI/Tokens.xaml"/>
+                <ResourceDictionary Source="UI/Components.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

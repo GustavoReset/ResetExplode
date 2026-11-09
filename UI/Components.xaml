@@ -1,0 +1,397 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:ui="clr-namespace:FortKnox.UI">
+    <!-- ===== Design System Fort Knox · componentes base =====
+         Depende de Theme.xaml (paleta, fontes, PrimaryButton/OutlineButton/DangerButton, DataGrid) e de UI/Tokens.xaml.
+         Regra: só DynamicResource para cores (troca claro/escuro na hora); degradês da marca são StaticResource. -->
+
+    <BooleanToVisibilityConverter x:Key="UiBoolVis"/>
+
+    <!-- ===== Botões complementares ===== -->
+    <!-- Terciário: só texto em ouro (ações leves, "Ver detalhes") -->
+    <Style x:Key="GhostButton" TargetType="Button">
+        <Setter Property="Foreground" Value="{DynamicResource AccentText}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="b" Background="{TemplateBinding Background}" CornerRadius="{StaticResource RadiusControl}" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="b" Property="Background" Value="{DynamicResource AccentSoft}"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="b" Property="Background" Value="{DynamicResource AccentSoft}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="b" Property="Opacity" Value="0.35"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Botão de ícone (Content = glifo Segoe Fluent; ToolTip obrigatório para acessibilidade) -->
+    <Style x:Key="IconButton" TargetType="Button">
+        <Setter Property="Width" Value="34"/>
+        <Setter Property="Height" Value="34"/>
+        <Setter Property="Foreground" Value="{DynamicResource Muted}"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="FontFamily" Value="{StaticResource Icons}"/>
+        <Setter Property="FontSize" Value="15"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="b" Background="{TemplateBinding Background}" CornerRadius="{StaticResource RadiusControl}"
+                            BorderThickness="1" BorderBrush="Transparent">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="b" Property="Background" Value="{DynamicResource Hover}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource Fg}"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="b" Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Foreground" Value="{DynamicResource AccentText}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="b" Property="Opacity" Value="0.35"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Tamanho compacto (linhas de tabela, cartões pequenos): use junto com os estilos de botão via BasedOn -->
+    <Style x:Key="PrimaryButtonSm" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+        <Setter Property="Padding" Value="16,6"/>
+        <Setter Property="FontSize" Value="12"/>
+    </Style>
+    <Style x:Key="OutlineButtonSm" TargetType="Button" BasedOn="{StaticResource OutlineButton}">
+        <Setter Property="Padding" Value="16,6"/>
+        <Setter Property="FontSize" Value="12"/>
+    </Style>
+    <Style x:Key="DangerButtonSm" TargetType="Button" BasedOn="{StaticResource DangerButton}">
+        <Setter Property="Padding" Value="16,6"/>
+        <Setter Property="FontSize" Value="12"/>
+    </Style>
+
+    <!-- ===== Barra de progresso fina (ouro; indeterminada = lingote correndo) ===== -->
+    <Style x:Key="FkProgress" TargetType="ProgressBar">
+        <Setter Property="Height" Value="6"/>
+        <Setter Property="Minimum" Value="0"/>
+        <Setter Property="Maximum" Value="1"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ProgressBar">
+                    <Grid ClipToBounds="True">
+                        <Border x:Name="PART_Track" Background="{DynamicResource Line}" CornerRadius="3"/>
+                        <Border x:Name="PART_Indicator" Background="{StaticResource GoldGradient}" CornerRadius="3" HorizontalAlignment="Left"/>
+                        <Canvas x:Name="indet" Visibility="Collapsed">
+                            <Border x:Name="runner" Width="90" Height="{Binding ActualHeight, RelativeSource={RelativeSource TemplatedParent}}"
+                                    Background="{StaticResource GoldGradient}" CornerRadius="3" Canvas.Left="-90"/>
+                        </Canvas>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsIndeterminate" Value="True">
+                            <Setter TargetName="PART_Indicator" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="indet" Property="Visibility" Value="Visible"/>
+                            <Trigger.EnterActions>
+                                <BeginStoryboard x:Name="run">
+                                    <Storyboard RepeatBehavior="Forever">
+                                        <DoubleAnimation Storyboard.TargetName="runner" Storyboard.TargetProperty="(Canvas.Left)"
+                                                         From="-90" To="900" Duration="0:0:1.6"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <StopStoryboard BeginStoryboardName="run"/>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ===== Dica (ToolTip) ===== -->
+    <Style TargetType="ToolTip">
+        <Setter Property="Background" Value="{DynamicResource Panel}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Fg}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource LineStrong}"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToolTip">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1"
+                            CornerRadius="{StaticResource RadiusControl}" Padding="10,6" MaxWidth="320">
+                        <ContentPresenter TextElement.Foreground="{TemplateBinding Foreground}">
+                            <ContentPresenter.Resources>
+                                <Style TargetType="TextBlock"><Setter Property="TextWrapping" Value="Wrap"/></Style>
+                            </ContentPresenter.Resources>
+                        </ContentPresenter>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ===== Cabeçalho de seção (rótulo mono ouro + linha) ===== -->
+    <Style x:Key="SectionHeader" TargetType="TextBlock" BasedOn="{StaticResource Label}">
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="Margin" Value="0,0,0,12"/>
+    </Style>
+
+    <!-- ===== Grade de dados compacta (listas longas: arquivos, apps, achados) ===== -->
+    <Style x:Key="FkDataGrid" TargetType="DataGrid" BasedOn="{StaticResource {x:Type DataGrid}}">
+        <Setter Property="AutoGenerateColumns" Value="False"/>
+        <Setter Property="IsReadOnly" Value="True"/>
+        <Setter Property="MinRowHeight" Value="38"/>
+        <Setter Property="EnableRowVirtualization" Value="True"/>
+        <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling"/>
+        <Setter Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="True"/>
+        <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
+    </Style>
+
+    <!-- ===== Selo de status ===== -->
+    <Style TargetType="ui:StatusBadge">
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Foreground" Value="{DynamicResource Muted}"/>
+        <Setter Property="Background" Value="{DynamicResource Panel}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource LineStrong}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ui:StatusBadge">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1"
+                            CornerRadius="{StaticResource RadiusBadge}" Padding="9,3,10,3">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="6" Height="6" Fill="{TemplateBinding Foreground}" VerticalAlignment="Center" Margin="0,0,7,0"/>
+                            <TextBlock Text="{TemplateBinding DisplayText}" Foreground="{TemplateBinding Foreground}"
+                                       FontFamily="{StaticResource Mono}" FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="Status" Value="Bom">
+                <Setter Property="Foreground" Value="{DynamicResource Ok}"/>
+                <Setter Property="Background" Value="{DynamicResource OkSoft}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource Ok}"/>
+            </Trigger>
+            <Trigger Property="Status" Value="Atencao">
+                <Setter Property="Foreground" Value="{DynamicResource Warn}"/>
+                <Setter Property="Background" Value="{DynamicResource WarnSoft}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource Warn}"/>
+            </Trigger>
+            <Trigger Property="Status" Value="Ruim">
+                <Setter Property="Foreground" Value="{DynamicResource Danger}"/>
+                <Setter Property="Background" Value="{DynamicResource DangerSoft}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource Danger}"/>
+            </Trigger>
+            <Trigger Property="Status" Value="Info">
+                <Setter Property="Foreground" Value="{DynamicResource Info}"/>
+                <Setter Property="Background" Value="{DynamicResource InfoSoft}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource Info}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- ===== Estado vazio ===== -->
+    <Style TargetType="ui:EmptyState">
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ui:EmptyState">
+                    <StackPanel HorizontalAlignment="Center" MaxWidth="400" Margin="0,24">
+                        <Border Width="56" Height="56" CornerRadius="28" Background="{DynamicResource AccentSoft}"
+                                BorderBrush="{DynamicResource Accent}" BorderThickness="1" HorizontalAlignment="Center">
+                            <TextBlock Text="{TemplateBinding Glyph}" FontFamily="{StaticResource Icons}" FontSize="22"
+                                       Foreground="{DynamicResource AccentText}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <TextBlock Text="{TemplateBinding Title}" FontSize="15" FontWeight="SemiBold" Foreground="{DynamicResource Fg}"
+                                   HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="0,14,0,0"/>
+                        <TextBlock Text="{TemplateBinding Message}" FontSize="13" Foreground="{DynamicResource Muted}"
+                                   HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                        <Button x:Name="act" Style="{StaticResource OutlineButtonSm}" Content="{TemplateBinding ActionText}"
+                                Command="{TemplateBinding ActionCommand}" HorizontalAlignment="Center" Margin="0,16,0,0"/>
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="ActionText" Value="{x:Null}">
+                            <Setter TargetName="act" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ===== Cartão de diálogo (modal) ===== -->
+    <Style TargetType="ui:DialogCard">
+        <Setter Property="Width" Value="440"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ui:DialogCard">
+                    <Border Background="{DynamicResource CardFill}" BorderBrush="{DynamicResource LineStrong}" BorderThickness="1"
+                            CornerRadius="{StaticResource RadiusCard}" Padding="24,22">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="28" ShadowDepth="6" Opacity="0.45" Color="#000000"/>
+                        </Border.Effect>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Border x:Name="ico" Width="34" Height="34" CornerRadius="{StaticResource RadiusBadge}" Background="{StaticResource GoldButton}" Margin="0,0,14,0">
+                                    <TextBlock x:Name="glyph" Text="&#xE946;" FontFamily="{StaticResource Icons}" FontSize="16"
+                                               Foreground="#0B0C0E" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Text="{TemplateBinding Title}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Fg}"
+                                           VerticalAlignment="Center" TextWrapping="Wrap" MaxWidth="330"/>
+                            </StackPanel>
+                            <TextBlock Text="{TemplateBinding Message}" FontSize="13" Foreground="{DynamicResource Muted}"
+                                       TextWrapping="Wrap" Margin="48,8,0,0" LineHeight="19"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,22,0,0">
+                                <Button x:Name="PART_Cancel" Style="{StaticResource OutlineButtonSm}" Content="{TemplateBinding CancelText}" Margin="0,0,10,0"/>
+                                <Button x:Name="PART_Confirm" Style="{StaticResource PrimaryButtonSm}" Content="{TemplateBinding ConfirmText}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Kind" Value="Destructive">
+                            <Setter TargetName="ico" Property="Background" Value="{StaticResource RedGradient}"/>
+                            <Setter TargetName="glyph" Property="Text" Value="&#xE7BA;"/>
+                            <Setter TargetName="glyph" Property="Foreground" Value="#F6F5F1"/>
+                            <Setter TargetName="PART_Confirm" Property="Style" Value="{StaticResource DangerButtonSm}"/>
+                        </Trigger>
+                        <Trigger Property="Kind" Value="Info">
+                            <Setter TargetName="PART_Cancel" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ===== Painel de varredura ===== -->
+    <Style TargetType="ui:ScannerPanel">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ui:ScannerPanel">
+                    <Border Style="{StaticResource CardBorder}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Radar: anéis, feixe girando e o símbolo Bastião no centro -->
+                            <Grid Width="132" Height="132" Margin="0,0,24,0" VerticalAlignment="Top">
+                                <Ellipse Stroke="{DynamicResource LineStrong}" StrokeThickness="1"/>
+                                <Ellipse Margin="22" Stroke="{DynamicResource Line}" StrokeThickness="1"/>
+                                <Ellipse Margin="44" Stroke="{DynamicResource Line}" StrokeThickness="1"/>
+                                <Path x:Name="PART_Sweep" Data="M66,66 L66,0 A66,66 0 0 1 132,66 Z" RenderTransformOrigin="0.5,0.5">
+                                    <Path.RenderTransform><RotateTransform Angle="45"/></Path.RenderTransform>
+                                    <Path.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                            <GradientStop Offset="0" Color="#00D4A13A"/>
+                                            <GradientStop Offset="1" Color="#8CD4A13A"/>
+                                        </LinearGradientBrush>
+                                    </Path.Fill>
+                                </Path>
+                                <Image Source="{StaticResource BrandSymbol}" Width="44" Height="46"/>
+                            </Grid>
+
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="{TemplateBinding Title}" Style="{StaticResource Label}"/>
+                                <TextBlock Text="{TemplateBinding Phase}" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource Fg}" TextWrapping="Wrap"/>
+                                <TextBlock Text="{TemplateBinding CurrentItem}" FontFamily="{StaticResource Mono}" FontSize="11.5"
+                                           Foreground="{DynamicResource Muted}" TextTrimming="CharacterEllipsis" Margin="0,6,0,12"/>
+                                <Grid>
+                                    <ProgressBar x:Name="bar" Style="{StaticResource FkProgress}" Value="{TemplateBinding BarValue}" Margin="0,0,56,0"
+                                                 IsIndeterminate="{TemplateBinding IsIndeterminate}"/>
+                                    <TextBlock Text="{TemplateBinding PercentText}" FontFamily="{StaticResource Mono}" FontSize="12"
+                                               Foreground="{DynamicResource AccentText}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                </Grid>
+                                <UniformGrid Columns="3" Margin="0,16,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="VERIFICADOS" FontFamily="{StaticResource Mono}" FontSize="10" Foreground="{DynamicResource Faint}"/>
+                                        <TextBlock Text="{TemplateBinding ScannedText}" Style="{StaticResource Big}" FontSize="19"/>
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="ACHADOS" FontFamily="{StaticResource Mono}" FontSize="10" Foreground="{DynamicResource Faint}"/>
+                                        <TextBlock x:Name="found" Text="{TemplateBinding FindingsText}" Style="{StaticResource Big}" FontSize="19"/>
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="TEMPO" FontFamily="{StaticResource Mono}" FontSize="10" Foreground="{DynamicResource Faint}"/>
+                                        <TextBlock Text="{TemplateBinding ElapsedText}" Style="{StaticResource Big}" FontSize="19"/>
+                                    </StackPanel>
+                                </UniformGrid>
+                                <StackPanel Orientation="Horizontal" Margin="0,18,0,0">
+                                    <Button x:Name="start" Style="{StaticResource PrimaryButton}" Content="{TemplateBinding StartText}" Command="{TemplateBinding StartCommand}"/>
+                                    <Button x:Name="cancel" Style="{StaticResource OutlineButton}" Content="Cancelar" Command="{TemplateBinding CancelCommand}" Visibility="Collapsed"/>
+                                </StackPanel>
+                            </StackPanel>
+
+                            <!-- Achados ao vivo -->
+                            <ItemsControl x:Name="list" Grid.Row="1" Grid.ColumnSpan="2" ItemsSource="{TemplateBinding Findings}" Margin="0,20,0,0">
+                                <ItemsControl.Template>
+                                    <ControlTemplate TargetType="ItemsControl">
+                                        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="240">
+                                            <ItemsPresenter/>
+                                        </ScrollViewer>
+                                    </ControlTemplate>
+                                </ItemsControl.Template>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type ui:ScanFinding}">
+                                        <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0" Padding="0,10">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="96"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <ui:StatusBadge Status="{Binding Status}"/>
+                                                <StackPanel Grid.Column="1">
+                                                    <TextBlock Text="{Binding Name}" Foreground="{DynamicResource Fg}" FontSize="13" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Text="{Binding Detail}" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="State" Value="Running">
+                            <Setter TargetName="start" Property="Visibility" Value="Collapsed"/>
+                            <Setter TargetName="cancel" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                        <Trigger Property="State" Value="Idle">
+                            <Setter TargetName="bar" Property="Opacity" Value="0.4"/>
+                        </Trigger>
+                        <Trigger Property="FindingsCount" Value="0">
+                            <Setter TargetName="list" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
