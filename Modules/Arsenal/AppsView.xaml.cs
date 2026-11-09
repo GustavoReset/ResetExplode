@@ -1,46 +1,56 @@
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Controls;
+using FortKnox.UI;
 
 namespace FortKnox;
 
-/// <summary>Aba ARSENAL · Instalar apps: essenciais pós-formatação pelo winget.</summary>
-public partial class MainWindow
+/// <summary>ARSENAL · Instalar apps: essenciais pós-formatação pelo winget (antigo MainWindow.Apps.cs).</summary>
+public partial class AppsView : UserControl
 {
-    private List<InstallableApp>? _installApps;
-    private bool _appsBusy, _appsStop;
+    private List<InstallableApp>? _apps;
+    private bool _busy, _stop;
 
-    private void InitApps()
+    public AppsView() => InitializeComponent();
+
+    /// <summary>Instalando agora? (o módulo não deixa a instalação morrer escondida ao sair da página; só ao fechar o app).</summary>
+    public bool IsBusy => _busy;
+
+    public void Activate()
     {
-        if (_appsBusy) return;
-        if (_installApps == null)
+        if (_busy) return;
+        if (_apps == null)
         {
-            _installApps = AppInstaller.Catalog();
-            AppsList.ItemsSource = _installApps;
-            AppInstaller.RefreshInstalled(_installApps);
-            foreach (var a in _installApps) a.Selected = a.PreSelect && !a.Installed;
+            _apps = AppInstaller.Catalog();
+            AppsList.ItemsSource = _apps;
+            AppInstaller.RefreshInstalled(_apps);
+            foreach (var a in _apps) a.Selected = a.PreSelect && !a.Installed;
         }
-        else AppInstaller.RefreshInstalled(_installApps);
+        else AppInstaller.RefreshInstalled(_apps);
 
         bool winget = AppInstaller.WingetAvailable;
         BtnAppsStore.Visibility = winget ? Visibility.Collapsed : Visibility.Visible;
         BtnAppsInstall.IsEnabled = winget;
-        int installed = _installApps.Count(a => a.Installed);
+        int installed = _apps.Count(a => a.Installed);
         AppsStatus.Text = winget
-            ? $"{installed} de {_installApps.Count} já instalados. Marque o que quer e clique em INSTALAR SELECIONADOS."
+            ? $"{installed} de {_apps.Count} já instalados. Marque o que quer e clique em INSTALAR SELECIONADOS."
             : "O winget não foi encontrado. Em PC recém-formatado ele aparece depois que a Microsoft Store atualiza o " +
               "\"Instalador de Aplicativo\": use o botão abaixo, espere atualizar e abra esta página de novo.";
     }
 
+    /// <summary>Ao fechar o app: para depois do app atual (o winget não é interrompido no meio de uma instalação).</summary>
+    public void RequestStop() => _stop = true;
+
     private void BtnAppsAll_Click(object sender, RoutedEventArgs e)
     {
-        if (_installApps == null || _appsBusy) return;
-        foreach (var a in _installApps) a.Selected = !a.Installed;
+        if (_apps == null || _busy) return;
+        foreach (var a in _apps) a.Selected = !a.Installed;
     }
 
     private void BtnAppsNone_Click(object sender, RoutedEventArgs e)
     {
-        if (_installApps == null || _appsBusy) return;
-        foreach (var a in _installApps) a.Selected = false;
+        if (_apps == null || _busy) return;
+        foreach (var a in _apps) a.Selected = false;
     }
 
     private void BtnAppsStore_Click(object sender, RoutedEventArgs e)
@@ -52,19 +62,16 @@ public partial class MainWindow
 
     private async void BtnAppsInstall_Click(object sender, RoutedEventArgs e)
     {
-        if (_installApps == null) return;
-        if (_appsBusy) { _appsStop = true; BtnAppsInstall.IsEnabled = false; AppsStatus.Text = "Parando depois do app atual…"; return; }
+        if (_apps == null) return;
+        if (_busy) { _stop = true; BtnAppsInstall.IsEnabled = false; AppsStatus.Text = "Parando depois do app atual…"; return; }
 
-        var sel = _installApps.Where(a => a.Selected && !a.Installed).ToList();
+        var sel = _apps.Where(a => a.Selected && !a.Installed).ToList();
         if (sel.Count == 0) { AppsStatus.Text = "Nenhum app selecionado."; return; }
-        if (sel.Any(a => a.WingetId == "RARLab.WinRAR") && sel.Any(a => a.WingetId == "7zip.7zip"))
-        {
-            var r = MessageBox.Show("WinRAR e 7-Zip fazem a mesma coisa. Instalar os dois mesmo assim?", "Instalar apps",
-                                    MessageBoxButton.YesNo, MessageBoxImage.Question);
-            if (r != MessageBoxResult.Yes) return;
-        }
+        if (sel.Any(a => a.WingetId == "RARLab.WinRAR") && sel.Any(a => a.WingetId == "7zip.7zip")
+            && !FkDialog.Confirm(Window.GetWindow(this), "Instalar WinRAR e 7-Zip?", "Os dois fazem a mesma coisa. Instalar os dois mesmo assim?", "Instalar os dois"))
+            return;
 
-        _appsBusy = true; _appsStop = false;
+        _busy = true; _stop = false;
         BtnAppsInstall.Content = "PARAR";
         foreach (var a in sel) a.Status = "Na fila.";
         int ok = 0, done = 0;
@@ -73,7 +80,7 @@ public partial class MainWindow
 
         foreach (var app in sel)
         {
-            if (_appsStop) { app.Status = "Não instalado (parado)."; continue; }
+            if (_stop) { app.Status = "Não instalado (parado)."; continue; }
             AppsStatus.Text = $"Instalando {app.Name} ({done + 1} de {sel.Count})… baixando do site oficial, pode levar alguns minutos.";
             app.Status = "Instalando…";
             try
@@ -88,12 +95,12 @@ public partial class MainWindow
             AppsProgress.ScaleX = (double)done / sel.Count;
         }
 
-        AppInstaller.RefreshInstalled(_installApps);
-        _appsBusy = false;
+        AppInstaller.RefreshInstalled(_apps);
+        _busy = false;
         BtnAppsInstall.Content = "INSTALAR SELECIONADOS";
         BtnAppsInstall.IsEnabled = true;
         AppsStatus.Text = $"{ok} de {sel.Count} instalados." +
                           (failed.Count > 0 ? $" Falharam: {string.Join(", ", failed)} (veja o motivo na lista)." : "") +
-                          (_appsStop ? " Instalação interrompida." : "");
+                          (_stop ? " Instalação interrompida." : "");
     }
 }

@@ -13,6 +13,8 @@ public partial class MainWindow
         ["PageVault"] = CofreModule.RouteSenhas,
         ["PagePdf"] = PrensaModule.RoutePdf,
         ["PageNet"] = RadarModule.RouteConexao,
+        ["PageStartup"] = ArsenalModule.RouteStartup,
+        ["PageApps"] = ArsenalModule.RouteApps,
     };
 
     private FortKnoxHost? Core => App.Core;
@@ -23,6 +25,7 @@ public partial class MainWindow
         Core.Modules.Add(new CofreModule(PageVault, this));
         Core.Modules.Add(new PrensaModule(PagePdf));
         Core.Modules.Add(new RadarModule(NetTools));
+        Core.Modules.Add(new ArsenalModule(PageStartup, PageApps, () => _settings.StartupRemoved, () => { try { _settings.Save(); } catch (System.IO.IOException) { } }));
     }
 
     /// <summary>Chamado por Nav_Checked. Erros do módulo vão para o log e para a barra de status, sem derrubar o app.</summary>

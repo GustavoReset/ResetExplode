@@ -278,8 +278,6 @@ public partial class MainWindow : Window
             case "PageInteg": InitInteg(); break;
             case "PageLauncher": InitLauncher(); break;
             case "PageDriver": InitDriver(); break;
-            case "PageStartup": ScanStartup(); break;
-            case "PageApps": InitApps(); break;
             case "PageMakerPorts": ScanUsb(); break;
             case "PageMakerDrv": InitMakerDrivers(); break;
             case "PageOptimize": InitOptimize(); break;
