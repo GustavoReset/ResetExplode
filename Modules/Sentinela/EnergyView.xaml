@@ -1,22 +1,22 @@
 <UserControl x:Class="FortKnox.EnergyView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="clr-namespace:FortKnox.UI">
     <!-- SENTINELA · Energia (Fase 3.3l: extraído do MainWindow.xaml, sem mudança visual) -->
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="36,30,36,30">
             <Grid Margin="0,0,0,20">
                 <StackPanel Margin="0,0,160,0">
-                    <TextBlock Text="SENTINELA · ENERGIA" Style="{StaticResource H1}"/>
-                    <TextBlock x:Name="EnergyStatus" Text="Bateria, fonte de energia e consumo" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="SENTINELA · ENERGIA" Style="{StaticResource H1}"/>
+                        <TextBlock Style="{StaticResource InfoTip}" ToolTip="Os dados vêm do Windows (WMI). Alguns notebooks não informam ciclos de carga ou a capacidade de projeto. O consumo mostrado vem dos sensores de CPU e GPU, não da fonte (PSU) do PC."/>
+                    </StackPanel>
+                    <ui:StatusLine x:Name="EnergyStatus" Text="Bateria, fonte de energia e consumo" FontSize="13" Margin="0,4,0,0"/>
                 </StackPanel>
                 <Button x:Name="BtnEnergyRefresh" Style="{StaticResource OutlineButton}" Content="ATUALIZAR" Padding="18,9"
                         HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnEnergyRefresh_Click"/>
             </Grid>
             <ItemsControl x:Name="EnergyCards" ItemTemplate="{StaticResource CardTemplate}"/>
-            <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap">
-                Os dados vêm do Windows (WMI). Alguns notebooks não informam ciclos de carga ou a capacidade de projeto.
-                O consumo mostrado vem dos sensores de CPU e GPU, não da fonte (PSU) do PC.
-            </TextBlock>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

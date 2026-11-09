@@ -1,27 +1,33 @@
 <UserControl x:Class="FortKnox.DriversView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="clr-namespace:FortKnox.UI">
     <!-- ALICERCE · Drivers (Fase 3.3c: extraído do MainWindow.xaml, sem mudança visual) -->
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="36,30,36,30">
             <Grid Margin="0,0,0,20">
                 <StackPanel Margin="0,0,190,0">
-                    <TextBlock Text="ALICERCE · DRIVERS" Style="{StaticResource H1}"/>
-                    <TextBlock Text="Verifique, baixe e instale drivers · NVIDIA e AMD automáticos, fabricantes pela página oficial" Style="{StaticResource Sub}" TextWrapping="Wrap"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="ALICERCE · DRIVERS" Style="{StaticResource H1}"/>
+                        <TextBlock Style="{StaticResource InfoTip}" ToolTip="Verifique, baixe e instale drivers · NVIDIA e AMD automáticos, fabricantes pela página oficial"/>
+                    </StackPanel>
                 </StackPanel>
                 <Button x:Name="BtnDrvScan" Style="{StaticResource PrimaryButton}" Content="VERIFICAR TUDO" Padding="20,9"
                         HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnDrvScan_Click"/>
             </Grid>
             <Grid Height="3" Margin="0,0,0,8" Background="{DynamicResource Line}">
-                <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
+                <Border Background="{StaticResource GoldGradient}" RenderTransformOrigin="0,0.5">
                     <Border.RenderTransform><ScaleTransform x:Name="DrvProgress" ScaleX="0"/></Border.RenderTransform>
                 </Border>
             </Grid>
-            <TextBlock x:Name="DrvStatus" Text="Clique em VERIFICAR TUDO." Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,16"/>
+            <ui:StatusLine x:Name="DrvStatus" Text="Clique em VERIFICAR TUDO." Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,16"/>
 
-            <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
                 <StackPanel>
-                    <TextBlock Text="PLACA DE VÍDEO" Style="{StaticResource Label}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="PLACA DE VÍDEO" Style="{StaticResource Label}"/>
+                        <TextBlock Style="{StaticResource InfoTip}" FontSize="12" VerticalAlignment="Top" Margin="8,-1,0,0" ToolTip="NVIDIA: o instalador é baixado do servidor oficial, a assinatura digital é conferida e um ponto de restauração é criado antes de abrir. AMD: o programa procura o instalador na página oficial do seu modelo (RX série 4000 a 9000); se o site bloquear, use ABRIR PÁGINA OFICIAL. Intel: só a página oficial."/>
+                    </StackPanel>
                     <ItemsControl x:Name="DrvGpus">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -41,27 +47,22 @@
                         <Button x:Name="BtnDrvInstall" Style="{StaticResource PrimaryButton}" Content="BAIXAR E INSTALAR" Padding="18,8" Margin="0,0,10,8" Click="BtnDrvInstall_Click" IsEnabled="False"/>
                         <Button x:Name="BtnDrvGpuPage" Style="{StaticResource OutlineButton}" Content="ABRIR PÁGINA OFICIAL" Padding="18,8" Margin="0,0,10,8" Click="BtnDrvGpuPage_Click"/>
                     </WrapPanel>
-                    <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap">
-                        NVIDIA: o instalador é baixado do servidor oficial, a assinatura digital é conferida e um ponto de restauração é criado antes de abrir.
-                        AMD: o programa procura o instalador na página oficial do seu modelo (RX série 4000 a 9000); se o site bloquear, use ABRIR PÁGINA OFICIAL. Intel: só a página oficial.
-                    </TextBlock>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
 
-            <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
                 <StackPanel>
-                    <TextBlock Text="PLACA-MÃE / FABRICANTE" Style="{StaticResource Label}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="PLACA-MÃE / FABRICANTE" Style="{StaticResource Label}"/>
+                        <TextBlock Style="{StaticResource InfoTip}" FontSize="12" VerticalAlignment="Top" Margin="8,-1,0,0" ToolTip="ASUS, MSI, Gigabyte e outros não têm API pública de versões. Abrimos o suporte oficial do fabricante detectado (chipset, áudio, rede, BIOS). Se a página não abrir no seu modelo, digite o modelo mostrado acima na busca do site."/>
+                    </StackPanel>
                     <TextBlock x:Name="DrvBoard" Margin="0,10,0,0" TextWrapping="Wrap"/>
                     <Button x:Name="BtnDrvBoardPage" Style="{StaticResource OutlineButton}" Content="ABRIR SUPORTE DO FABRICANTE" Padding="18,8" Margin="0,14,0,8"
                             HorizontalAlignment="Left" Click="BtnDrvBoardPage_Click" IsEnabled="False"/>
-                    <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap">
-                        ASUS, MSI, Gigabyte e outros não têm API pública de versões. Abrimos o suporte oficial do fabricante detectado
-                        (chipset, áudio, rede, BIOS). Se a página não abrir no seu modelo, digite o modelo mostrado acima na busca do site.
-                    </TextBlock>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
 
-            <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
                 <StackPanel>
                     <TextBlock Text="WINDOWS UPDATE (DRIVERS CERTIFICADOS)" Style="{StaticResource Label}"/>
                     <TextBlock x:Name="DrvWuList" Margin="0,10,0,0" TextWrapping="Wrap" Text="Ainda não pesquisado."/>
@@ -70,19 +71,20 @@
                         <Button x:Name="BtnDrvWuInstall" Style="{StaticResource PrimaryButton}" Content="INSTALAR TODOS" Padding="18,8" Margin="0,0,10,8" Click="BtnDrvWuInstall_Click" IsEnabled="False"/>
                     </WrapPanel>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
 
-            <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
                 <StackPanel>
-                    <TextBlock Text="BACKUP DOS DRIVERS" Style="{StaticResource Label}"/>
-                    <TextBlock Margin="0,10,0,0" TextWrapping="Wrap" Foreground="{DynamicResource Muted}"
-                               Text="Exporta todos os drivers de terceiros para Documentos\FortKnox-Drivers. Útil antes de formatar ou de trocar um driver."/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="BACKUP DOS DRIVERS" Style="{StaticResource Label}"/>
+                        <TextBlock Style="{StaticResource InfoTip}" FontSize="12" VerticalAlignment="Top" Margin="8,-1,0,0" ToolTip="Exporta todos os drivers de terceiros para Documentos\FortKnox-Drivers. Útil antes de formatar ou de trocar um driver."/>
+                    </StackPanel>
                     <Button x:Name="BtnDrvBackup" Style="{StaticResource OutlineButton}" Content="FAZER BACKUP" Padding="18,8" Margin="0,14,0,0"
                             HorizontalAlignment="Left" Click="BtnDrvBackup_Click"/>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
 
-            <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
                 <StackPanel>
                     <TextBlock Text="DRIVERS INSTALADOS" Style="{StaticResource Label}"/>
                     <ItemsControl x:Name="DrvList" Margin="0,10,0,0">
@@ -107,7 +109,7 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

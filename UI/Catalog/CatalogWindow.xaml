@@ -30,7 +30,7 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Margin="0,0,12,12">
-                                <Border Height="54" CornerRadius="{StaticResource RadiusControl}" Background="{Binding Brush}"
+                                <ui:ChamferBorder Height="54" Cut="6" Background="{Binding Brush}"
                                         BorderBrush="{DynamicResource Line}" BorderThickness="1"/>
                                 <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold" Margin="0,6,0,0"/>
                                 <TextBlock Text="{Binding Token}" FontFamily="{StaticResource Mono}" FontSize="10.5" Foreground="{DynamicResource Muted}"/>
@@ -41,7 +41,7 @@
 
                 <!-- 2. Tipografia -->
                 <TextBlock Text="02 · TIPOGRAFIA" Style="{StaticResource SectionHeader}"/>
-                <Border Style="{StaticResource CardBorder}" Margin="0,0,0,28">
+                <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,28">
                     <Grid>
                         <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
                         <StackPanel>
@@ -60,14 +60,14 @@
                             <TextBlock Text="Números com unidade e espaço, vírgula decimal: 1,4 ms." Style="{StaticResource Sub}" TextWrapping="Wrap"/>
                         </StackPanel>
                     </Grid>
-                </Border>
+                </ui:ChamferBorder>
 
                 <!-- 3. Botões e status -->
                 <Grid Margin="0,0,0,28">
                     <Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="24"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                     <StackPanel>
                         <TextBlock Text="03 · BOTÕES" Style="{StaticResource SectionHeader}"/>
-                        <Border Style="{StaticResource CardBorder}">
+                        <ui:ChamferBorder Style="{StaticResource Card}">
                             <StackPanel>
                                 <WrapPanel>
                                     <Button Style="{StaticResource PrimaryButton}" Content="Otimizar agora" Margin="0,0,10,10"/>
@@ -86,11 +86,11 @@
                                 </WrapPanel>
                                 <TextBlock Text="Um principal por tela. Verbo no imperativo. Destrutivo sempre com confirmação." Style="{StaticResource Sub}"/>
                             </StackPanel>
-                        </Border>
+                        </ui:ChamferBorder>
                     </StackPanel>
                     <StackPanel Grid.Column="2">
                         <TextBlock Text="04 · STATUS E CAMPOS" Style="{StaticResource SectionHeader}"/>
-                        <Border Style="{StaticResource CardBorder}">
+                        <ui:ChamferBorder Style="{StaticResource Card}">
                             <StackPanel>
                                 <WrapPanel Margin="0,0,0,14">
                                     <ui:StatusBadge Status="Bom" Margin="0,0,8,8"/>
@@ -110,7 +110,7 @@
                                     <RadioButton Style="{StaticResource Chip}" Content="Personalizada" GroupName="scan"/>
                                 </WrapPanel>
                             </StackPanel>
-                        </Border>
+                        </ui:ChamferBorder>
                     </StackPanel>
                 </Grid>
 
@@ -124,7 +124,7 @@
 
                 <!-- 6. Grade de dados -->
                 <TextBlock Text="06 · GRADE DE DADOS" Style="{StaticResource SectionHeader}"/>
-                <Border Style="{StaticResource CardBorder}" Margin="0,0,0,28">
+                <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,28">
                     <DataGrid x:Name="DemoGrid" Style="{StaticResource FkDataGrid}" HeadersVisibility="Column">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="PROGRAMA" Binding="{Binding Name}" Width="2*"/>
@@ -146,7 +146,7 @@
                             </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
-                </Border>
+                </ui:ChamferBorder>
 
                 <!-- 7. Modais, estado vazio e aviso -->
                 <Grid>
@@ -168,25 +168,25 @@
                     </StackPanel>
                     <StackPanel Grid.Column="2">
                         <TextBlock Text="08 · ESTADO VAZIO E AVISO" Style="{StaticResource SectionHeader}"/>
-                        <Border Style="{StaticResource CardBorder}" Margin="0,0,0,16">
+                        <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,16">
                             <ui:EmptyState Glyph="&#xE7FC;" Title="Nenhum jogo encontrado ainda."
                                            Message="Adicione um .exe ou abra a Steam uma vez para o Fort Knox encontrar seus jogos."
                                            ActionText="Adicionar jogo"/>
-                        </Border>
+                        </ui:ChamferBorder>
                         <!-- Aviso (toast): sempre escuro, igual ao ToastWindow -->
-                        <Border Background="#F2111316" BorderBrush="#80D4A13A" BorderThickness="1" CornerRadius="6" Padding="16,12" Width="340" HorizontalAlignment="Left">
+                        <ui:ChamferBorder Background="#F2111316" BorderBrush="#80D4A13A" BorderThickness="1" Cut="6" Padding="16,12" Width="340" HorizontalAlignment="Left">
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/></Grid.ColumnDefinitions>
-                                <Border Width="34" Height="34" Background="{StaticResource GoldButton}" CornerRadius="4" VerticalAlignment="Top" Margin="0,2,14,0">
+                                <ui:ChamferBorder Width="34" Height="34" Background="{StaticResource GoldButton}" Cut="4" VerticalAlignment="Top" Margin="0,2,14,0">
                                     <TextBlock Text="&#xE88E;" FontFamily="{StaticResource Icons}" FontSize="17" Foreground="#0B0C0E" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                </Border>
+                                </ui:ChamferBorder>
                                 <StackPanel Grid.Column="1">
                                     <TextBlock Text="Pendrive conectado (E:)" Foreground="#F6F5F1" FontSize="13.5" FontWeight="SemiBold"/>
                                     <TextBlock Text="SanDisk Ultra · 57,3 GB livres" Foreground="#9AA0A9" FontSize="12" Margin="0,3,0,0"/>
                                     <Image Source="{StaticResource BrandWordmark}" Height="7" HorizontalAlignment="Left" Margin="0,8,0,0" Opacity="0.8"/>
                                 </StackPanel>
                             </Grid>
-                        </Border>
+                        </ui:ChamferBorder>
                     </StackPanel>
                 </Grid>
             </StackPanel>

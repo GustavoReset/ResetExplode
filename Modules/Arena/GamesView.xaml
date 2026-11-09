@@ -1,6 +1,7 @@
 <UserControl x:Class="FortKnox.GamesView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="clr-namespace:FortKnox.UI">
     <!-- ARENA · FPS estimado (Fase 3.3j: extraído do MainWindow.xaml, sem mudança visual) -->
     <Grid Margin="36,30,36,30">
         <Grid.RowDefinitions>
@@ -13,14 +14,14 @@
         <Grid Margin="0,0,0,20">
             <StackPanel>
                 <TextBlock Text="ARENA · FPS ESTIMADO" Style="{StaticResource H1}"/>
-                <TextBlock x:Name="GamesSub" Text="FPS esperado no seu PC" Style="{StaticResource Sub}"/>
+                <ui:StatusLine x:Name="GamesSub" Text="FPS esperado no seu PC" FontSize="13" Margin="0,4,0,0"/>
             </StackPanel>
             <TextBox x:Name="GameSearch" Width="260" HorizontalAlignment="Right" VerticalAlignment="Center"
                      Tag="Buscar jogo…" TextChanged="GameSearch_Changed"/>
         </Grid>
 
         <!-- Configuração -->
-        <Border Grid.Row="1" Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+        <ui:ChamferBorder Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,14">
             <WrapPanel>
                 <StackPanel Margin="0,0,32,0">
                     <TextBlock Text="RESOLUÇÃO" Style="{StaticResource Label}"/>
@@ -48,10 +49,10 @@
                     </StackPanel>
                 </StackPanel>
             </WrapPanel>
-        </Border>
+        </ui:ChamferBorder>
 
         <!-- Fonte dos dados -->
-        <Border Grid.Row="2" Style="{StaticResource CardBorder}" Margin="0,0,0,14" Padding="18,14">
+        <ui:ChamferBorder Grid.Row="2" Style="{StaticResource Card}" Margin="0,0,0,14" Padding="18,14">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -71,7 +72,7 @@
                             Click="BtnApiKey_Click"/>
                 </StackPanel>
             </Grid>
-        </Border>
+        </ui:ChamferBorder>
 
         <!-- Cartões dos jogos -->
         <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto" Padding="0,0,6,0">
@@ -83,7 +84,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border Style="{StaticResource CardBorder}" Margin="0,0,10,10" Padding="16,14">
+                        <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,10,10" Padding="16,14">
                             <StackPanel>
                                 <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="14" TextTrimming="CharacterEllipsis"/>
                                 <TextBlock Text="{Binding Genre}" Foreground="{DynamicResource Faint}" FontSize="11" Margin="0,2,0,10"/>
@@ -110,7 +111,7 @@
                                 <TextBlock Text="{Binding Detail}" Foreground="{DynamicResource Faint}" FontSize="11" Margin="0,3,0,0"
                                            TextTrimming="CharacterEllipsis"/>
                             </StackPanel>
-                        </Border>
+                        </ui:ChamferBorder>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

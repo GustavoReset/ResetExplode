@@ -1,6 +1,7 @@
 <UserControl x:Class="FortKnox.PdfView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="clr-namespace:FortKnox.UI"
              AllowDrop="True" DragOver="View_DragOver" Drop="View_Drop">
 
     <UserControl.Resources>
@@ -16,13 +17,14 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel x:Name="PdfRoot" Margin="36,30,36,30">
 
-            <TextBlock Text="PRENSA · PDF" Style="{StaticResource H1}"/>
-            <TextBlock Text="Mesclar, dividir, comprimir e extrair texto · tudo local, seus arquivos não saem do computador · arraste PDFs para esta tela"
-                       Style="{StaticResource Sub}" TextWrapping="Wrap" Margin="0,4,0,18"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,18">
+                <TextBlock Text="PRENSA · PDF" Style="{StaticResource H1}"/>
+                <TextBlock Style="{StaticResource InfoTip}" ToolTip="Mesclar, dividir, comprimir e extrair texto · tudo local, seus arquivos não saem do computador · arraste PDFs para esta tela"/>
+            </StackPanel>
 
             <!-- Progresso -->
             <Grid Height="3" Margin="0,0,0,8" Background="{DynamicResource Line}">
-                <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
+                <Border Background="{StaticResource GoldGradient}" RenderTransformOrigin="0,0.5">
                     <Border.RenderTransform><ScaleTransform x:Name="PBar" ScaleX="0"/></Border.RenderTransform>
                 </Border>
             </Grid>
@@ -31,7 +33,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock x:Name="PStatus" Text="Escolha uma operação." Foreground="{DynamicResource Muted}" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                <ui:StatusLine x:Name="PStatus" Text="Escolha uma operação." Foreground="{DynamicResource Muted}" TextWrapping="Wrap" VerticalAlignment="Center"/>
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                     <Button x:Name="PBtnReveal" Style="{StaticResource OutlineButton}" Content="MOSTRAR NA PASTA" Padding="12,6" FontSize="11"
                             Margin="12,0,0,0" Visibility="Collapsed" Click="PReveal_Click"/>
@@ -49,7 +51,7 @@
             </WrapPanel>
 
             <!-- Arquivo (abas dividir / comprimir / extrair) -->
-            <Border x:Name="PFileCard" Style="{StaticResource CardBorder}" Margin="0,0,0,16" Visibility="Collapsed">
+            <ui:ChamferBorder x:Name="PFileCard" Style="{StaticResource Card}" Margin="0,0,0,16" Visibility="Collapsed">
                 <StackPanel>
                     <TextBlock Text="ARQUIVO PDF" Style="{StaticResource Label}"/>
                     <Grid>
@@ -62,10 +64,10 @@
                     </Grid>
                     <TextBlock x:Name="PFileInfo" Style="{StaticResource PdfMuted}" FontSize="12" Margin="0,8,0,0"/>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
 
             <!-- MESCLAR -->
-            <Border x:Name="PanelMerge" Style="{StaticResource CardBorder}">
+            <ui:ChamferBorder x:Name="PanelMerge" Style="{StaticResource Card}">
                 <StackPanel>
                     <TextBlock Text="PDFs NA ORDEM DA MESCLAGEM" Style="{StaticResource Label}"/>
                     <DataGrid x:Name="PMergeGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserResizeColumns="False"
@@ -87,14 +89,16 @@
                         <Button x:Name="PBtnMerge" Style="{StaticResource PrimaryButton}" Content="MESCLAR" Padding="22,8" Margin="0,0,0,8" Click="PMerge_Click"/>
                     </WrapPanel>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
 
             <!-- DIVIDIR -->
-            <Border x:Name="PanelSplit" Style="{StaticResource CardBorder}" Visibility="Collapsed">
+            <ui:ChamferBorder x:Name="PanelSplit" Style="{StaticResource Card}" Visibility="Collapsed">
                 <StackPanel>
-                    <TextBlock Text="INTERVALOS" Style="{StaticResource Label}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="INTERVALOS" Style="{StaticResource Label}"/>
+                        <TextBlock Style="{StaticResource InfoTip}" FontSize="12" VerticalAlignment="Top" Margin="8,-1,0,0" ToolTip="Cada intervalo vira um arquivo. &quot;8-&quot; significa da página 8 até o fim."/>
+                    </StackPanel>
                     <TextBox x:Name="PRanges" Tag="ex.: 1-3,5,8-   (vazio = um arquivo por página)" Margin="0,0,0,6"/>
-                    <TextBlock Text="Cada intervalo vira um arquivo. &quot;8-&quot; significa da página 8 até o fim." Style="{StaticResource PdfMuted}" FontSize="11" Margin="0,0,0,14"/>
                     <TextBlock Text="PASTA DE SAÍDA" Style="{StaticResource Label}"/>
                     <Grid Margin="0,0,0,14">
                         <Grid.ColumnDefinitions>
@@ -106,26 +110,27 @@
                     </Grid>
                     <Button x:Name="PBtnSplit" Style="{StaticResource PrimaryButton}" Content="DIVIDIR" Padding="22,8" HorizontalAlignment="Left" Click="PSplit_Click"/>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
 
             <!-- COMPRIMIR -->
-            <Border x:Name="PanelCompress" Style="{StaticResource CardBorder}" Visibility="Collapsed">
+            <ui:ChamferBorder x:Name="PanelCompress" Style="{StaticResource Card}" Visibility="Collapsed">
                 <StackPanel>
-                    <TextBlock Text="NÍVEL" Style="{StaticResource Label}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="NÍVEL" Style="{StaticResource Label}"/>
+                        <TextBlock Style="{StaticResource InfoTip}" FontSize="12" VerticalAlignment="Top" Margin="8,-1,0,0" ToolTip="A redução vem de recomprimir as imagens JPEG do PDF. Texto, fontes e vetores não são alterados. O original nunca é modificado: o resultado é salvo em outro arquivo, e só se ficar menor."/>
+                    </StackPanel>
                     <WrapPanel Margin="0,0,0,8">
                         <RadioButton Style="{StaticResource Chip}" GroupName="PdfLevel" Content="LEVE" Tag="low" Margin="0,0,6,0" Checked="PLevel_Checked"/>
                         <RadioButton Style="{StaticResource Chip}" GroupName="PdfLevel" Content="MÉDIO" Tag="medium" IsChecked="True" Margin="0,0,6,0" Checked="PLevel_Checked"/>
                         <RadioButton Style="{StaticResource Chip}" GroupName="PdfLevel" Content="FORTE" Tag="high" Checked="PLevel_Checked"/>
                     </WrapPanel>
                     <TextBlock x:Name="PLevelHint" Style="{StaticResource PdfMuted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10"/>
-                    <TextBlock Style="{StaticResource PdfMuted}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,14"
-                               Text="A redução vem de recomprimir as imagens JPEG do PDF. Texto, fontes e vetores não são alterados. O original nunca é modificado: o resultado é salvo em outro arquivo, e só se ficar menor."/>
                     <Button x:Name="PBtnCompress" Style="{StaticResource PrimaryButton}" Content="COMPRIMIR" Padding="22,8" HorizontalAlignment="Left" Click="PCompress_Click"/>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
 
             <!-- EXTRAIR TEXTO -->
-            <Border x:Name="PanelText" Style="{StaticResource CardBorder}" Visibility="Collapsed">
+            <ui:ChamferBorder x:Name="PanelText" Style="{StaticResource Card}" Visibility="Collapsed">
                 <StackPanel>
                     <Button x:Name="PBtnExtract" Style="{StaticResource PrimaryButton}" Content="EXTRAIR TEXTO" Padding="22,8" HorizontalAlignment="Left" Margin="0,0,0,14" Click="PExtract_Click"/>
                     <TextBox x:Name="PText" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" FontFamily="{StaticResource Mono}" FontSize="12"
@@ -135,7 +140,7 @@
                         <Button x:Name="PBtnCopyTxt" Style="{StaticResource OutlineButton}" Content="COPIAR TUDO" Padding="12,7" FontSize="11" IsEnabled="False" Click="PCopyTxt_Click"/>
                     </WrapPanel>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

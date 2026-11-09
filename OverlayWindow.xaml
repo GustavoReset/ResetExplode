@@ -1,13 +1,14 @@
 <Window x:Class="FortKnox.OverlayWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="clr-namespace:FortKnox.UI"
         Title="Fort Knox overlay" WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         Topmost="True" ShowInTaskbar="False" ShowActivated="False" ResizeMode="NoResize" Focusable="False"
         SizeToContent="WidthAndHeight" UseLayoutRounding="True" TextOptions.TextFormattingMode="Display">
-    <Border x:Name="Box" Background="#D90B0C0E" BorderBrush="#66D4A13A" BorderThickness="1" CornerRadius="4" Padding="12,9">
-        <Border.LayoutTransform>
+    <ui:ChamferBorder x:Name="Box" Background="#D90B0C0E" BorderBrush="#66D4A13A" BorderThickness="1" Cut="4" Padding="12,9">
+        <ui:ChamferBorder.LayoutTransform>
             <ScaleTransform x:Name="Scale" ScaleX="1" ScaleY="1"/>
-        </Border.LayoutTransform>
+        </ui:ChamferBorder.LayoutTransform>
         <StackPanel TextElement.FontFamily="{StaticResource Mono}" TextElement.FontSize="12" TextElement.Foreground="#F6F5F1">
             <!-- FPS em destaque (cada parte aparece só se escolhida na aba Overlay) -->
             <StackPanel x:Name="OFpsRow" Orientation="Horizontal">
@@ -35,5 +36,5 @@
             </ItemsControl>
             <TextBlock x:Name="OGame" Text="" Foreground="#8C6A2A" FontSize="10" Margin="0,5,0,0"/>
         </StackPanel>
-    </Border>
+    </ui:ChamferBorder>
 </Window>

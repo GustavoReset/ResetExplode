@@ -1,6 +1,7 @@
 <Window x:Class="FortKnox.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="clr-namespace:FortKnox.UI"
         xmlns:local="clr-namespace:FortKnox"
         Title="Fort Knox" Icon="Assets/app.ico" Width="1320" Height="840" MinWidth="1120" MinHeight="660"
         WindowStartupLocation="CenterScreen" WindowStyle="None" ResizeMode="CanResize"
@@ -44,21 +45,20 @@
             </StackPanel>
 
             <!-- ===== Menu lateral por categorias (painel arredondado, sempre visível) ===== -->
-            <Border x:Name="Sidebar" Grid.Row="1" Margin="14,0,0,14" Background="{DynamicResource PanelFill}"
-                    BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="8">
+            <ui:ChamferBorder x:Name="Sidebar" Grid.Row="1" Margin="14,0,0,14" Background="{DynamicResource PanelFill}"
+                    BorderBrush="{DynamicResource Line}" BorderThickness="1">
                 <DockPanel>
                     <!-- Rodapé: aviso de sensores + leitura ao vivo compacta -->
                     <StackPanel DockPanel.Dock="Bottom" Margin="16,6,16,16">
-                        <Border x:Name="CpuSensorWarn" Visibility="Collapsed" BorderBrush="{DynamicResource Danger}" BorderThickness="1"
-                                CornerRadius="8" Padding="12,10" Margin="0,0,0,12">
+                        <ui:ChamferBorder x:Name="CpuSensorWarn" Visibility="Collapsed" BorderBrush="{DynamicResource Danger}" BorderThickness="1" Padding="12,10" Margin="0,0,0,12">
                             <StackPanel>
                                 <TextBlock Text="Sem temperatura e consumo da CPU" FontWeight="SemiBold" FontSize="12" TextWrapping="Wrap"/>
                                 <TextBlock x:Name="CpuSensorWarnText" Foreground="{DynamicResource Muted}" FontSize="11" TextWrapping="Wrap" Margin="0,3,0,8"/>
                                 <Button Style="{StaticResource PrimaryButton}" Content="CORRIGIR" Padding="10,5" FontSize="11"
                                         Click="BtnFixCpuSensors_Click"/>
                             </StackPanel>
-                        </Border>
-                        <Border Background="{DynamicResource CardFill}" BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="8" Padding="14,10">
+                        </ui:ChamferBorder>
+                        <ui:ChamferBorder Background="{DynamicResource CardFill}" BorderBrush="{DynamicResource Line}" BorderThickness="1" Padding="14,10">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="46"/>
@@ -79,7 +79,7 @@
                                 <TextBlock Grid.Row="2" Text="TESTE" Foreground="{DynamicResource AccentText}" FontFamily="{StaticResource Mono}" FontSize="10" FontWeight="Bold" Margin="0,3" VerticalAlignment="Center"/>
                                 <TextBlock x:Name="SideStress" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Text="parado" FontFamily="{StaticResource Mono}" FontSize="12" Margin="0,3"/>
                             </Grid>
-                        </Border>
+                        </ui:ChamferBorder>
                         <DockPanel Margin="4,12,2,0">
                             <Image Source="{StaticResource BrandSymbol}" Width="12" Height="12.5" Margin="0,0,8,0" VerticalAlignment="Center" Opacity="0.85"/>
                             <TextBlock x:Name="SideVersion" Text="v0.16" Foreground="{DynamicResource Faint}" FontFamily="{StaticResource Mono}" FontSize="10.5" VerticalAlignment="Center"/>
@@ -279,7 +279,7 @@
                         </StackPanel>
                     </ScrollViewer>
                 </DockPanel>
-            </Border>
+            </ui:ChamferBorder>
 
             <!-- ===== Conteúdo ===== -->
             <Grid Grid.Row="1" Grid.Column="1">

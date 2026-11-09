@@ -56,6 +56,43 @@ public partial class MainWindow
     /// <summary>"Eventos recentes" do PAINEL (benchmarks, testes, dispositivos conectados).</summary>
     private void AddEvent(string icon, string title, string detail, string value) => PageDash.AddEvent(icon, title, detail, value);
 
+    /// <summary>
+    /// Modo de revisão visual (--capturas): abre cada página do menu, espera carregar e grava um PNG da janela.
+    /// Inclui a mandala do PAINEL aberta e com um módulo escolhido. Não altera nada no sistema além de ler sensores.
+    /// </summary>
+    public async Task CaptureTourAsync(string dir, bool light)
+    {
+        System.IO.Directory.CreateDirectory(dir);
+        if (light != ThemeManager.IsLight) ThemeManager.Apply(light);
+        Width = 1440; Height = 900;
+        await Task.Delay(2500);
+        async Task Shot(string name)
+        {
+            await Task.Delay(1600);
+            UpdateLayout();
+            var dpi = System.Windows.Media.VisualTreeHelper.GetDpi(this);
+            var bmp = new System.Windows.Media.Imaging.RenderTargetBitmap((int)(Root.ActualWidth * dpi.DpiScaleX), (int)(Root.ActualHeight * dpi.DpiScaleY),
+                                                                         dpi.PixelsPerInchX, dpi.PixelsPerInchY, System.Windows.Media.PixelFormats.Pbgra32);
+            bmp.Render(Root);
+            var enc = new System.Windows.Media.Imaging.PngBitmapEncoder();
+            enc.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(bmp));
+            await using var fs = System.IO.File.Create(System.IO.Path.Combine(dir, name + ".png"));
+            enc.Save(fs);
+        }
+        NavigateTo("PageDash");
+        await Shot("00-painel");
+        PageDash.Mandala.Expand();
+        await Shot("01-painel-mandala");
+        PageDash.Mandala.SelectForCapture(3);
+        await Shot("02-painel-mandala-arsenal");
+        PageDash.Mandala.ResetClosed();
+        foreach (var page in ModuleRoutes.Keys.Where(p => p != "PageDash"))
+        {
+            NavigateTo(page);
+            await Shot(page);
+        }
+    }
+
     /// <summary>Abre uma página do menu pelo nome da página (Tag do item), como se a pessoa tivesse clicado.</summary>
     private void NavigateTo(string page)
     {

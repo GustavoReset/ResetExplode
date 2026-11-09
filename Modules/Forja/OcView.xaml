@@ -1,37 +1,37 @@
 <UserControl x:Class="FortKnox.OcView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="clr-namespace:FortKnox.UI">
     <!-- FORJA · Overclock (Fase 3.3h: extraído do MainWindow.xaml, sem mudança visual) -->
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="36,30,36,30">
             <StackPanel Margin="0,0,0,20">
-                <TextBlock Text="FORJA · OVERCLOCK" Style="{StaticResource H1}"/>
-                <TextBlock Text="Ajustes da GPU, verificador de estabilidade e guia de overclock na BIOS" Style="{StaticResource Sub}"/>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="FORJA · OVERCLOCK" Style="{StaticResource H1}"/>
+                    <TextBlock Style="{StaticResource InfoTip}" ToolTip="Ajustes da GPU, verificador de estabilidade e guia de overclock na BIOS"/>
+                </StackPanel>
             </StackPanel>
 
             <!-- GPU: limite de energia e teto de clock -->
-            <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
                 <StackPanel>
                     <TextBlock x:Name="OcGpuTitle" Style="{StaticResource Label}"/>
                     <TextBlock x:Name="OcGpuState" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,16"/>
 
                     <Grid>
-                        <TextBlock Text="LIMITE DE ENERGIA" Style="{StaticResource Label}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="LIMITE DE ENERGIA" Style="{StaticResource Label}"/>
+                            <TextBlock Style="{StaticResource InfoTip}" FontSize="12" VerticalAlignment="Top" Margin="8,-1,0,0" ToolTip="Mais energia = clocks mais altos sustentados (e mais calor). Menos energia = PC mais frio e silencioso."/>
+                        </StackPanel>
                         <TextBlock x:Name="OcPowerValue" FontFamily="{StaticResource Mono}" HorizontalAlignment="Right"/>
                     </Grid>
                     <Slider x:Name="OcPower" Minimum="175" Maximum="300" Value="250" TickFrequency="5"
                             IsSnapToTickEnabled="True" ValueChanged="OcPower_Changed"/>
-                    <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,6,0,16">
-                        Mais energia = clocks mais altos sustentados (e mais calor). Menos energia = PC mais frio e silencioso.
-                    </TextBlock>
-
-                    <TextBlock Text="TETO DE CLOCK (UNDERVOLT)" Style="{StaticResource Label}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="TETO DE CLOCK (UNDERVOLT)" Style="{StaticResource Label}"/>
+                        <TextBlock Style="{StaticResource InfoTip}" FontSize="12" VerticalAlignment="Top" Margin="8,-1,0,0" ToolTip="Limitar o clock máximo faz a placa usar menos tensão: costuma perder 1–3% de FPS e economizar bastante energia e calor. &quot;Sem teto&quot; é o comportamento normal. Ajustes temporários: voltam ao padrão ao reiniciar o PC. Usa só os controles oficiais do driver NVIDIA (NVML); offset de clock/memória não é liberado por essa via no Windows."/>
+                    </StackPanel>
                     <WrapPanel x:Name="OcClockPanel" Margin="0,4,0,0"/>
-                    <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,8,0,16">
-                        Limitar o clock máximo faz a placa usar menos tensão: costuma perder 1–3% de FPS e economizar bastante
-                        energia e calor. "Sem teto" é o comportamento normal.
-                    </TextBlock>
-
                     <WrapPanel>
                         <Button x:Name="BtnOcApply" Style="{StaticResource PrimaryButton}" Content="APLICAR"
                                 Padding="20,9" Margin="0,0,10,8" Click="BtnOcApply_Click"/>
@@ -39,22 +39,16 @@
                                 Padding="20,9" Margin="0,0,10,8" Click="BtnOcReset_Click"/>
                     </WrapPanel>
                     <TextBlock x:Name="OcGpuResult" TextWrapping="Wrap"/>
-                    <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,8,0,0">
-                        Ajustes temporários: voltam ao padrão ao reiniciar o PC. Usa só os controles oficiais do driver NVIDIA (NVML);
-                        offset de clock/memória não é liberado por essa via no Windows.
-                    </TextBlock>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
 
             <!-- Verificador de estabilidade -->
-            <Border Style="{StaticResource CardBorder}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
                 <StackPanel>
-                    <TextBlock Text="VERIFICADOR DE ESTABILIDADE" Style="{StaticResource Label}"/>
-                    <TextBlock Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,12">
-                        Depois de mudar algo (aqui ou na BIOS): mede a nota, roda stress, vigia temperatura e procura erros de
-                        hardware (WHEA) e reinícios do driver de vídeo no registro do Windows.
-                    </TextBlock>
-
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="VERIFICADOR DE ESTABILIDADE" Style="{StaticResource Label}"/>
+                        <TextBlock Style="{StaticResource InfoTip}" FontSize="12" VerticalAlignment="Top" Margin="8,-1,0,0" ToolTip="Depois de mudar algo (aqui ou na BIOS): mede a nota, roda stress, vigia temperatura e procura erros de hardware (WHEA) e reinícios do driver de vídeo no registro do Windows."/>
+                    </StackPanel>
                     <TextBlock Text="CONFIGURAÇÃO TESTADA" Style="{StaticResource Label}"/>
                     <TextBox x:Name="OcLabel" Tag="ex.: PBO + Curve Optimizer -15, GPU 220 W" Margin="0,0,0,12"/>
 
@@ -81,13 +75,13 @@
                             HorizontalAlignment="Left" Padding="24,10" Margin="0,14,0,0" Click="BtnOcCheck_Click"/>
 
                     <Grid Height="4" Margin="0,12,0,8" Background="{DynamicResource Line}">
-                        <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
+                        <Border Background="{StaticResource GoldGradient}" RenderTransformOrigin="0,0.5">
                             <Border.RenderTransform>
                                 <ScaleTransform x:Name="OcProgress" ScaleX="0"/>
                             </Border.RenderTransform>
                         </Border>
                     </Grid>
-                    <TextBlock x:Name="OcStatus" Foreground="{DynamicResource Muted}" TextWrapping="Wrap"/>
+                    <ui:StatusLine x:Name="OcStatus" Foreground="{DynamicResource Muted}" TextWrapping="Wrap"/>
 
                     <Border x:Name="OcVerdictCard" Background="{DynamicResource Card}" BorderBrush="{DynamicResource LineStrong}"
                             BorderThickness="1" Padding="14,10" Margin="0,12,0,0" Visibility="Collapsed">
@@ -118,10 +112,10 @@
                     <TextBlock Text="HISTÓRICO" Style="{StaticResource Label}" Margin="0,16,0,8"/>
                     <ItemsControl x:Name="OcHistory" ItemTemplate="{StaticResource Meter}"/>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
 
             <!-- Guia de overclock na BIOS -->
-            <Border Style="{StaticResource CardBorder}">
+            <ui:ChamferBorder Style="{StaticResource Card}">
                 <StackPanel>
                     <TextBlock x:Name="OcGuideTitle" Text="GUIA: OVERCLOCK NA BIOS" Style="{StaticResource Label}"/>
                     <TextBlock x:Name="OcGuideIntro" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,10"/>
@@ -149,7 +143,7 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

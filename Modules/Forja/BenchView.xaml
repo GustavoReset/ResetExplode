@@ -1,6 +1,7 @@
 <UserControl x:Class="FortKnox.BenchView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="clr-namespace:FortKnox.UI">
     <!-- FORJA · Benchmark (Fase 3.3i: extraído do MainWindow.xaml, sem mudança visual) -->
     <Grid Margin="36,30,36,30">
         <Grid.RowDefinitions>
@@ -10,7 +11,7 @@
         </Grid.RowDefinitions>
         <StackPanel Margin="0,0,0,16">
             <TextBlock Text="FORJA · BENCHMARK" Style="{StaticResource H1}"/>
-            <TextBlock x:Name="BenchSub" Text="Benchmark de CPU por renderização 3D (path tracing), no mesmo princípio do Cinebench" Style="{StaticResource Sub}"/>
+            <ui:StatusLine x:Name="BenchSub" Text="Benchmark de CPU por renderização 3D (path tracing), no mesmo princípio do Cinebench" FontSize="13" Margin="0,4,0,0"/>
         </StackPanel>
 
         <!-- Seletor de teste -->
@@ -31,7 +32,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- Render -->
-            <Border Style="{StaticResource CardBorder}" Padding="14" VerticalAlignment="Top">
+            <ui:ChamferBorder Style="{StaticResource Card}" Padding="14" VerticalAlignment="Top">
                 <StackPanel>
                     <Border Background="#050505">
                         <Viewbox Stretch="Uniform">
@@ -44,23 +45,23 @@
                         </Viewbox>
                     </Border>
                     <Grid Height="3" Margin="0,12,0,8" Background="{DynamicResource Line}">
-                        <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
+                        <Border Background="{StaticResource GoldGradient}" RenderTransformOrigin="0,0.5">
                             <Border.RenderTransform>
                                 <ScaleTransform x:Name="BenchProgress" ScaleX="0"/>
                             </Border.RenderTransform>
                         </Border>
                     </Grid>
                     <Grid>
-                        <TextBlock x:Name="BenchStatus" Text="Pronto" Foreground="{DynamicResource Muted}"/>
+                        <ui:StatusLine x:Name="BenchStatus" Text="Pronto" Foreground="{DynamicResource Muted}"/>
                         <TextBlock x:Name="BenchElapsed" FontFamily="{StaticResource Mono}" Foreground="{DynamicResource Muted}" HorizontalAlignment="Right"/>
                     </Grid>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
 
             <!-- Painel lateral -->
             <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
+                    <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,12">
                         <StackPanel>
                             <TextBlock Text="TESTE" Style="{StaticResource Label}"/>
                             <WrapPanel x:Name="BenchModePanel">
@@ -76,9 +77,9 @@
                             <Button x:Name="BtnBench" Style="{StaticResource PrimaryButton}" Content="INICIAR" Margin="0,12,0,0" Click="BtnBench_Click"/>
                             <TextBlock x:Name="BenchHint" Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,8,0,0"/>
                         </StackPanel>
-                    </Border>
+                    </ui:ChamferBorder>
 
-                    <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
+                    <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,12">
                         <StackPanel>
                             <TextBlock Text="RESULTADO" Style="{StaticResource Label}"/>
                             <Grid>
@@ -97,9 +98,9 @@
                             </Grid>
                             <TextBlock x:Name="BenchRatio" Foreground="{DynamicResource Muted}" FontSize="12" Margin="0,8,0,0" TextWrapping="Wrap"/>
                         </StackPanel>
-                    </Border>
+                    </ui:ChamferBorder>
 
-                    <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
+                    <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,12">
                         <StackPanel>
                             <TextBlock Text="DURANTE O TESTE" Style="{StaticResource Label}"/>
                             <ItemsControl x:Name="BenchLive">
@@ -113,15 +114,15 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </StackPanel>
-                    </Border>
+                    </ui:ChamferBorder>
 
-                    <Border Style="{StaticResource CardBorder}">
+                    <ui:ChamferBorder Style="{StaticResource Card}">
                         <StackPanel>
                             <TextBlock Text="HISTÓRICO" Style="{StaticResource Label}"/>
                             <TextBlock x:Name="BenchHistoryEmpty" Text="Nenhum resultado ainda." Foreground="{DynamicResource Faint}"/>
                             <ItemsControl x:Name="BenchHistory" ItemTemplate="{StaticResource Meter}"/>
                         </StackPanel>
-                    </Border>
+                    </ui:ChamferBorder>
                 </StackPanel>
             </ScrollViewer>
         </Grid>
@@ -133,15 +134,12 @@
                 <ColumnDefinition Width="16"/>
                 <ColumnDefinition Width="310"/>
             </Grid.ColumnDefinitions>
-            <Border Style="{StaticResource CardBorder}" VerticalAlignment="Top" Padding="24,20">
+            <ui:ChamferBorder Style="{StaticResource Card}" VerticalAlignment="Top" Padding="24,20">
                 <StackPanel>
-                    <TextBlock Text="VALE · CENA DE JOGO" Style="{StaticResource Label}"/>
-                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource Muted}">
-                        Sobrevoo de um vale com terreno gerado por ruído fractal (~500 mil triângulos), 40 mil árvores
-                        por instancing, sombras em tempo real (mapa 4096² com bordas suaves), água com ondas, neblina,
-                        céu e pós-processamento HDR. A câmera segue um trajeto fixo pelo tempo e a resolução é fixa:
-                        o trabalho é o mesmo em qualquer PC. A cena abre numa janela própria; ESC cancela.
-                    </TextBlock>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="VALE · CENA DE JOGO" Style="{StaticResource Label}"/>
+                        <TextBlock Style="{StaticResource InfoTip}" FontSize="12" VerticalAlignment="Top" Margin="8,-1,0,0" ToolTip="Sobrevoo de um vale com terreno gerado por ruído fractal (~500 mil triângulos), 40 mil árvores por instancing, sombras em tempo real (mapa 4096² com bordas suaves), água com ondas, neblina, céu e pós-processamento HDR. A câmera segue um trajeto fixo pelo tempo e a resolução é fixa: o trabalho é o mesmo em qualquer PC. A cena abre numa janela própria; ESC cancela."/>
+                    </StackPanel>
                     <Grid Margin="0,22,0,0">
                         <StackPanel>
                             <TextBlock Text="FPS AGORA" Style="{StaticResource Label}"/>
@@ -153,16 +151,16 @@
                         </StackPanel>
                     </Grid>
                     <Grid Height="3" Margin="0,14,0,8" Background="{DynamicResource Line}">
-                        <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
+                        <Border Background="{StaticResource GoldGradient}" RenderTransformOrigin="0,0.5">
                             <Border.RenderTransform><ScaleTransform x:Name="GbProgress" ScaleX="0"/></Border.RenderTransform>
                         </Border>
                     </Grid>
-                    <TextBlock x:Name="GbStatus" Text="Pronto" Foreground="{DynamicResource Muted}"/>
+                    <ui:StatusLine x:Name="GbStatus" Text="Pronto" Foreground="{DynamicResource Muted}"/>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
             <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
+                    <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,12">
                         <StackPanel>
                             <TextBlock Text="RESOLUÇÃO" Style="{StaticResource Label}"/>
                             <WrapPanel x:Name="GbResPanel">
@@ -177,19 +175,19 @@
                             </WrapPanel>
                             <Button x:Name="BtnGpuBench" Style="{StaticResource PrimaryButton}" Content="INICIAR" Margin="0,12,0,0" Click="BtnGpuBench_Click"/>
                         </StackPanel>
-                    </Border>
-                    <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
+                    </ui:ChamferBorder>
+                    <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,12">
                         <StackPanel>
                             <TextBlock Text="RESULTADO" Style="{StaticResource Label}"/>
                             <ItemsControl x:Name="GbResult" ItemTemplate="{StaticResource KeyValueRow}"/>
                         </StackPanel>
-                    </Border>
-                    <Border Style="{StaticResource CardBorder}">
+                    </ui:ChamferBorder>
+                    <ui:ChamferBorder Style="{StaticResource Card}">
                         <StackPanel>
                             <TextBlock Text="HISTÓRICO" Style="{StaticResource Label}"/>
                             <ItemsControl x:Name="GbHistory" ItemTemplate="{StaticResource Meter}"/>
                         </StackPanel>
-                    </Border>
+                    </ui:ChamferBorder>
                 </StackPanel>
             </ScrollViewer>
         </Grid>
@@ -203,15 +201,12 @@
             </Grid.ColumnDefinitions>
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <Border Style="{StaticResource CardBorder}" VerticalAlignment="Top" Padding="24,20" Margin="0,0,0,12">
+                    <ui:ChamferBorder Style="{StaticResource Card}" VerticalAlignment="Top" Padding="24,20" Margin="0,0,0,12">
                         <StackPanel>
-                            <TextBlock Text="CIDADE DE OBJETOS · RAY TRACING POR HARDWARE" Style="{StaticResource Label}"/>
-                            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource Muted}">
-                                Direct3D 12 com DXR 1.1: usa os núcleos de ray tracing da placa (RTX 20 ou mais nova, Radeon RX 6000
-                                ou mais nova, Intel Arc). 4 mil objetos em materiais fosco, metal e espelho; por pixel, path tracing com
-                                sombras suaves, oclusão de ambiente, reflexos de reflexos e iluminação indireta. A estrutura de
-                                aceleração é refeita a cada frame, com objetos girando, como nos jogos. Abre numa janela própria; ESC cancela.
-                            </TextBlock>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="CIDADE DE OBJETOS · RAY TRACING POR HARDWARE" Style="{StaticResource Label}"/>
+                                <TextBlock Style="{StaticResource InfoTip}" FontSize="12" VerticalAlignment="Top" Margin="8,-1,0,0" ToolTip="Direct3D 12 com DXR 1.1: usa os núcleos de ray tracing da placa (RTX 20 ou mais nova, Radeon RX 6000 ou mais nova, Intel Arc). 4 mil objetos em materiais fosco, metal e espelho; por pixel, path tracing com sombras suaves, oclusão de ambiente, reflexos de reflexos e iluminação indireta. A estrutura de aceleração é refeita a cada frame, com objetos girando, como nos jogos. Abre numa janela própria; ESC cancela."/>
+                            </StackPanel>
                             <Grid Margin="0,22,0,0">
                                 <StackPanel>
                                     <TextBlock Text="FPS AGORA" Style="{StaticResource Label}"/>
@@ -223,34 +218,30 @@
                                 </StackPanel>
                             </Grid>
                             <Grid Height="3" Margin="0,14,0,8" Background="{DynamicResource Line}">
-                                <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
+                                <Border Background="{StaticResource GoldGradient}" RenderTransformOrigin="0,0.5">
                                     <Border.RenderTransform><ScaleTransform x:Name="RtProgress" ScaleX="0"/></Border.RenderTransform>
                                 </Border>
                             </Grid>
-                            <TextBlock x:Name="RtStatus" Text="Pronto" Foreground="{DynamicResource Muted}" TextWrapping="Wrap"/>
+                            <ui:StatusLine x:Name="RtStatus" Text="Pronto" Foreground="{DynamicResource Muted}" TextWrapping="Wrap"/>
                         </StackPanel>
-                    </Border>
-                    <Border Style="{StaticResource CardBorder}" Padding="24,20">
+                    </ui:ChamferBorder>
+                    <ui:ChamferBorder Style="{StaticResource Card}" Padding="24,20">
                         <StackPanel>
-                            <TextBlock Text="COMO COMPARAR COM CONFIANÇA" Style="{StaticResource Label}"/>
-                            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource Muted}" FontSize="12">
-                                O teste aquece a placa sem medir (o clock e a temperatura se estabilizam) e depois roda 3 passadas
-                                iguais. A nota usa a MEDIANA das passadas, e a variação entre elas mostra se o resultado é
-                                confiável (abaixo de 3%). O tempo de cada frame vem do relógio da própria GPU. Compare só resultados
-                                com a mesma resolução e o mesmo preset, com o PC na tomada, sem outros programas pesados abertos
-                                e com o mesmo driver. A cena é sempre a mesma (sementes fixas), em qualquer PC.
-                            </TextBlock>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="COMO COMPARAR COM CONFIANÇA" Style="{StaticResource Label}"/>
+                                <TextBlock Style="{StaticResource InfoTip}" FontSize="12" VerticalAlignment="Top" Margin="8,-1,0,0" ToolTip="O teste aquece a placa sem medir (o clock e a temperatura se estabilizam) e depois roda 3 passadas iguais. A nota usa a MEDIANA das passadas, e a variação entre elas mostra se o resultado é confiável (abaixo de 3%). O tempo de cada frame vem do relógio da própria GPU. Compare só resultados com a mesma resolução e o mesmo preset, com o PC na tomada, sem outros programas pesados abertos e com o mesmo driver. A cena é sempre a mesma (sementes fixas), em qualquer PC."/>
+                            </StackPanel>
                             <TextBlock Text="REFERÊNCIA MEDIDA" Style="{StaticResource Label}" Margin="0,14,0,4"/>
                             <TextBlock TextWrapping="Wrap" FontSize="12">
                                 AMD Radeon RX 9070 · Alta 1440p · modo Padrão: 878 pts (87,8 FPS, 1% low 77), variação 0,5%.
                             </TextBlock>
                         </StackPanel>
-                    </Border>
+                    </ui:ChamferBorder>
                 </StackPanel>
             </ScrollViewer>
             <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
+                    <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,12">
                         <StackPanel>
                             <TextBlock Text="RESOLUÇÃO" Style="{StaticResource Label}"/>
                             <WrapPanel x:Name="RtResPanel">
@@ -258,15 +249,15 @@
                                 <RadioButton Style="{StaticResource Chip}" GroupName="RtRes" Content="1440p" Tag="2560x1440" IsChecked="True"/>
                                 <RadioButton Style="{StaticResource Chip}" GroupName="RtRes" Content="4K" Tag="3840x2160"/>
                             </WrapPanel>
-                            <TextBlock Text="PRESET" Style="{StaticResource Label}" Margin="0,10,0,8"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="PRESET" Style="{StaticResource Label}" Margin="0,10,0,8"/>
+                                <TextBlock Style="{StaticResource InfoTip}" FontSize="12" VerticalAlignment="Top" Margin="8,-1,0,0" ToolTip="Normal: 2 amostras e 2 rebatidas por pixel · Alta: 4 e 3 · Extrema: 8 e 4."/>
+                            </StackPanel>
                             <WrapPanel x:Name="RtPresetPanel">
                                 <RadioButton Style="{StaticResource Chip}" GroupName="RtPreset" Content="Normal" Tag="normal"/>
                                 <RadioButton Style="{StaticResource Chip}" GroupName="RtPreset" Content="Alta" Tag="alta" IsChecked="True"/>
                                 <RadioButton Style="{StaticResource Chip}" GroupName="RtPreset" Content="Extrema" Tag="extrema"/>
                             </WrapPanel>
-                            <TextBlock Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0">
-                                Normal: 2 amostras e 2 rebatidas por pixel · Alta: 4 e 3 · Extrema: 8 e 4.
-                            </TextBlock>
                             <TextBlock Text="MODO" Style="{StaticResource Label}" Margin="0,10,0,8"/>
                             <WrapPanel x:Name="RtModePanel">
                                 <RadioButton Style="{StaticResource Chip}" GroupName="RtMode" Content="Padrão" Tag="std" IsChecked="True"
@@ -276,20 +267,20 @@
                             </WrapPanel>
                             <Button x:Name="BtnRtBench" Style="{StaticResource PrimaryButton}" Content="INICIAR" Margin="0,12,0,0" Click="BtnRtBench_Click"/>
                         </StackPanel>
-                    </Border>
-                    <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
+                    </ui:ChamferBorder>
+                    <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,12">
                         <StackPanel>
                             <TextBlock Text="RESULTADO" Style="{StaticResource Label}"/>
                             <TextBlock x:Name="RtVerdict" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,6"/>
                             <ItemsControl x:Name="RtResult" ItemTemplate="{StaticResource KeyValueRow}"/>
                         </StackPanel>
-                    </Border>
-                    <Border Style="{StaticResource CardBorder}">
+                    </ui:ChamferBorder>
+                    <ui:ChamferBorder Style="{StaticResource Card}">
                         <StackPanel>
                             <TextBlock Text="HISTÓRICO" Style="{StaticResource Label}"/>
                             <ItemsControl x:Name="RtHistory" ItemTemplate="{StaticResource Meter}"/>
                         </StackPanel>
-                    </Border>
+                    </ui:ChamferBorder>
                 </StackPanel>
             </ScrollViewer>
         </Grid>
@@ -301,7 +292,7 @@
                 <ColumnDefinition Width="16"/>
                 <ColumnDefinition Width="310"/>
             </Grid.ColumnDefinitions>
-            <Border Style="{StaticResource CardBorder}" Padding="14" VerticalAlignment="Top">
+            <ui:ChamferBorder Style="{StaticResource Card}" Padding="14" VerticalAlignment="Top">
                 <StackPanel>
                     <Grid>
                         <Border Background="#050505" HorizontalAlignment="Center">
@@ -311,25 +302,21 @@
                                    HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Grid>
                     <Grid Height="3" Margin="0,12,0,8" Background="{DynamicResource Line}">
-                        <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
+                        <Border Background="{StaticResource GoldGradient}" RenderTransformOrigin="0,0.5">
                             <Border.RenderTransform><ScaleTransform x:Name="SimProgress" ScaleX="0"/></Border.RenderTransform>
                         </Border>
                     </Grid>
                     <Grid>
-                        <TextBlock x:Name="SimStatus" Text="Pronto" Foreground="{DynamicResource Muted}"/>
+                        <ui:StatusLine x:Name="SimStatus" Text="Pronto" Foreground="{DynamicResource Muted}"/>
                         <TextBlock x:Name="SimFpsNow" FontFamily="{StaticResource Mono}" Foreground="{DynamicResource Muted}" HorizontalAlignment="Right"/>
                     </Grid>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
             <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
+                    <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,12">
                         <StackPanel>
-                            <TextBlock Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10">
-                                Simula o trabalho de CPU de um jogo: a thread principal monta a grade espacial, roda a lógica
-                                e prepara o desenho; as outras threads calculam física, colisão e IA de 30 mil unidades.
-                                A nota é quantos frames por segundo a CPU aguenta.
-                            </TextBlock>
+                            <TextBlock Style="{StaticResource InfoTip}" HorizontalAlignment="Right" Margin="0,0,0,4" ToolTip="Simula o trabalho de CPU de um jogo: a thread principal monta a grade espacial, roda a lógica e prepara o desenho; as outras threads calculam física, colisão e IA de 30 mil unidades. A nota é quantos frames por segundo a CPU aguenta."/>
                             <TextBlock Text="DURAÇÃO" Style="{StaticResource Label}"/>
                             <WrapPanel x:Name="SimDurPanel">
                                 <RadioButton Style="{StaticResource Chip}" GroupName="SimDur" Content="20 s" Tag="20" IsChecked="True"/>
@@ -337,19 +324,19 @@
                             </WrapPanel>
                             <Button x:Name="BtnSimBench" Style="{StaticResource PrimaryButton}" Content="INICIAR" Margin="0,12,0,0" Click="BtnSimBench_Click"/>
                         </StackPanel>
-                    </Border>
-                    <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
+                    </ui:ChamferBorder>
+                    <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,12">
                         <StackPanel>
                             <TextBlock Text="RESULTADO" Style="{StaticResource Label}"/>
                             <ItemsControl x:Name="SimResult" ItemTemplate="{StaticResource KeyValueRow}"/>
                         </StackPanel>
-                    </Border>
-                    <Border Style="{StaticResource CardBorder}">
+                    </ui:ChamferBorder>
+                    <ui:ChamferBorder Style="{StaticResource Card}">
                         <StackPanel>
                             <TextBlock Text="HISTÓRICO" Style="{StaticResource Label}"/>
                             <ItemsControl x:Name="SimHistory" ItemTemplate="{StaticResource Meter}"/>
                         </StackPanel>
-                    </Border>
+                    </ui:ChamferBorder>
                 </StackPanel>
             </ScrollViewer>
         </Grid>
@@ -361,7 +348,7 @@
                 <ColumnDefinition Width="16"/>
                 <ColumnDefinition Width="310"/>
             </Grid.ColumnDefinitions>
-            <Border Style="{StaticResource CardBorder}" VerticalAlignment="Top" Padding="24,20">
+            <ui:ChamferBorder Style="{StaticResource Card}" VerticalAlignment="Top" Padding="24,20">
                 <StackPanel>
                     <TextBlock Text="RESULTADOS" Style="{StaticResource Label}"/>
                     <ItemsControl x:Name="MemResult" Margin="0,4,0,0">
@@ -370,8 +357,7 @@
                                 <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,0,0,1" Padding="0,12">
                                     <Grid>
                                         <StackPanel>
-                                            <TextBlock Text="{Binding Label}" FontSize="14"/>
-                                            <TextBlock Text="{Binding Hint}" Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,2,140,0"/>
+                                            <TextBlock Text="{Binding Label}" FontSize="14" ToolTip="{Binding Hint}" Cursor="Help"/>
                                         </StackPanel>
                                         <TextBlock Text="{Binding Value}" FontFamily="{StaticResource Mono}" FontSize="20" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                     </Grid>
@@ -380,31 +366,27 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                     <Grid Height="3" Margin="0,16,0,8" Background="{DynamicResource Line}">
-                        <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
+                        <Border Background="{StaticResource GoldGradient}" RenderTransformOrigin="0,0.5">
                             <Border.RenderTransform><ScaleTransform x:Name="MemProgress" ScaleX="0"/></Border.RenderTransform>
                         </Border>
                     </Grid>
-                    <TextBlock x:Name="MemStatus" Text="Pronto" Foreground="{DynamicResource Muted}"/>
+                    <ui:StatusLine x:Name="MemStatus" Text="Pronto" Foreground="{DynamicResource Muted}"/>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
             <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
+                    <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,12">
                         <StackPanel>
-                            <TextBlock Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,12">
-                                Mede a latência e a banda da RAM e simula o carregamento de um mapa: um pacote de 512 MB e
-                                mil arquivos de 64 KB, lidos do disco sem o cache do Windows. Os arquivos de teste ficam na
-                                pasta temporária e são apagados no final.
-                            </TextBlock>
+                            <TextBlock Style="{StaticResource InfoTip}" HorizontalAlignment="Right" Margin="0,0,0,4" ToolTip="Mede a latência e a banda da RAM e simula o carregamento de um mapa: um pacote de 512 MB e mil arquivos de 64 KB, lidos do disco sem o cache do Windows. Os arquivos de teste ficam na pasta temporária e são apagados no final."/>
                             <Button x:Name="BtnMemBench" Style="{StaticResource PrimaryButton}" Content="INICIAR" Click="BtnMemBench_Click"/>
                         </StackPanel>
-                    </Border>
-                    <Border Style="{StaticResource CardBorder}">
+                    </ui:ChamferBorder>
+                    <ui:ChamferBorder Style="{StaticResource Card}">
                         <StackPanel>
                             <TextBlock Text="HISTÓRICO" Style="{StaticResource Label}"/>
                             <ItemsControl x:Name="MemHistory" ItemTemplate="{StaticResource Meter}"/>
                         </StackPanel>
-                    </Border>
+                    </ui:ChamferBorder>
                 </StackPanel>
             </ScrollViewer>
         </Grid>
@@ -416,7 +398,7 @@
                 <ColumnDefinition Width="16"/>
                 <ColumnDefinition Width="310"/>
             </Grid.ColumnDefinitions>
-            <Border Style="{StaticResource CardBorder}" VerticalAlignment="Top" Padding="24,20">
+            <ui:ChamferBorder Style="{StaticResource Card}" VerticalAlignment="Top" Padding="24,20">
                 <StackPanel>
                     <TextBlock Text="RESULTADOS" Style="{StaticResource Label}"/>
                     <ItemsControl x:Name="DiskResult" Margin="0,4,0,0">
@@ -425,8 +407,7 @@
                                 <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,0,0,1" Padding="0,12">
                                     <Grid>
                                         <StackPanel>
-                                            <TextBlock Text="{Binding Label}" FontSize="14"/>
-                                            <TextBlock Text="{Binding Hint}" Foreground="{DynamicResource Faint}" FontSize="11" TextWrapping="Wrap" Margin="0,2,170,0"/>
+                                            <TextBlock Text="{Binding Label}" FontSize="14" ToolTip="{Binding Hint}" Cursor="Help"/>
                                         </StackPanel>
                                         <TextBlock Text="{Binding Value}" FontFamily="{StaticResource Mono}" FontSize="20" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                     </Grid>
@@ -435,38 +416,37 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                     <Grid Height="3" Margin="0,16,0,8" Background="{DynamicResource Line}">
-                        <Border Background="{StaticResource GoldGradient}" CornerRadius="2" RenderTransformOrigin="0,0.5">
+                        <Border Background="{StaticResource GoldGradient}" RenderTransformOrigin="0,0.5">
                             <Border.RenderTransform><ScaleTransform x:Name="DiskProgress" ScaleX="0"/></Border.RenderTransform>
                         </Border>
                     </Grid>
-                    <TextBlock x:Name="DiskStatus" Text="Pronto" Foreground="{DynamicResource Muted}" TextWrapping="Wrap"/>
+                    <ui:StatusLine x:Name="DiskStatus" Text="Pronto" Foreground="{DynamicResource Muted}" TextWrapping="Wrap"/>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
             <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
+                    <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,12">
                         <StackPanel>
                             <TextBlock Text="UNIDADE" Style="{StaticResource Label}"/>
                             <WrapPanel x:Name="DiskDrivePanel"/>
-                            <TextBlock Text="TAMANHO DO TESTE" Style="{StaticResource Label}" Margin="0,10,0,8"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="TAMANHO DO TESTE" Style="{StaticResource Label}" Margin="0,10,0,8"/>
+                                <TextBlock Style="{StaticResource InfoTip}" FontSize="12" VerticalAlignment="Top" Margin="8,-1,0,0" ToolTip="Mede leitura e escrita sequenciais e acessos aleatórios de 4 KB, direto no disco (sem o cache do Windows). Grava um arquivo temporário na unidade escolhida e o apaga no final. Feche outros programas pesados antes."/>
+                            </StackPanel>
                             <WrapPanel x:Name="DiskSizePanel">
                                 <RadioButton Style="{StaticResource Chip}" GroupName="DiskSize" Content="512 MB" Tag="512"/>
                                 <RadioButton Style="{StaticResource Chip}" GroupName="DiskSize" Content="1 GB" Tag="1024" IsChecked="True"/>
                                 <RadioButton Style="{StaticResource Chip}" GroupName="DiskSize" Content="4 GB" Tag="4096"/>
                             </WrapPanel>
-                            <TextBlock Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,12,0,12">
-                                Mede leitura e escrita sequenciais e acessos aleatórios de 4 KB, direto no disco (sem o cache do Windows).
-                                Grava um arquivo temporário na unidade escolhida e o apaga no final. Feche outros programas pesados antes.
-                            </TextBlock>
                             <Button x:Name="BtnDiskBench" Style="{StaticResource PrimaryButton}" Content="INICIAR" Click="BtnDiskBench_Click"/>
                         </StackPanel>
-                    </Border>
-                    <Border Style="{StaticResource CardBorder}">
+                    </ui:ChamferBorder>
+                    <ui:ChamferBorder Style="{StaticResource Card}">
                         <StackPanel>
                             <TextBlock Text="HISTÓRICO" Style="{StaticResource Label}"/>
                             <ItemsControl x:Name="DiskHistory" ItemTemplate="{StaticResource Meter}"/>
                         </StackPanel>
-                    </Border>
+                    </ui:ChamferBorder>
                 </StackPanel>
             </ScrollViewer>
         </Grid>

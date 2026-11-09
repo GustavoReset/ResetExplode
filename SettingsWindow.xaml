@@ -5,11 +5,10 @@
         Title="Fort Knox · Configurações" WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         ResizeMode="NoResize" ShowInTaskbar="False" SizeToContent="WidthAndHeight" UseLayoutRounding="True"
         FontFamily="{StaticResource Text}" Foreground="{DynamicResource Fg}" TextOptions.TextFormattingMode="Display">
-    <Border Margin="24" Width="520" Background="{DynamicResource CardFill}" BorderBrush="{DynamicResource LineStrong}" BorderThickness="1"
-            CornerRadius="{StaticResource RadiusCard}" Padding="26,22">
-        <Border.Effect>
+    <ui:ChamferBorder Margin="24" Width="520" Background="{DynamicResource CardFill}" BorderBrush="{DynamicResource LineStrong}" BorderThickness="1" ClipContent="False" Padding="26,22">
+        <ui:ChamferBorder.Effect>
             <DropShadowEffect BlurRadius="28" ShadowDepth="6" Opacity="0.45" Color="#000000"/>
-        </Border.Effect>
+        </ui:ChamferBorder.Effect>
         <StackPanel>
             <Grid>
                 <TextBlock Text="CONFIGURAÇÕES" Style="{StaticResource H1}" FontSize="17"/>
@@ -17,7 +16,7 @@
             </Grid>
 
             <TextBlock Text="COFRE · ABERTURA" Style="{StaticResource SectionHeader}" Margin="0,22,0,10"/>
-            <Border BorderBrush="{DynamicResource Line}" BorderThickness="1" CornerRadius="{StaticResource RadiusControl}" Padding="16,14">
+            <ui:ChamferBorder BorderBrush="{DynamicResource Line}" BorderThickness="1" Cut="6" Padding="16,14">
                 <StackPanel>
                     <Grid>
                         <StackPanel Margin="0,0,70,0">
@@ -34,7 +33,7 @@
                                    TextWrapping="Wrap" MaxWidth="330"/>
                     </StackPanel>
                 </StackPanel>
-            </Border>
+            </ui:ChamferBorder>
 
             <TextBlock x:Name="DevNote" FontFamily="{StaticResource Mono}" FontSize="10.5" Foreground="{DynamicResource Warn}" Margin="0,12,0,0"
                        TextWrapping="Wrap" Visibility="Collapsed"
@@ -42,5 +41,5 @@
 
             <Button Style="{StaticResource PrimaryButtonSm}" Content="Pronto" HorizontalAlignment="Right" Margin="0,22,0,0" Click="Close_Click"/>
         </StackPanel>
-    </Border>
+    </ui:ChamferBorder>
 </Window>
