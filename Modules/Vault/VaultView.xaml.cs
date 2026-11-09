@@ -29,6 +29,9 @@ public partial class VaultView : UserControl
     /// <summary>Disparado quando o usuário clica em BLOQUEAR: a janela deve esquecer a verificação do Hello.</summary>
     public event Action? ManualLock;
 
+    /// <summary>Texto mostrado enquanto a trava (Windows Hello ou senha mestra) é pedida. Definido pelo CofreModule.</summary>
+    public string GateMessage { get; set; } = "Confirme no Windows Hello para abrir o Vault…";
+
     private bool _authenticating;
     private int _epoch; // sobe a cada Lock(): uma abertura que terminou depois de bloquear é descartada
 
@@ -48,7 +51,7 @@ public partial class VaultView : UserControl
         {
             _locked = true;
             VBtnLock.Content = "DESBLOQUEAR";
-            VStatus.Text = "Confirme no Windows Hello para abrir o Vault…";
+            VStatus.Text = GateMessage;
             UpdateButtons();
             _authenticating = true;
             HelloResult result;

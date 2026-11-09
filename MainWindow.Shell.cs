@@ -1,4 +1,3 @@
-using System.Windows.Interop;
 using FortKnox.Core;
 
 namespace FortKnox;
@@ -21,7 +20,7 @@ public partial class MainWindow
     private void RegisterModules()
     {
         if (Core == null) return;
-        Core.Modules.Add(new CofreModule(PageVault, () => new WindowInteropHelper(this).Handle));
+        Core.Modules.Add(new CofreModule(PageVault, this));
         Core.Modules.Add(new PrensaModule(PagePdf));
         Core.Modules.Add(new RadarModule(NetTools));
     }
@@ -42,6 +41,9 @@ public partial class MainWindow
             StatusText.Text = "Não foi possível abrir esta página: " + ex.Message;
         }
     }
+
+    /// <summary>Engrenagem da barra de título: Configurações do app (por enquanto, como o COFRE abre).</summary>
+    private void Settings_Click(object sender, System.Windows.RoutedEventArgs e) => new SettingsWindow(this).ShowDialog();
 
     /// <summary>Ao fechar a janela: encerra os módulos na thread da interface (eles mexem em controles).</summary>
     private void ShutdownModules()
