@@ -1,24 +1,25 @@
 using System.Windows;
 using System.Windows.Controls;
+using FortKnox.Core.Changes;
 using FortKnox.UI;
 
 namespace FortKnox;
 
 /// <summary>
 /// ARSENAL · Otimização (Fase 3.3k; antes no MainWindow.xaml.cs): limpa a memória, fecha programas em segundo plano
-/// e liga/desliga ajustes do Windows com "Restaurar originais". O backup dos ajustes continua em AppSettings.TweakBackup.
+/// e liga/desliga ajustes do Windows com "Restaurar originais". Cada ajuste é um ferrolho no Diário (Fase 3.4e).
 /// </summary>
 public partial class OptimizeView : UserControl
 {
     private List<BackgroundApp> _apps = new();
     private readonly List<Tweak> _tweaks = WindowsTweaks.All(); // só as definições; o estado é lido ao abrir a página
     private bool _optInit;
-    private AppSettings _settings = null!;
-    private Action _save = () => { };
+    private IChangeJournal? _journal;
 
     public OptimizeView() => InitializeComponent();
 
-    public void Attach(AppSettings settings, Action save) { _settings = settings; _save = save; }
+    /// <summary>Ligado pelo ArsenalModule: cada ajuste vira um ferrolho com o próprio desfazer (Fase 3.4e).</summary>
+    public void Attach(IChangeJournal journal) => _journal = journal;
 
     /// <summary>Definições dos ajustes do Windows (o PAINEL lê Modo de Jogo e Game DVR para a saúde do PC).</summary>
     public IReadOnlyList<Tweak> Tweaks => _tweaks;
@@ -87,14 +88,14 @@ public partial class OptimizeView : UserControl
         UpdateRamStatus();
     }
 
-    private void Tweak_Click(object sender, RoutedEventArgs e)
+    private async void Tweak_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not CheckBox { Tag: Tweak t } box) return;
+        if (sender is not CheckBox { Tag: Tweak t } box || _journal == null) return;
         bool turnOn = box.IsChecked == true;
+        box.IsEnabled = false;
         try
         {
-            t.Write(turnOn, _settings);
-            _save();
+            await _journal.ApplyAsync(ArsenalChanges.TweakRequest(t, turnOn));
             t.Refresh();
             t.Status = t.IsOn == turnOn
                 ? (turnOn ? "Aplicado." : "Desligado.") + (t.NeedsRestart ? " Reinicie o PC para valer." : "")
@@ -105,12 +106,15 @@ public partial class OptimizeView : UserControl
             t.Refresh();
             t.Status = $"Falhou: {ex.Message}";
         }
+        box.IsEnabled = true;
         box.IsChecked = t.IsOn; // o binding é só leitura: volta ao estado real
     }
 
-    private void BtnRestoreTweaks_Click(object sender, RoutedEventArgs e)
+    private async void BtnRestoreTweaks_Click(object sender, RoutedEventArgs e)
     {
-        if (_settings.TweakBackup.Count == 0)
+        if (_journal == null) return;
+        var applied = ArsenalChanges.AppliedTweaks(_journal);
+        if (applied.Count == 0)
         {
             FkDialog.Info(Owner, "Nada para restaurar", "Nenhum ajuste foi alterado pelo Fort Knox ainda.");
             return;
@@ -118,9 +122,16 @@ public partial class OptimizeView : UserControl
         if (!FkDialog.Confirm(Owner, "Restaurar os ajustes originais?",
                               "Os ajustes do Windows voltam para como estavam antes do Fort Knox alterá-los.", "Restaurar"))
             return;
-        bool restart = _tweaks.Any(t => t.NeedsRestart && _settings.TweakBackup.ContainsKey(t.Id));
-        WindowsTweaks.RestoreAll(_tweaks, _settings);
-        foreach (var t in _tweaks) { t.Refresh(); t.Status = "Restaurado."; }
-        if (restart) FkDialog.Info(Owner, "Reinicie para concluir", "Alguns ajustes só voltam ao original depois de reiniciar o PC.");
+        bool restart = applied.Any(f => f.Kind == ArsenalChanges.KindTweakLegacy ||
+                                        _tweaks.Any(t => t.NeedsRestart && f.Title.StartsWith(t.Title + ":", StringComparison.Ordinal)));
+        var failed = new List<string>();
+        foreach (var f in applied) // mais novo primeiro: o último desfazer devolve o valor de antes do primeiro ajuste
+        {
+            try { await _journal.RevertAsync(f.Id); }
+            catch (Exception ex) { failed.Add($"{f.Title} ({ex.Message})"); }
+        }
+        foreach (var t in _tweaks) { t.Refresh(); t.Status = failed.Count == 0 ? "Restaurado." : ""; }
+        if (failed.Count > 0) FkDialog.Info(Owner, "Alguns ajustes não voltaram", string.Join("\n", failed.Take(6)));
+        else if (restart) FkDialog.Info(Owner, "Reinicie para concluir", "Alguns ajustes só voltam ao original depois de reiniciar o PC.");
     }
 }

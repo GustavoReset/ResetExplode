@@ -5,9 +5,9 @@ namespace FortKnox;
 
 /// <summary>
 /// ARSENAL como módulo do núcleo (Fase 3.3). Otimização, Limpeza, Desinstalar, Inicialização, Instalar apps e Atualizar apps (Fases 3.3a, 3.3k, 3.4b, 3.4c e 3.4d).
-/// A Otimização recebe o ciclo de 1 s (uso da RAM) e guarda o backup dos ajustes em AppSettings.TweakBackup.
+/// A Otimização recebe o ciclo de 1 s (uso da RAM); ajustes e removidos da inicialização são ferrolhos (ArsenalChanges).
 /// </summary>
-public sealed class ArsenalModule(OptimizeView optimize, CleanupView cleanup, UninstallView uninstall, StartupView startup, AppsView apps, UpdatesView updates, Func<List<StartupBackup>> legacyRemoved, Action saveLegacy) : ModuleBase
+public sealed class ArsenalModule(OptimizeView optimize, CleanupView cleanup, UninstallView uninstall, StartupView startup, AppsView apps, UpdatesView updates, Func<AppSettings> legacy, Action saveLegacy) : ModuleBase
 {
     public const string RouteOptimize = "arsenal/otimizacao";
     public const string RouteCleanup = "arsenal/limpeza";
@@ -60,18 +60,31 @@ public sealed class ArsenalModule(OptimizeView optimize, CleanupView cleanup, Un
             return t.IsOn == on ? HealthIndicator.Bom(okText) : HealthIndicator.Atencao(badText, RouteOptimize, 70);
         });
 
-    protected override Task OnInitializeAsync(CancellationToken ct)
+    protected override async Task OnInitializeAsync(CancellationToken ct)
     {
-        // Migração única: "Restaurar removidos" saía do settings.json antigo (AppSettings.StartupRemoved).
-        var legacy = legacyRemoved();
-        if (legacy.Count > 0 && Context.Settings.Migrate<ArsenalSettings>(SettingsId, () => new ArsenalSettings { StartupRemoved = legacy.ToList() }))
+        ArsenalChanges.Register(Context.Changes, optimize.Tweaks);
+
+        // Migração única (Fase 3.4e): o TweakBackup e os removidos da inicialização (settings.json antigo e a seção
+        // "arsenal" do modules.json) viram ferrolhos no Diário. Depois disso as listas antigas ficam vazias.
+        var old = legacy();
+        var prefs = Context.Settings.Section<ArsenalSettings>(SettingsId);
+        var removed = old.StartupRemoved.Concat(prefs.Value.StartupRemoved).ToList();
+        var tweaks = new TweakBackup(old.TweakBackup);
+        if (tweaks.Count > 0 || removed.Count > 0)
         {
-            legacy.Clear();
-            saveLegacy();
-            Context.Log.Info("ARSENAL: lista de removidos da inicialização migrada para modules.json");
+            try
+            {
+                int n = await ArsenalChanges.MigrateLegacyAsync(Context.Changes, tweaks, removed);
+                old.TweakBackup.Clear();
+                old.StartupRemoved.Clear();
+                saveLegacy();
+                prefs.Update(p => p.StartupRemoved.Clear());
+                Context.Log.Info($"ARSENAL: {n} cópia(s) antiga(s) de ajustes e inicialização migrada(s) para o Diário de Ferrolhos");
+            }
+            catch (Exception ex) { Context.Log.Error("ARSENAL: migração para o Diário de Ferrolhos falhou (as listas antigas ficam)", ex); }
         }
-        startup.Attach(Context.Settings.Section<ArsenalSettings>(SettingsId));
-        return Task.CompletedTask;
+        optimize.Attach(Context.Changes);
+        startup.Attach(Context.Changes);
     }
 
     public override Task OnPageActivatedAsync(string route, CancellationToken ct)

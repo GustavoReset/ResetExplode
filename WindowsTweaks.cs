@@ -6,7 +6,7 @@ using Microsoft.Win32;
 namespace FortKnox;
 
 /// <summary>
-/// Ajuste do Windows para jogos: lê o estado atual, aplica e guarda o valor original (em AppSettings.TweakBackup)
+/// Ajuste do Windows para jogos: lê o estado atual, aplica e guarda o valor original (no ferrolho, Fase 3.4e)
 /// na primeira vez que é alterado, para "Restaurar originais" desfazer tudo.
 /// Só ajustes documentados e reversíveis; nada que reduza a segurança (Defender, VBS/HVCI, UAC, Windows Update).
 /// </summary>
@@ -18,8 +18,8 @@ public sealed class Tweak : INotifyPropertyChanged
     public string Effect { get; init; } = "";
     public bool NeedsRestart { get; init; }
     internal Func<bool?> Read { get; init; } = () => null;
-    internal Action<bool, AppSettings> Write { get; init; } = (_, _) => { };
-    internal Action<AppSettings> Restore { get; init; } = _ => { };
+    internal Action<bool, TweakBackup> Write { get; init; } = (_, _) => { };
+    internal Action<TweakBackup> Restore { get; init; } = _ => { };
 
     private bool _isOn;
     public bool IsOn { get => _isOn; set { _isOn = value; Changed(nameof(IsOn)); } }
@@ -31,6 +31,13 @@ public sealed class Tweak : INotifyPropertyChanged
 
     private void Changed(string p) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(p));
     public event PropertyChangedEventHandler? PropertyChanged;
+}
+
+/// <summary>Valores originais antes de um ajuste (chave do ajuste → valor; "<ausente>" = não existia).</summary>
+public sealed class TweakBackup : Dictionary<string, string?>
+{
+    public TweakBackup() { }
+    public TweakBackup(IDictionary<string, string?> d) : base(d) { }
 }
 
 public static class WindowsTweaks
@@ -47,7 +54,7 @@ public static class WindowsTweaks
             Read = () => ActiveScheme()?.Equals(HighPerformance, StringComparison.OrdinalIgnoreCase),
             Write = (on, s) =>
             {
-                if (!s.TweakBackup.ContainsKey("power")) s.TweakBackup["power"] = ActiveScheme();
+                if (!s.ContainsKey("power")) s["power"] = ActiveScheme();
                 if (on)
                 {
                     // Alguns PCs vêm sem o plano listado: duplicar o modelo padrão o recria com o mesmo GUID.
@@ -55,11 +62,11 @@ public static class WindowsTweaks
                         PowerCfg($"-duplicatescheme {HighPerformance} {HighPerformance}");
                     PowerCfg($"/setactive {HighPerformance}");
                 }
-                else if (s.TweakBackup["power"] is string prev && !prev.Equals(HighPerformance, StringComparison.OrdinalIgnoreCase))
+                else if (s["power"] is string prev && !prev.Equals(HighPerformance, StringComparison.OrdinalIgnoreCase))
                     PowerCfg($"/setactive {prev}");
                 else PowerCfg("/setactive 381b4222-f694-41f0-9685-ff5bb260df2e"); // Equilibrado
             },
-            Restore = s => { if (s.TweakBackup.GetValueOrDefault("power") is string prev) PowerCfg($"/setactive {prev}"); },
+            Restore = s => { if (s.GetValueOrDefault("power") is string prev) PowerCfg($"/setactive {prev}"); },
         },
         RegTweak("gamemode", "Modo de Jogo",
             "Dá prioridade ao jogo e evita que o Windows Update instale ou reinicie durante a partida.",
@@ -96,8 +103,8 @@ public static class WindowsTweaks
             Read = () => DxSettings().GetValueOrDefault("SwapEffectUpgradeEnable") == "1",
             Write = (on, s) =>
             {
-                if (!s.TweakBackup.ContainsKey("windowed"))
-                    s.TweakBackup["windowed"] = Registry.CurrentUser.OpenSubKey(DxPath)?.GetValue("DirectXUserGlobalSettings") as string ?? "<ausente>";
+                if (!s.ContainsKey("windowed"))
+                    s["windowed"] = Registry.CurrentUser.OpenSubKey(DxPath)?.GetValue("DirectXUserGlobalSettings") as string ?? "<ausente>";
                 var d = DxSettings();
                 d["SwapEffectUpgradeEnable"] = on ? "1" : "0";
                 using var k = Registry.CurrentUser.CreateSubKey(DxPath);
@@ -105,7 +112,7 @@ public static class WindowsTweaks
             },
             Restore = s =>
             {
-                if (s.TweakBackup.GetValueOrDefault("windowed") is not string prev) return;
+                if (s.GetValueOrDefault("windowed") is not string prev) return;
                 using var k = Registry.CurrentUser.CreateSubKey(DxPath);
                 if (prev == "<ausente>") k.DeleteValue("DirectXUserGlobalSettings", false);
                 else k.SetValue("DirectXUserGlobalSettings", prev);
@@ -120,26 +127,24 @@ public static class WindowsTweaks
             Write = (on, s) =>
             {
                 foreach (var n in new[] { "MouseSpeed", "MouseThreshold1", "MouseThreshold2" })
-                    if (!s.TweakBackup.ContainsKey($"mouse.{n}")) s.TweakBackup[$"mouse.{n}"] = ReadString(Registry.CurrentUser, @"Control Panel\Mouse", n);
+                    if (!s.ContainsKey($"mouse.{n}")) s[$"mouse.{n}"] = ReadString(Registry.CurrentUser, @"Control Panel\Mouse", n);
                 var v = on ? new[] { "0", "0", "0" } : new[] { "1", "6", "10" }; // padrão do Windows
                 ApplyMouse(v);
             },
             Restore = s =>
             {
-                if (!s.TweakBackup.ContainsKey("mouse.MouseSpeed")) return;
+                if (!s.ContainsKey("mouse.MouseSpeed")) return;
                 ApplyMouse(new[] { "MouseSpeed", "MouseThreshold1", "MouseThreshold2" }
-                    .Select(n => s.TweakBackup.GetValueOrDefault($"mouse.{n}") ?? "0").ToArray());
+                    .Select(n => s.GetValueOrDefault($"mouse.{n}") ?? "0").ToArray());
             },
         },
     };
 
-    /// <summary>Desfaz tudo que foi alterado pelo app (valores guardados antes da primeira alteração).</summary>
-    public static void RestoreAll(IEnumerable<Tweak> tweaks, AppSettings s)
+    /// <summary>Desfaz com uma cópia de valores originais (cada ferrolho de ajuste guarda a sua; o TweakBackup antigo do settings.json também).</summary>
+    public static void RestoreAll(IEnumerable<Tweak> tweaks, TweakBackup s)
     {
         foreach (var t in tweaks)
             try { t.Restore(s); } catch { }
-        s.TweakBackup.Clear();
-        s.Save();
     }
 
     // ------------------------------------------------------------------ registro
@@ -165,17 +170,17 @@ public static class WindowsTweaks
         return k?.GetValue(name)?.ToString();
     }
 
-    private static void SetDword(AppSettings s, string backupKey, RegistryKey hive, string path, string name, int value)
+    private static void SetDword(TweakBackup s, string backupKey, RegistryKey hive, string path, string name, int value)
     {
-        if (!s.TweakBackup.ContainsKey(backupKey))
-            s.TweakBackup[backupKey] = ReadDword(hive, path, name)?.ToString() ?? "<ausente>";
+        if (!s.ContainsKey(backupKey))
+            s[backupKey] = ReadDword(hive, path, name)?.ToString() ?? "<ausente>";
         using var k = hive.CreateSubKey(path);
         k.SetValue(name, value, RegistryValueKind.DWord);
     }
 
-    private static void RestoreDword(AppSettings s, string backupKey, RegistryKey hive, string path, string name)
+    private static void RestoreDword(TweakBackup s, string backupKey, RegistryKey hive, string path, string name)
     {
-        if (s.TweakBackup.GetValueOrDefault(backupKey) is not string prev) return;
+        if (s.GetValueOrDefault(backupKey) is not string prev) return;
         using var k = hive.CreateSubKey(path);
         if (prev == "<ausente>") k.DeleteValue(name, false);
         else k.SetValue(name, int.Parse(prev), RegistryValueKind.DWord);
