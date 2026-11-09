@@ -23,9 +23,18 @@ public partial class MainWindow
         ["PageOverlay"] = VigiaModule.RouteOverlay,
         ["PageStress"] = ForjaModule.RouteStress,
         ["PageOc"] = ForjaModule.RouteOc,
+        ["PageBench"] = ForjaModule.RouteBench,
     };
 
     private FortKnoxHost? Core => App.Core;
+
+    /// <summary>Cena de GPU, ray tracing ou disco rodando: o ciclo de 1 s não consulta os sensores (evita engasgos na medição).</summary>
+    private bool _gpuBenchActive;
+
+    /// <summary>Algum benchmark da FORJA rodando (os outros testes esperam).</summary>
+    private bool AnyBenchRunning => PageBench.IsRunning;
+
+    private void SaveSettings() { try { _settings.Save(); } catch (System.IO.IOException) { } }
 
     private void RegisterModules()
     {
@@ -34,11 +43,22 @@ public partial class MainWindow
         PageStress.RunningChanged += running => SideStress.Text = running ? "rodando" : "parado";
         PageStress.Finished += (title, detail, state) => AddEvent("", title, detail, state);
 
-        // FORJA · Overclock: histórico em AppSettings.BenchRecords (compartilhado com o Benchmark até a próxima fatia)
-        PageOc.Attach(_live, _settings, () => { try { _settings.Save(); } catch (System.IO.IOException) { } },
+        // FORJA · Overclock: histórico em AppSettings.BenchRecords (o PAINEL e o relatório também leem)
+        PageOc.Attach(_live, _settings, SaveSettings,
                       () => PageStress.IsRunning || AnyBenchRunning,
                       pause => _gpuBenchActive = pause,
                       () => _cpuName);
+
+        // FORJA · Benchmark: render de CPU, cena de jogo, ray tracing, simulação, memória e disco
+        PageBench.Attach(new BenchView.Host
+        {
+            Live = _live, Settings = _settings, Save = SaveSettings, CpuName = () => _cpuName,
+            OtherBusy = () => PageStress.IsRunning || PageOc.IsRunning,
+            PauseSensors = pause => _gpuBenchActive = pause,
+            GetOverlay = () => PageOverlay.IsOn, SetOverlay = on => PageOverlay.IsOn = on,
+            AddEvent = AddEvent,
+        });
+        PageBench.Init();
 
         if (Core == null) return;
         Core.Modules.Add(new CofreModule(PageVault, this));
@@ -51,7 +71,7 @@ public partial class MainWindow
         Core.Modules.Add(new ArenaModule(PageLauncher, () => _settings, () => { try { _settings.Save(); } catch (System.IO.IOException) { } }));
         Core.Modules.Add(new VigiaModule(PageOverlay));
 
-        Core.Modules.Add(new ForjaModule(PageStress, PageOc));
+        Core.Modules.Add(new ForjaModule(PageStress, PageOc, PageBench));
     }
 
     /// <summary>Chamado por Nav_Checked. Erros do módulo vão para o log e para a barra de status, sem derrubar o app.</summary>
