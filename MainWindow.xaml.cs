@@ -47,12 +47,12 @@ public partial class MainWindow : Window
         _monitor = new SensorMonitor();
         _live = new LiveReadings(_monitor, () => _gpus.FirstOrDefault());
         PageSensors.Attach(_monitor);
-        SystemSub.Text = "Lendo informações do sistema…";
+        PageSystem.Subtitle = "Lendo informações do sistema…";
         PageSensors.Status = "Detectando o hardware…";
 
         RegisterModules();
         SnapshotUsb();
-        RefreshDrives();
+        PageSystem.RefreshDrives();
         TitlePage.Text = "Painel";
         UpdateDashboard();
 
@@ -104,11 +104,9 @@ public partial class MainWindow : Window
             try
             {
                 var info = await Task.Run(SystemInfoCollector.Collect);
-                InfoCategories.ItemsSource = info;
-                InfoCategories.SelectedIndex = 0;
-                SystemSub.Text = $"{Environment.MachineName} · {info.Count} categorias";
+                PageSystem.SetInfo(info);
             }
-            catch (Exception ex) { SystemSub.Text = $"Não foi possível ler as informações do sistema: {ex.Message}"; }
+            catch (Exception ex) { PageSystem.Subtitle = $"Não foi possível ler as informações do sistema: {ex.Message}"; }
         }
 
         async Task LoadSensors()
@@ -225,33 +223,12 @@ public partial class MainWindow : Window
             p.Visibility = p.Name == name ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    // ---------------- Sistema ----------------
-
-    private void InfoCategories_Changed(object sender, SelectionChangedEventArgs e)
-    {
-        if (InfoCategories.SelectedItem is not InfoNode node) return;
-        InfoTitle.Text = node.Header;
-        InfoDetails.ItemsSource = node.Children;
-        bool storage = node.Header == "Armazenamento";
-        DrivesPanel.Visibility = storage ? Visibility.Visible : Visibility.Collapsed;
-        if (storage) RefreshDrives();
-    }
-
     // ---------------- Unidades e dispositivos conectados ----------------
 
-    private List<DriveCard> _drives = new();
     private Dictionary<string, UsbDevice> _usbPresent = new(StringComparer.OrdinalIgnoreCase);
     private DateTime _lastVolumeEvent = DateTime.MinValue;
     private DispatcherTimer? _usbDebounce;
     private ToastWindow? _toast;
-
-    private async void RefreshDrives()
-    {
-        _drives = await Task.Run(DriveMap.Read);
-        DriveCards.ItemsSource = _drives;
-        long total = _drives.Sum(d => d.Total), free = _drives.Sum(d => d.Free);
-        DrivesSummary.Text = $"{_drives.Count} unidades · {DriveCard.Fmt(free)} livres de {DriveCard.Fmt(total)}";
-    }
 
     private void Toast(string title, string text, string icon)
     {
@@ -298,7 +275,7 @@ public partial class MainWindow : Window
     private async void OnVolumes(List<string> letters, bool arrived)
     {
         if (arrived) await Task.Delay(800); // o sistema de arquivos leva um instante para montar
-        var before = _drives;
+        var before = PageSystem.Drives;
         var now = await Task.Run(DriveMap.Read);
         foreach (var l in letters)
         {
@@ -311,15 +288,7 @@ public partial class MainWindow : Window
                 Toast("Unidade removida", old != null ? $"{old.Title} pode ser desconectada." : $"{l} removida.", "");
             }
         }
-        _drives = now;
-
-        // Discos físicos (lista abaixo dos cartões) também mudam com pendrive/HD externo.
-        if (InfoCategories.ItemsSource is IEnumerable<InfoNode> cats && cats.FirstOrDefault(c => c.Header == "Armazenamento") is { } storage)
-        {
-            await Task.Run(() => SystemInfoCollector.RefreshDisks(storage));
-            if (InfoCategories.SelectedItem == storage) { InfoDetails.ItemsSource = null; InfoDetails.ItemsSource = storage.Children; }
-        }
-        if (DrivesPanel.IsVisible) RefreshDrives();
+        await PageSystem.OnVolumesChangedAsync(now); // unidades e discos físicos da página Sistema
     }
 
     private async void DiffUsb()
