@@ -3,14 +3,77 @@ using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Threading;
+using FortKnox.UI;
 
 namespace FortKnox;
 
-/// <summary>Exportação de relatório (botão em SENTINELA · Sistema). Saúde dos discos e benchmark de disco foram para os módulos.</summary>
-public partial class MainWindow
+/// <summary>
+/// SENTINELA · Sistema (Fase 3.3m; antes no MainWindow.xaml.cs e MainWindow.Disks.cs): informações do sistema por categoria,
+/// cartões das unidades (C:, pendrive, HD externo, rede) e o botão EXPORTAR RELATÓRIO (Laudo Fort Knox em HTML ou JSON).
+/// </summary>
+public partial class SystemView : UserControl
 {
+    /// <summary>Dados que o relatório junta de outras partes do app.</summary>
+    public sealed class Host
+    {
+        public required SensorMonitor Monitor { get; init; }
+        public required Func<IReadOnlyList<GpuInfo>> Gpus { get; init; }
+        public required AppSettings Settings { get; init; }
+        /// <summary>Último teste de conexão do RADAR (null se não rodou nesta sessão).</summary>
+        public required Func<IReadOnlyList<DiskHealthCard>?> LastNetwork { get; init; }
+    }
+
+    private Host _host = null!;
+
+    public SystemView() => InitializeComponent();
+
+    public void Attach(Host host) => _host = host;
+
+    /// <summary>Unidades lidas por último (o PAINEL mostra o disco C:; os avisos de USB comparam antes e depois).</summary>
+    public List<DriveCard> Drives { get; private set; } = new();
+
+    public string Subtitle { get => SystemSub.Text; set => SystemSub.Text = value; }
+
+    /// <summary>Categorias lidas do WMI na abertura do app (em segundo plano).</summary>
+    public void SetInfo(List<InfoNode> info)
+    {
+        InfoCategories.ItemsSource = info;
+        InfoCategories.SelectedIndex = 0;
+        SystemSub.Text = $"{Environment.MachineName} · {info.Count} categorias";
+    }
+
+    private void InfoCategories_Changed(object sender, SelectionChangedEventArgs e)
+    {
+        if (InfoCategories.SelectedItem is not InfoNode node) return;
+        InfoTitle.Text = node.Header;
+        InfoDetails.ItemsSource = node.Children;
+        bool storage = node.Header == "Armazenamento";
+        DrivesPanel.Visibility = storage ? Visibility.Visible : Visibility.Collapsed;
+        if (storage) RefreshDrives();
+    }
+
+    public async void RefreshDrives() => ShowDrives(await Task.Run(DriveMap.Read));
+
+    private void ShowDrives(List<DriveCard> drives)
+    {
+        Drives = drives;
+        DriveCards.ItemsSource = drives;
+        long total = drives.Sum(d => d.Total), free = drives.Sum(d => d.Free);
+        DrivesSummary.Text = $"{drives.Count} unidades · {DriveCard.Fmt(free)} livres de {DriveCard.Fmt(total)}";
+    }
+
+    /// <summary>Pendrive ou HD externo entrou/saiu: guarda as unidades novas e relê os discos físicos da categoria Armazenamento.</summary>
+    public async Task OnVolumesChangedAsync(List<DriveCard> now)
+    {
+        Drives = now;
+        if (InfoCategories.ItemsSource is IEnumerable<InfoNode> cats && cats.FirstOrDefault(c => c.Header == "Armazenamento") is { } storage)
+        {
+            await Task.Run(() => SystemInfoCollector.RefreshDisks(storage));
+            if (InfoCategories.SelectedItem == storage) { InfoDetails.ItemsSource = null; InfoDetails.ItemsSource = storage.Children; }
+        }
+        if (DrivesPanel.IsVisible) ShowDrives(now);
+    }
+
     // ================= Relatório exportável =================
 
     private async void BtnReport_Click(object sender, RoutedEventArgs e)
@@ -22,7 +85,8 @@ public partial class MainWindow
             DefaultExt = ".html",
             FileName = $"Fort-Knox-relatorio-{DateTime.Now:yyyyMMdd-HHmm}",
         };
-        if (dlg.ShowDialog(this) != true) return;
+        var owner = Window.GetWindow(this);
+        if (dlg.ShowDialog(owner) != true) return;
         string path = dlg.FileName;
         bool json = string.Equals(Path.GetExtension(path), ".json", StringComparison.OrdinalIgnoreCase);
 
@@ -31,7 +95,7 @@ public partial class MainWindow
         try
         {
             // Dados que vivem na interface são copiados aqui (thread da tela); a leitura dos discos roda em segundo plano.
-            var sensorsSnapshot = _monitor.Rows.ToList();
+            var sensorsSnapshot = _host.Monitor.Rows.ToList();
             var data = new ReportData
             {
                 Date = DateTime.Now,
@@ -40,7 +104,7 @@ public partial class MainWindow
                 LogoBase64 = LoadLogoBase64(),
                 System = (InfoCategories.ItemsSource as IEnumerable<InfoNode> ?? Enumerable.Empty<InfoNode>())
                          .Select(ReportBuilder.ToNode).Where(n => n != null).Cast<ReportNode>().ToList(),
-                Gpus = _gpus.Select(g => new ReportGpu(g.Name, g.Subtitle,
+                Gpus = _host.Gpus().Select(g => new ReportGpu(g.Name, g.Subtitle,
                          g.Sections.Select(ReportBuilder.ToNode).Where(n => n != null).Cast<ReportNode>().ToList())).ToList(),
                 Sensors = sensorsSnapshot.Select(s => new ReportSensor(s.Hardware, s.Category, s.Name, s.Value, s.Min, s.Max)).ToList(),
                 Benchmarks = BuildBenchList(),
@@ -49,8 +113,8 @@ public partial class MainWindow
             data.Disks.AddRange(disks.Select(d => new ReportDisk(d.Title, d.Meta, d.VerdictText, d.Reasons, d.Metrics)));
             var power = await Task.Run(() => BatteryInfo.Read(sensorsSnapshot));
             data.Power.AddRange(power.Select(d => new ReportDisk(d.Title, d.Meta, d.VerdictText, d.Reasons, d.Metrics)));
-            if (_lastNet != null)
-                data.Network.AddRange(_lastNet.Select(d => new ReportDisk(d.Title, d.Meta, d.VerdictText, d.Reasons, d.Metrics)));
+            if (_host.LastNetwork() is { } net)
+                data.Network.AddRange(net.Select(d => new ReportDisk(d.Title, d.Meta, d.VerdictText, d.Reasons, d.Metrics)));
 
             string text = json ? ReportBuilder.Json(data) : ReportBuilder.Html(data);
             await File.WriteAllTextAsync(path, text, new UTF8Encoding(true));
@@ -60,7 +124,7 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            MessageBox.Show(this, "Não foi possível gerar o relatório:\n" + ex.Message, "Fort Knox", MessageBoxButton.OK, MessageBoxImage.Warning);
+            FkDialog.Info(owner, "Não foi possível gerar o relatório", ex.Message);
         }
         finally
         {
@@ -76,8 +140,9 @@ public partial class MainWindow
             "gpu" => "Cena de jogo (GPU)", "sim" => "Simulação de jogo (CPU)", "mem" => "Memória e carregamento",
             "disk" => "Disco", "oc" => "Forja · overclock (estabilidade)", _ => t
         };
-        var list = _settings.BenchRecords.Select(r => new ReportBench(r.Date, TestName(r.Test), r.Summary)).ToList();
-        foreach (var r in _settings.BenchRuns)
+        var s = _host.Settings;
+        var list = s.BenchRecords.Select(r => new ReportBench(r.Date, TestName(r.Test), r.Summary)).ToList();
+        foreach (var r in s.BenchRuns)
         {
             var parts = new List<string>();
             if (r.Multi is double mt) parts.Add($"multi-core {mt:N0} pts");

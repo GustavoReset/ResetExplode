@@ -31,6 +31,7 @@ public partial class MainWindow
         ["PageGpu"] = SentinelaModule.RouteGpu,
         ["PageDisks"] = SentinelaModule.RouteDiscos,
         ["PageEnergy"] = SentinelaModule.RouteEnergia,
+        ["PageSystem"] = SentinelaModule.RouteSistema,
     };
 
     private FortKnoxHost? Core => App.Core;
@@ -74,12 +75,19 @@ public partial class MainWindow
         PageGpu.Attach(_monitor);
         PageDisks.Attach(_monitor);
         PageEnergy.Attach(_monitor);
+        PageSystem.Attach(new SystemView.Host
+        {
+            Monitor = _monitor, Gpus = () => _gpus, Settings = _settings, LastNetwork = () => PageNet.LastResult,
+        });
+
+        // RADAR · teste de conexão: espera benchmark e Stress test terminarem
+        PageNet.Attach(() => AnyBenchRunning || PageStress.IsRunning || PageOc.IsRunning);
 
         if (Core == null) return;
         Core.Modules.Add(new SentinelaModule(PageDisks, PageEnergy));
         Core.Modules.Add(new CofreModule(PageVault, this));
         Core.Modules.Add(new PrensaModule(PagePdf));
-        Core.Modules.Add(new RadarModule(NetTools));
+        Core.Modules.Add(new RadarModule(PageNet));
         Core.Modules.Add(new ArsenalModule(PageOptimize, PageStartup, PageApps, () => _settings.StartupRemoved, () => { try { _settings.Save(); } catch (System.IO.IOException) { } }));
         Core.Modules.Add(new OficinaModule(PageMakerPorts, PageMakerDrv, () => _settings.ComDbBackup, () => { _settings.ComDbBackup = null; try { _settings.Save(); } catch (System.IO.IOException) { } }));
         Core.Modules.Add(new AlicerceModule(PageDriver));

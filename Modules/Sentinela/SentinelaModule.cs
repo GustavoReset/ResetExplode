@@ -3,11 +3,12 @@ using FortKnox.Core.Modules;
 namespace FortKnox;
 
 /// <summary>
-/// SENTINELA como módulo do núcleo (Fase 3.3l): Sensores, Placa de vídeo, Discos e Energia.
-/// Sistema (informações e unidades) migra na próxima fatia, junto com o PAINEL e o ciclo de sensores no núcleo.
+/// SENTINELA como módulo do núcleo (Fases 3.3l e 3.3m): Sistema, Sensores, Placa de vídeo, Discos e Energia.
+/// As Views são ligadas na abertura pelo Shell (Sistema lê o WMI em segundo plano assim que o app abre).
 /// </summary>
 public sealed class SentinelaModule(DisksView disks, EnergyView energy) : ModuleBase
 {
+    public const string RouteSistema = "sentinela/sistema";
     public const string RouteSensores = "sentinela/sensores";
     public const string RouteGpu = "sentinela/gpu";
     public const string RouteDiscos = "sentinela/discos";
@@ -17,6 +18,7 @@ public sealed class SentinelaModule(DisksView disks, EnergyView energy) : Module
     public override string DisplayName => "SENTINELA";
     public override IReadOnlyList<NavEntry> Pages { get; } = new[]
     {
+        new NavEntry(RouteSistema, "Sistema", "", 110, "SENTINELA"),
         new NavEntry(RouteSensores, "Sensores", "", 120, "SENTINELA"),
         new NavEntry(RouteGpu, "Placa de vídeo", "", 130, "SENTINELA"),
         new NavEntry(RouteDiscos, "Discos", "", 140, "SENTINELA"),
