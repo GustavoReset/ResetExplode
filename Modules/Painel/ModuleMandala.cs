@@ -186,16 +186,20 @@ public sealed class ModuleMandala : UserControl
         var text = new TextBlock { Text = label, FontSize = module ? 8.5 : 10.5, HorizontalAlignment = HorizontalAlignment.Center,
                                    Margin = new Thickness(0, module ? 7 : 5, 0, 0), TextTrimming = TextTrimming.CharacterEllipsis, MaxWidth = size + 30 };
         text.SetResourceReference(TextBlock.FontFamilyProperty, module ? "Display" : "Text");
-        var sp = new StackPanel();
-        sp.Children.Add(icon);
-        if (module) sp.Children.Add(text);
-        var b = new Button { Width = size, Height = size, Tag = module ? 12.0 : 9.0, Content = sp, RenderTransformOrigin = new Point(0.5, 0.5),
+        var b = new Button { Width = size, Height = size, Tag = module ? 12.0 : 9.0, RenderTransformOrigin = new Point(0.5, 0.5),
                              RenderTransform = new ScaleTransform(1, 1) };
         b.SetResourceReference(StyleProperty, "MandalaNode");
         AutomationProperties.SetName(b, label);
-        if (!module)
+        if (module)
         {
-            // Ferramenta: rótulo fora do nó (legível sem aumentar o nó)
+            var sp = new StackPanel();
+            sp.Children.Add(icon);
+            sp.Children.Add(text);
+            b.Content = sp;
+        }
+        else
+        {
+            // Ferramenta: só o ícone no nó; o rótulo vai para fora da órbita (legível sem aumentar o nó)
             b.Content = icon;
             b.Resources["label"] = text;
         }
