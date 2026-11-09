@@ -2,6 +2,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using FortKnox.Core.Modules;
+using FortKnox.UI;
 using LibreHardwareMonitor.Hardware;
 
 namespace FortKnox;
@@ -18,7 +20,10 @@ public partial class DashView : UserControl
         public string When => At.Date == DateTime.Today ? $"hoje {At:HH:mm}" : $"{At:dd/MM HH:mm}";
     }
     public sealed record DashRingItem(Brush Swatch, string Label, string Value);
-    public sealed record DashCheck(string Title, string Detail, bool Ok);
+    public sealed record DashCheck(string Title, string Detail, bool Ok, string? FixRoute)
+    {
+        public bool CanFix => !Ok && FixRoute != null;
+    }
 
     private readonly record struct DashSample(float? CpuT, float? GpuT, float? CpuL, float? GpuL, float? CpuW, float? GpuW);
 
@@ -39,6 +44,12 @@ public partial class DashView : UserControl
         public required Func<IReadOnlyList<DriveCard>> Drives { get; init; }
         /// <summary>Abre uma página do menu pelo nome (ex.: "PageBench").</summary>
         public required Action<string> Navigate { get; init; }
+        /// <summary>Abre uma página pela rota do módulo (ex.: "arsenal/otimizacao"), usada pelo "Resolver" do Lastro.</summary>
+        public required Action<string> NavigateRoute { get; init; }
+        /// <summary>Recalcula o Lastro (núcleo) e devolve a nota.</summary>
+        public required Func<HealthState> Lastro { get; init; }
+        /// <summary>Todas as leituras da última conta, para a lista "Saúde do PC".</summary>
+        public required Func<IReadOnlyList<IndicatorResult>> HealthDetails { get; init; }
     }
 
     private Host _host = null!;
@@ -364,43 +375,38 @@ public partial class DashView : UserControl
     }
 
     // ---------------- saúde do PC ----------------
-
+    /// <summary>
+    /// Lastro (Fase 3.4): pede ao núcleo a nota (média ponderada dos indicadores de cada módulo; qualquer Ruim limita a 59)
+    /// e mostra cada indicador com o motivo. "Resolver" abre a página que corrige.
+    /// </summary>
     private void UpdateDashHealth()
     {
         _healthAt = DateTime.Now;
-        DashCheck Item(bool ok, string title, string okText, string badText) => new(title, ok ? okText : badText, ok);
-
-        var list = new List<DashCheck>();
-        if (_monitor.IsOpen) // enquanto detecta o hardware, ainda não dá para saber
-        {
-            var sensors = _monitor.DiagnoseCpuSensors();
-            list.Add(Item(sensors == SensorMonitor.CpuSensorProblem.None, "Sensores da CPU",
-                          "Temperatura e consumo disponíveis.", SensorMonitor.Explain(sensors).Split('.')[0] + "."));
-        }
-
-        var errs = OcCheck.ErrorsSince(DateTime.Now.AddDays(-7));
-        list.Add(Item(errs.Error == null && errs.Total == 0, "Sem erros de hardware",
-                      "Nenhum WHEA ou reinício do driver de vídeo em 7 dias.",
-                      errs.Error != null ? "Não foi possível ler o registro do Windows."
-                                         : $"{errs.Whea} WHEA · {errs.GpuResets} reinícios do driver em 7 dias."));
-
-        var gm = _host.Tweaks().FirstOrDefault(t => t.Id == "gamemode");
-        var dvr = _host.Tweaks().FirstOrDefault(t => t.Id == "gamedvr");
-        try { gm?.Refresh(); dvr?.Refresh(); } catch { }
-        if (gm != null) list.Add(Item(gm.IsOn, "Modo de Jogo ligado", "O Windows prioriza o jogo.", "Desligado: ligue em Arsenal › Otimização."));
-        if (dvr != null) list.Add(Item(dvr.IsOn, "Gravação em segundo plano desligada", "O Game Bar não grava o tempo todo.",
-                                       "O Game DVR está gravando: custa FPS."));
-
-        try
-        {
-            var (reserved, inUse) = UsbCleaner.ComStatus();
-            int stuck = reserved.Except(inUse).Count();
-            list.Add(Item(stuck == 0, "Portas COM livres", "Nenhum número COM preso.",
-                          $"{stuck} números presos por dispositivos antigos."));
-        }
-        catch { }
-
-        _health = list;
+        var state = _host.Lastro();
+        var all = _host.HealthDetails();
+        _health = all.Select(r => new DashCheck(r.Title, r.Reading.Reason, r.Reading.Level == HealthLevel.Bom, r.Reading.FixRoute))
+                     .OrderBy(c => c.Ok).ToList();
         DashHealth.ItemsSource = _health;
+
+        if (state.Lastro < 0)
+        {
+            DashLastro.Text = "—";
+            DashLastroBadge.Status = HealthStatus.Neutro;
+            DashLastroBadge.Text = "Calculando";
+            return;
+        }
+        DashLastro.Text = state.Lastro.ToString();
+        (DashLastroBadge.Status, DashLastroBadge.Text) = state.Level switch
+        {
+            HealthLevel.Ruim => (HealthStatus.Ruim, "Ruim"),
+            HealthLevel.Atencao => (HealthStatus.Atencao, "Atenção"),
+            _ => (HealthStatus.Bom, "Bom"),
+        };
+        DashLastroSub.Text = $"Lastro: {all.Count} verificações · {DateTime.Now:HH:mm}";
+    }
+
+    private void DashFix_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { Tag: string route } && route.Length > 0) _host.NavigateRoute(route);
     }
 }

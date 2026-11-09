@@ -6,8 +6,32 @@ namespace FortKnox;
 /// SENTINELA como módulo do núcleo (Fases 3.3l e 3.3m): Sistema, Sensores, Placa de vídeo, Discos e Energia.
 /// As Views são ligadas na abertura pelo Shell (Sistema lê o WMI em segundo plano assim que o app abre).
 /// </summary>
-public sealed class SentinelaModule(DisksView disks, EnergyView energy) : ModuleBase
+public sealed class SentinelaModule(DisksView disks, EnergyView energy, SensorMonitor sensors) : ModuleBase
 {
+    /// <summary>Lastro: sensores da CPU respondendo e saúde S.M.A.R.T. dos discos (quando já lida).</summary>
+    public override IEnumerable<IHealthIndicator> HealthIndicators { get; } = new IHealthIndicator[]
+    {
+        new HealthIndicator("sentinela.cpu-sensores", "Sensores da CPU", () => sensors.IsOpen ? 1 : 0, () =>
+        {
+            var p = sensors.DiagnoseCpuSensors();
+            return p == SensorMonitor.CpuSensorProblem.None
+                ? HealthIndicator.Bom("Temperatura e consumo disponíveis.")
+                : HealthIndicator.Atencao(SensorMonitor.Explain(p).Split('.')[0] + ".", RouteSensores);
+        }),
+        new HealthIndicator("sentinela.discos", "Saúde dos discos", () => disks.LastCards.Count > 0 ? 3 : 0, () =>
+        {
+            var cards = disks.LastCards;
+            int critical = cards.Count(c => c.Verdict == DiskVerdict.Critical);
+            int warning = cards.Count(c => c.Verdict == DiskVerdict.Warning);
+            if (critical > 0) return HealthIndicator.Ruim($"{critical} disco(s) com sinal de falha. Faça backup agora.", RouteDiscos, 10);
+            if (warning > 0) return HealthIndicator.Atencao($"{warning} disco(s) pedem atenção.", RouteDiscos);
+            return HealthIndicator.Bom($"{cards.Count} disco(s) sem problemas nas leituras disponíveis.");
+        }),
+    };
+
+    /// <summary>Lê a saúde dos discos uma vez em segundo plano, para o Lastro ter o dado sem a pessoa abrir a página.</summary>
+    public void PrimeDiskHealth() { if (disks.LastCards.Count == 0) disks.Refresh(); }
+
     public const string RouteSistema = "sentinela/sistema";
     public const string RouteSensores = "sentinela/sensores";
     public const string RouteGpu = "sentinela/gpu";

@@ -24,6 +24,36 @@ public sealed class ArsenalModule(OptimizeView optimize, StartupView startup, Ap
     };
     public override ModuleCapabilities Capabilities => ModuleCapabilities.NeedsAdmin | ModuleCapabilities.UsesNetwork;
 
+    /// <summary>Lastro: espaço livre no disco do Windows, Modo de Jogo e gravação em segundo plano (Game DVR).</summary>
+    public override IEnumerable<IHealthIndicator> HealthIndicators => new IHealthIndicator[]
+    {
+        new HealthIndicator("arsenal.espaco-c", "Espaço no disco do Windows", 2, () =>
+        {
+            try
+            {
+                var c = new System.IO.DriveInfo(System.IO.Path.GetPathRoot(Environment.SystemDirectory) ?? "C:\\");
+                double free = (double)c.AvailableFreeSpace / c.TotalSize;
+                string gb = $"{c.AvailableFreeSpace / 1073741824.0:0.#} GB livres ({free:P0})";
+                return free < 0.05 ? HealthIndicator.Ruim($"Só {gb} em {c.Name.TrimEnd('\\')}. O Windows fica lento e pode falhar ao atualizar.", RouteOptimize, 25)
+                     : free < 0.15 ? HealthIndicator.Atencao($"{gb} em {c.Name.TrimEnd('\\')}.", RouteOptimize, 70)
+                     : HealthIndicator.Bom($"{gb} em {c.Name.TrimEnd('\\')}.");
+            }
+            catch (Exception) { return HealthIndicator.Bom("Sem leitura do espaço livre."); }
+        }),
+        Tweak("arsenal.modo-jogo", "Modo de Jogo ligado", "gamemode", on: true,
+              "O Windows prioriza o jogo.", "Desligado: ligue em Arsenal › Otimização."),
+        Tweak("arsenal.game-dvr", "Gravação em segundo plano desligada", "gamedvr", on: true,
+              "O Game Bar não grava o tempo todo.", "O Game DVR está gravando o tempo todo: custa FPS."),
+    };
+
+    private IHealthIndicator Tweak(string id, string title, string tweakId, bool on, string okText, string badText) =>
+        new HealthIndicator(id, title, () => optimize.Tweaks.Any(t => t.Id == tweakId) ? 0.5 : 0, () =>
+        {
+            var t = optimize.Tweaks.First(x => x.Id == tweakId);
+            try { t.Refresh(); } catch (Exception) { }
+            return t.IsOn == on ? HealthIndicator.Bom(okText) : HealthIndicator.Atencao(badText, RouteOptimize, 70);
+        });
+
     protected override Task OnInitializeAsync(CancellationToken ct)
     {
         // Migração única: "Restaurar removidos" saía do settings.json antigo (AppSettings.StartupRemoved).

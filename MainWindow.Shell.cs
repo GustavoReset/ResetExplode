@@ -46,6 +46,9 @@ public partial class MainWindow
 
     private void SaveSettings() { try { _settings.Save(); } catch (System.IO.IOException) { } }
 
+    /// <summary>Guardado para o Lastro pedir a primeira leitura dos discos assim que os sensores abrem.</summary>
+    private SentinelaModule? _sentinela;
+
     /// <summary>"Eventos recentes" do PAINEL (benchmarks, testes, dispositivos conectados).</summary>
     private void AddEvent(string icon, string title, string detail, string value) => PageDash.AddEvent(icon, title, detail, value);
 
@@ -92,6 +95,10 @@ public partial class MainWindow
         {
             Live = _live, Gpus = () => _gpus, CpuName = () => _cpuName, Settings = _settings,
             Tweaks = () => PageOptimize.Tweaks, Drives = () => PageSystem.Drives, Navigate = NavigateTo,
+            NavigateRoute = route => { if (ModuleRoutes.FirstOrDefault(kv => kv.Value == route).Key is { } page) NavigateTo(page); },
+            // Lastro: o núcleo soma os indicadores de saúde de todos os módulos (Fase 3.4)
+            Lastro = () => Core?.Modules.RecalculateLastro() ?? new Core.Modules.HealthState(),
+            HealthDetails = () => Core?.State.Get<Core.Modules.HealthState>().All ?? Array.Empty<Core.Modules.IndicatorResult>(),
         });
 
         // FORJA · Stress test: ligado já na abertura (o ciclo de 1 s alimenta o gráfico mesmo com a página fechada)
@@ -133,7 +140,7 @@ public partial class MainWindow
 
         if (Core == null) return;
         Core.Modules.Add(new PainelModule(PageDash));
-        Core.Modules.Add(new SentinelaModule(PageDisks, PageEnergy));
+        Core.Modules.Add(_sentinela = new SentinelaModule(PageDisks, PageEnergy, _monitor));
         Core.Modules.Add(new CofreModule(PageVault, this));
         Core.Modules.Add(new PrensaModule(PagePdf));
         Core.Modules.Add(new RadarModule(PageNet));

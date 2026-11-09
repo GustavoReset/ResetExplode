@@ -23,6 +23,20 @@ public sealed class ForjaModule(StressView stress, OcView oc, BenchView bench) :
     };
     public override ModuleCapabilities Capabilities => ModuleCapabilities.NeedsAdmin; // sensores de baixo nível e NVML
 
+    /// <summary>Lastro: erros de hardware (WHEA) e reinícios do driver de vídeo nos últimos 7 dias.</summary>
+    public override IEnumerable<IHealthIndicator> HealthIndicators { get; } = new IHealthIndicator[]
+    {
+        new HealthIndicator("forja.erros-hardware", "Erros de hardware", 3, () =>
+        {
+            var e = OcCheck.ErrorsSince(DateTime.Now.AddDays(-7));
+            if (e.Error != null) return HealthIndicator.Atencao("Não foi possível ler o registro de erros do Windows.", RouteOc, 80);
+            if (e.Total == 0) return HealthIndicator.Bom("Nenhum WHEA ou reinício do driver de vídeo em 7 dias.");
+            return e.Whea > 0
+                ? HealthIndicator.Ruim($"{e.Whea} erro(s) WHEA e {e.GpuResets} reinício(s) do driver em 7 dias. Desfaça o último overclock e verifique.", RouteOc)
+                : HealthIndicator.Atencao($"{e.GpuResets} reinício(s) do driver de vídeo em 7 dias.", RouteOc);
+        }),
+    };
+
     public override Task OnPageActivatedAsync(string route, CancellationToken ct)
     {
         if (route == RouteOc) oc.Activate();

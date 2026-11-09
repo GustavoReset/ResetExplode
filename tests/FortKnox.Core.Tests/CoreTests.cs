@@ -356,6 +356,7 @@ public sealed class LastroAndRegistryTests
         Assert.Equal(90, s.Lastro);
         Assert.Equal(HealthLevel.Atencao, s.Level);
         Assert.Equal("b", s.Worst[0].Id);
+        Assert.Equal(2, s.All.Count);
     }
 
     [Fact]

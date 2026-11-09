@@ -25,6 +25,23 @@ public sealed class OficinaModule(PortsView ports, SerialDriversView drivers, Fu
     };
     public override ModuleCapabilities Capabilities => ModuleCapabilities.NeedsAdmin;
 
+    /// <summary>Lastro: números COM presos por dispositivos que não estão conectados.</summary>
+    public override IEnumerable<IHealthIndicator> HealthIndicators { get; } = new IHealthIndicator[]
+    {
+        new HealthIndicator("oficina.portas-com", "Portas COM livres", 0.5, () =>
+        {
+            try
+            {
+                var (reserved, inUse) = UsbCleaner.ComStatus();
+                int stuck = reserved.Except(inUse).Count();
+                return stuck == 0 ? HealthIndicator.Bom("Nenhum número COM preso.")
+                     : stuck < 10 ? HealthIndicator.Atencao($"{stuck} números COM presos por dispositivos antigos.", RoutePorts, 80)
+                     : HealthIndicator.Atencao($"{stuck} números COM presos: novas placas podem cair em COM20 ou mais.", RoutePorts);
+            }
+            catch (Exception) { return HealthIndicator.Bom("Sem leitura das portas COM."); }
+        }),
+    };
+
     protected override Task OnInitializeAsync(CancellationToken ct)
     {
         // Migração única: o backup do ComDB ficava no settings.json antigo (AppSettings.ComDbBackup).
