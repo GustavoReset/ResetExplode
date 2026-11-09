@@ -18,10 +18,10 @@ public sealed class LightDeviceVm
 }
 
 /// <summary>
-/// Aba PRISMA: controle de iluminação e efeitos. Pontes: Corsair iCUE (SDK), OpenRGB (MSI Mystic Light, Gigabyte RGB Fusion,
+/// PRISMA como View (Fase 3.3d, antigo MainWindow.Integ.cs): controle de iluminação e efeitos. Pontes: Corsair iCUE (SDK), OpenRGB (MSI Mystic Light, Gigabyte RGB Fusion,
 /// ASUS Aura e outras marcas) e Razer Chroma. Todos os dispositivos aparecem numa lista só e recebem o mesmo efeito.
 /// </summary>
-public partial class MainWindow
+public partial class PrismaView : UserControl
 {
     private CorsairSdk? _cue;
     private CorsairBackend? _corsair;
@@ -39,6 +39,12 @@ public partial class MainWindow
     private int _lastLightError;
     private readonly Dictionary<string, int> _lightErrByDevice = new();
     private readonly Queue<string> _diag = new();
+    private SensorMonitor _monitor = null!;
+
+    public PrismaView() => InitializeComponent();
+
+    /// <summary>Sensores do app (efeitos que seguem temperatura e carga). Ligado pelo PrismaModule.</summary>
+    public void Attach(SensorMonitor monitor) => _monitor = monitor;
 
     /// <summary>Linha do painel de diagnóstico da aba (últimas 80 linhas).</summary>
     private void Diag(string line)
@@ -54,7 +60,7 @@ public partial class MainWindow
         ("Verde", 0, 255, 60), ("Ciano", 0, 220, 255), ("Azul", 0, 80, 255), ("Roxo", 150, 0, 255), ("Rosa", 255, 0, 160),
     };
 
-    private void InitInteg()
+    public void Activate()
     {
         if (_lightInited) return;
         _lightInited = true;
@@ -272,7 +278,7 @@ public partial class MainWindow
     private async void BtnLightSdk_Click(object sender, RoutedEventArgs e)
     {
         if (_lightBusy) return;
-        var ok = MessageBox.Show(this,
+        var ok = MessageBox.Show(Window.GetWindow(this)!,
             "O Fort Knox vai baixar o SDK oficial da Corsair (github.com/CorsairOfficial/cue-sdk), extrair somente o arquivo " +
             "iCUESDK.x64_2019.dll para a pasta\n" + CorsairSdkInstaller.TargetPath + "\ne conferir a assinatura digital dele.\n\nContinuar?",
             "Fort Knox · SDK da Corsair", MessageBoxButton.YesNo, MessageBoxImage.Question);
@@ -346,7 +352,7 @@ public partial class MainWindow
         LightRunHint.Text = "Controle devolvido: o iCUE, o OpenRGB e o Synapse reassumem as luzes.";
     }
 
-    private void ShutdownInteg()
+    public void Shutdown()
     {
         try { StopLighting(true); } catch { }
         try { _cue?.Dispose(); } catch { }

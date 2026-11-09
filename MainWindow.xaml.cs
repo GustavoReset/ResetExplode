@@ -135,7 +135,6 @@ public partial class MainWindow : Window
             _toast?.Close();
             _frames.Dispose();
             UnregisterHotKey(new System.Windows.Interop.WindowInteropHelper(this).Handle, HotkeyId);
-            ShutdownInteg();
             ShutdownModules(); // COFRE, PRENSA e RADAR (Fase 3.2)
             _launchCts?.Cancel();
             _monitor.Dispose();
@@ -275,7 +274,6 @@ public partial class MainWindow : Window
             case "PageDisks": RefreshDiskHealth(); break;
             case "PageEnergy": RefreshEnergy(); break;
             case "PageOc": UpdateOcGpuState(); UpdateRecentErrors(); break;
-            case "PageInteg": InitInteg(); break;
             case "PageLauncher": InitLauncher(); break;
             case "PageOptimize": InitOptimize(); break;
         }
