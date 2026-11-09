@@ -16,6 +16,17 @@ public partial class App : Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
+        // Catálogo do Design System: FortKnox.exe --catalogo [--claro] [--png <pasta>]. Não abre o app nem lê hardware.
+        int cat = Array.IndexOf(e.Args, "--catalogo");
+        if (cat >= 0)
+        {
+            base.OnStartup(e);
+            int png = Array.IndexOf(e.Args, "--png");
+            ThemeManager.Apply(e.Args.Contains("--claro"));
+            new UI.CatalogWindow(png >= 0 && png + 1 < e.Args.Length ? e.Args[png + 1] : null).Show();
+            return;
+        }
+
         bool first;
         try { _single = new Mutex(true, @"Local\FortKnox.SingleInstance", out first); }
         catch (UnauthorizedAccessException) { first = false; } // criado por outra instância com outro nível de permissão
