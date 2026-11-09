@@ -5,8 +5,8 @@ using System.Windows.Media;
 
 namespace FortKnox;
 
-/// <summary>Aba FORJA · OVERCLOCK: ajustes da GPU (NVML), verificador de estabilidade e guia de overclock na BIOS.</summary>
-public partial class MainWindow
+/// <summary>FORJA · Overclock como View (Fase 3.3h, antigo MainWindow.Oc.cs): ajustes da GPU (NVML), verificador de estabilidade e guia de overclock na BIOS.</summary>
+public partial class OcView : UserControl
 {
     public sealed record GuideStep(string Number, string Title, string Where, string Text);
 
@@ -14,23 +14,55 @@ public partial class MainWindow
     private uint? _ocPendingCap;
     private CancellationTokenSource? _ocCts;
     private bool _ocRunning;
+    private LiveReadings _live = null!;
+    private AppSettings _settings = null!;
+    private Action _save = () => { };
+    private Func<bool> _otherBusy = () => false;
+    private Action<bool> _pauseSensors = _ => { };
+    private readonly BenchRenderer _bench = new();
+    private Func<string> _cpuName = () => "";
+    private string _cpuNameValue => _cpuName();
+
+    private Brush Fg => (Brush)FindResource("Fg");
+    private Brush Ink => (Brush)FindResource("Ink");
+    private Brush Card => (Brush)FindResource("Card");
+
+    public OcView() => InitializeComponent();
+
+    /// <summary>Ligado pelo Shell na abertura. otherBusy = outro teste rodando; pauseSensors = pausa a leitura do driver durante a cena de GPU.</summary>
+    public void Attach(LiveReadings live, AppSettings settings, Action save, Func<bool> otherBusy, Action<bool> pauseSensors, Func<string> cpuName)
+    {
+        _live = live; _settings = settings; _save = save; _otherBusy = otherBusy; _pauseSensors = pauseSensors; _cpuName = cpuName;
+    }
+
+    /// <summary>Verificação rodando? (os outros testes consultam isto).</summary>
+    public bool IsRunning => _ocRunning;
+
+    /// <summary>Ao abrir a página: estado atual da GPU e erros de hardware recentes.</summary>
+    public void Activate() { UpdateOcGpuState(); UpdateRecentErrors(); }
+
+    /// <summary>Ao fechar o app: cancela a verificação em andamento (o finally para CPU e GPU).</summary>
+    public void CancelAll() { try { _ocCts?.Cancel(); } catch (ObjectDisposedException) { } }
+
+    private static string? CheckedTag(Panel panel)
+        => panel.Children.OfType<RadioButton>().FirstOrDefault(r => r.IsChecked == true)?.Tag as string;
 
     private nint OcGpu
     {
         get
         {
-            if (_gpus.Count <= 0)
+            if (_live.MainGpu == null)
             {
                 return IntPtr.Zero;
             }
-            return _gpus[0].NvmlHandle;
+            return _live.MainGpu!.NvmlHandle;
         }
     }
 
-    private void InitOc()
+    public void Init()
     {
         nint ocGpu = OcGpu;
-        OcGpuTitle.Text = ((_gpus.Count > 0) ? ("GPU · " + GameCatalog.ShortGpuName(_gpus[0].Name).ToUpperInvariant()) : "GPU");
+        OcGpuTitle.Text = ((_live.MainGpu != null) ? ("GPU · " + GameCatalog.ShortGpuName(_live.MainGpu!.Name).ToUpperInvariant()) : "GPU");
         if (ocGpu == IntPtr.Zero)
         {
             OcGpuState.Text = "Ajustes disponíveis só para placas NVIDIA (via driver oficial).";
@@ -148,7 +180,7 @@ public partial class MainWindow
     private void BtnOcApply_Click(object sender, RoutedEventArgs e)
     {
         nint ocGpu = OcGpu;
-        if (ocGpu == IntPtr.Zero || !RequireAdmin())
+        if (ocGpu == IntPtr.Zero || !AdminGuard.Require(this))
         {
             return;
         }
@@ -195,7 +227,7 @@ public partial class MainWindow
     private void BtnOcReset_Click(object sender, RoutedEventArgs e)
     {
         nint ocGpu = OcGpu;
-        if (ocGpu == IntPtr.Zero || !RequireAdmin())
+        if (ocGpu == IntPtr.Zero || !AdminGuard.Require(this))
         {
             return;
         }
@@ -241,7 +273,7 @@ public partial class MainWindow
     private void UpdateOcHistory()
     {
         List<BenchRecord> source = _settings.BenchRecords.Where((BenchRecord r) => r.Test == "oc").ToList();
-        OcHistory.ItemsSource = source.Select((BenchRecord r) => new MeterItem($"{r.Date:dd/MM HH:mm}", r.Summary, r.Score)).ToList();
+        OcHistory.ItemsSource = source.Select((BenchRecord r) => new MainWindow.MeterItem($"{r.Date:dd/MM HH:mm}", r.Summary, r.Score)).ToList();
     }
 
     private async void BtnOcCheck_Click(object sender, RoutedEventArgs e)
@@ -251,7 +283,7 @@ public partial class MainWindow
             _ocCts?.Cancel();
             return;
         }
-        if (PageStress.IsRunning || AnyBenchRunning)
+        if (_otherBusy())
         {
             OcStatus.Text = "Termine o outro teste antes.";
             return;
@@ -301,9 +333,9 @@ public partial class MainWindow
                 GpuGameBench gb = new GpuGameBench
                 {
                     Duration = TimeSpan.FromSeconds(30.0),
-                    AdapterName = ((_gpus.Count > 0) ? _gpus[0].Name : "")
+                    AdapterName = ((_live.MainGpu != null) ? _live.MainGpu!.Name : "")
                 };
-                _gpuBenchActive = true;
+                _pauseSensors(true);
                 using (ct.Register(gb.Cancel))
                 {
                     GpuGameResult gpuGameResult = await Task.Factory.StartNew((Func<GpuGameResult>)gb.Run, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
@@ -316,7 +348,7 @@ public partial class MainWindow
                         fail = "a cena de GPU falhou (" + gb.Error + ")";
                     }
                 }
-                _gpuBenchActive = false;
+                _pauseSensors(false);
             }
             if (fail == null && !ct.IsCancellationRequested)
             {
@@ -333,7 +365,7 @@ public partial class MainWindow
                         Msaa = 4,
                         Shells = 128,
                         Iterations = 48,
-                        AdapterName = ((_gpus.Count > 0) ? _gpus[0].Name : "")
+                        AdapterName = ((_live.MainGpu != null) ? _live.MainGpu!.Name : "")
                     });
                 }
                 Stopwatch sw = Stopwatch.StartNew();
@@ -342,8 +374,8 @@ public partial class MainWindow
                 while (sw.Elapsed < duration && !ct.IsCancellationRequested)
                 {
                     await Task.Delay(1000);
-                    float? cpuTemperature = _monitor.CpuTemperature;
-                    float? num = MainGpuTemp();
+                    float? cpuTemperature = _live.Monitor.CpuTemperature;
+                    float? num = _live.MainGpuTemp();
                     if (cpuTemperature.HasValue)
                     {
                         float valueOrDefault = cpuTemperature.GetValueOrDefault();
@@ -354,7 +386,7 @@ public partial class MainWindow
                         float valueOrDefault2 = num.GetValueOrDefault();
                         maxGpu = Math.Max(maxGpu, valueOrDefault2);
                     }
-                    float? cpuPower = _monitor.CpuPower;
+                    float? cpuPower = _live.Monitor.CpuPower;
                     int num2;
                     if (cpuPower.HasValue)
                     {
@@ -370,7 +402,7 @@ public partial class MainWindow
                         sumCpuW += (double)cw;
                         nCpuW++;
                     }
-                    cpuPower = MainGpuPower();
+                    cpuPower = _live.MainGpuPower();
                     int num3;
                     if (cpuPower.HasValue)
                     {
@@ -427,7 +459,7 @@ public partial class MainWindow
         {
             stress.Stop();
             burn.Stop();
-            _gpuBenchActive = false;
+            _pauseSensors(false);
         }
         _ocRunning = false;
         BtnOcCheck.Content = "INICIAR VERIFICAÇÃO";
@@ -520,7 +552,7 @@ public partial class MainWindow
         obj[4] = (string)obj3;
         string summary = string.Concat(obj);
         _settings.BenchRecords.Insert(0, new BenchRecord(DateTime.Now, "oc", flag4 ? 1.0 : 0.15, summary));
-        _settings.Save();
+        _save();
         UpdateOcHistory();
         UpdateRecentErrors();
     }
@@ -533,8 +565,8 @@ public partial class MainWindow
         bool flag = item.Contains("Gigabyte", StringComparison.OrdinalIgnoreCase);
         bool flag2 = item.Contains("ASUS", StringComparison.OrdinalIgnoreCase);
         bool flag3 = item.Contains("Micro-Star", StringComparison.OrdinalIgnoreCase) || item.Contains("MSI", StringComparison.OrdinalIgnoreCase);
-        string text = GameCatalog.ShortCpuName(_cpuName);
-        bool num = _cpuName.Contains("Ryzen", StringComparison.OrdinalIgnoreCase);
+        string text = GameCatalog.ShortCpuName(_cpuNameValue);
+        bool num = _cpuNameValue.Contains("Ryzen", StringComparison.OrdinalIgnoreCase);
         string text2 = ((flag ? "Gigabyte" : (item.Split(' ').FirstOrDefault() ?? "")) + " " + item2).Trim();
         OcGuideTitle.Text = "GUIA: OVERCLOCK NA BIOS · " + text2.ToUpperInvariant() + " · " + text.ToUpperInvariant();
         OcGuideIntro.Text = "Faça uma mudança por vez e rode o verificador depois de cada uma. Os menus podem mudar um pouco com a versão da BIOS. Valores são pontos de partida seguros, não garantia: cada chip é diferente.";

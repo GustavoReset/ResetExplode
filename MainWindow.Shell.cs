@@ -22,6 +22,7 @@ public partial class MainWindow
         ["PageLauncher"] = ArenaModule.RouteBiblioteca,
         ["PageOverlay"] = VigiaModule.RouteOverlay,
         ["PageStress"] = ForjaModule.RouteStress,
+        ["PageOc"] = ForjaModule.RouteOc,
     };
 
     private FortKnoxHost? Core => App.Core;
@@ -32,6 +33,12 @@ public partial class MainWindow
         PageStress.Attach(_live);
         PageStress.RunningChanged += running => SideStress.Text = running ? "rodando" : "parado";
         PageStress.Finished += (title, detail, state) => AddEvent("", title, detail, state);
+
+        // FORJA · Overclock: histórico em AppSettings.BenchRecords (compartilhado com o Benchmark até a próxima fatia)
+        PageOc.Attach(_live, _settings, () => { try { _settings.Save(); } catch (System.IO.IOException) { } },
+                      () => PageStress.IsRunning || AnyBenchRunning,
+                      pause => _gpuBenchActive = pause,
+                      () => _cpuName);
 
         if (Core == null) return;
         Core.Modules.Add(new CofreModule(PageVault, this));
@@ -44,7 +51,7 @@ public partial class MainWindow
         Core.Modules.Add(new ArenaModule(PageLauncher, () => _settings, () => { try { _settings.Save(); } catch (System.IO.IOException) { } }));
         Core.Modules.Add(new VigiaModule(PageOverlay));
 
-        Core.Modules.Add(new ForjaModule(PageStress));
+        Core.Modules.Add(new ForjaModule(PageStress, PageOc));
     }
 
     /// <summary>Chamado por Nav_Checked. Erros do módulo vão para o log e para a barra de status, sem derrubar o app.</summary>
