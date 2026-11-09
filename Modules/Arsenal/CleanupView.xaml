@@ -18,7 +18,7 @@
 
             <ui:ScannerPanel x:Name="Scanner" Title="ARSENAL · VERIFICAÇÃO" StartText="Verificar" Margin="0,0,0,16"/>
 
-            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,16">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,16">
                 <StackPanel>
                     <Grid Margin="0,0,0,6">
                         <StackPanel Orientation="Horizontal">
@@ -64,7 +64,7 @@
                 </StackPanel>
             </ui:ChamferBorder>
 
-            <ui:ChamferBorder Style="{StaticResource Card}">
+            <ui:ChamferBorder Style="{StaticResource FkCard}">
                 <Grid>
                     <StackPanel Margin="0,0,200,0">
                         <TextBlock Text="LIXEIRA" Style="{StaticResource Label}"/>

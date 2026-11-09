@@ -41,7 +41,7 @@
 
                 <!-- 2. Tipografia -->
                 <TextBlock Text="02 · TIPOGRAFIA" Style="{StaticResource SectionHeader}"/>
-                <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,28">
+                <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,28">
                     <Grid>
                         <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition/><ColumnDefinition/></Grid.ColumnDefinitions>
                         <StackPanel>
@@ -67,7 +67,7 @@
                     <Grid.ColumnDefinitions><ColumnDefinition Width="3*"/><ColumnDefinition Width="24"/><ColumnDefinition Width="2*"/></Grid.ColumnDefinitions>
                     <StackPanel>
                         <TextBlock Text="03 · BOTÕES" Style="{StaticResource SectionHeader}"/>
-                        <ui:ChamferBorder Style="{StaticResource Card}">
+                        <ui:ChamferBorder Style="{StaticResource FkCard}">
                             <StackPanel>
                                 <WrapPanel>
                                     <Button Style="{StaticResource PrimaryButton}" Content="Otimizar agora" Margin="0,0,10,10"/>
@@ -90,7 +90,7 @@
                     </StackPanel>
                     <StackPanel Grid.Column="2">
                         <TextBlock Text="04 · STATUS E CAMPOS" Style="{StaticResource SectionHeader}"/>
-                        <ui:ChamferBorder Style="{StaticResource Card}">
+                        <ui:ChamferBorder Style="{StaticResource FkCard}">
                             <StackPanel>
                                 <WrapPanel Margin="0,0,0,14">
                                     <ui:StatusBadge Status="Bom" Margin="0,0,8,8"/>
@@ -124,7 +124,7 @@
 
                 <!-- 6. Grade de dados -->
                 <TextBlock Text="06 · GRADE DE DADOS" Style="{StaticResource SectionHeader}"/>
-                <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,28">
+                <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,28">
                     <DataGrid x:Name="DemoGrid" Style="{StaticResource FkDataGrid}" HeadersVisibility="Column">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="PROGRAMA" Binding="{Binding Name}" Width="2*"/>
@@ -168,7 +168,7 @@
                     </StackPanel>
                     <StackPanel Grid.Column="2">
                         <TextBlock Text="08 · ESTADO VAZIO E AVISO" Style="{StaticResource SectionHeader}"/>
-                        <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,16">
+                        <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,16">
                             <ui:EmptyState Glyph="&#xE7FC;" Title="Nenhum jogo encontrado ainda."
                                            Message="Adicione um .exe ou abra a Steam uma vez para o Fort Knox encontrar seus jogos."
                                            ActionText="Adicionar jogo"/>

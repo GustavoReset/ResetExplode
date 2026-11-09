@@ -46,7 +46,7 @@
         </Grid>
 
         <!-- ===== Aviso: o Windows não abriu o cofre ===== -->
-        <ui:ChamferBorder x:Name="VBanner" Grid.Row="1" Style="{StaticResource Card}" BorderBrush="{DynamicResource LineStrong}"
+        <ui:ChamferBorder x:Name="VBanner" Grid.Row="1" Style="{StaticResource FkCard}" BorderBrush="{DynamicResource LineStrong}"
                 Margin="0,0,0,16" Visibility="Collapsed">
             <StackPanel>
                 <TextBlock Text="COFRE ILEGÍVEL" Style="{StaticResource Label}"/>
@@ -57,7 +57,7 @@
         </ui:ChamferBorder>
 
         <!-- ===== Windows Hello: não verificado ===== -->
-        <ui:ChamferBorder x:Name="VAuthBanner" Grid.Row="1" Style="{StaticResource Card}" BorderBrush="{DynamicResource LineStrong}"
+        <ui:ChamferBorder x:Name="VAuthBanner" Grid.Row="1" Style="{StaticResource FkCard}" BorderBrush="{DynamicResource LineStrong}"
                 Margin="0,0,0,16" Visibility="Collapsed">
             <StackPanel>
                 <TextBlock Text="VAULT PROTEGIDO PELO WINDOWS HELLO" Style="{StaticResource Label}"/>
@@ -72,7 +72,7 @@
         </ui:ChamferBorder>
 
         <!-- ===== Backup: pede a senha do arquivo ===== -->
-        <ui:ChamferBorder x:Name="VBackupPanel" Grid.Row="2" Style="{StaticResource Card}" Margin="0,0,0,16" Visibility="Collapsed">
+        <ui:ChamferBorder x:Name="VBackupPanel" Grid.Row="2" Style="{StaticResource FkCard}" Margin="0,0,0,16" Visibility="Collapsed">
             <StackPanel>
                 <TextBlock x:Name="VBackupTitle" Style="{StaticResource Label}"/>
                 <TextBlock x:Name="VBackupHint" Style="{StaticResource VaultMuted}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,10"/>
@@ -90,7 +90,7 @@
         </ui:ChamferBorder>
 
         <!-- ===== Editor (novo / editar) ===== -->
-        <ui:ChamferBorder x:Name="VEditor" Grid.Row="3" Style="{StaticResource Card}" Margin="0,0,0,16" Visibility="Collapsed">
+        <ui:ChamferBorder x:Name="VEditor" Grid.Row="3" Style="{StaticResource FkCard}" Margin="0,0,0,16" Visibility="Collapsed">
             <StackPanel>
                 <TextBlock x:Name="VEditorTitle" Text="NOVO REGISTRO" Style="{StaticResource Label}"/>
                 <Grid>
@@ -129,7 +129,7 @@
         </ui:ChamferBorder>
 
         <!-- ===== Lista ===== -->
-        <ui:ChamferBorder Grid.Row="4" Style="{StaticResource Card}" Padding="6,14,6,6">
+        <ui:ChamferBorder Grid.Row="4" Style="{StaticResource FkCard}" Padding="6,14,6,6">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>

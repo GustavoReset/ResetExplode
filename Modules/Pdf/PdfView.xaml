@@ -51,7 +51,7 @@
             </WrapPanel>
 
             <!-- Arquivo (abas dividir / comprimir / extrair) -->
-            <ui:ChamferBorder x:Name="PFileCard" Style="{StaticResource Card}" Margin="0,0,0,16" Visibility="Collapsed">
+            <ui:ChamferBorder x:Name="PFileCard" Style="{StaticResource FkCard}" Margin="0,0,0,16" Visibility="Collapsed">
                 <StackPanel>
                     <TextBlock Text="ARQUIVO PDF" Style="{StaticResource Label}"/>
                     <Grid>
@@ -67,7 +67,7 @@
             </ui:ChamferBorder>
 
             <!-- MESCLAR -->
-            <ui:ChamferBorder x:Name="PanelMerge" Style="{StaticResource Card}">
+            <ui:ChamferBorder x:Name="PanelMerge" Style="{StaticResource FkCard}">
                 <StackPanel>
                     <TextBlock Text="PDFs NA ORDEM DA MESCLAGEM" Style="{StaticResource Label}"/>
                     <DataGrid x:Name="PMergeGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserResizeColumns="False"
@@ -92,7 +92,7 @@
             </ui:ChamferBorder>
 
             <!-- DIVIDIR -->
-            <ui:ChamferBorder x:Name="PanelSplit" Style="{StaticResource Card}" Visibility="Collapsed">
+            <ui:ChamferBorder x:Name="PanelSplit" Style="{StaticResource FkCard}" Visibility="Collapsed">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="INTERVALOS" Style="{StaticResource Label}"/>
@@ -113,7 +113,7 @@
             </ui:ChamferBorder>
 
             <!-- COMPRIMIR -->
-            <ui:ChamferBorder x:Name="PanelCompress" Style="{StaticResource Card}" Visibility="Collapsed">
+            <ui:ChamferBorder x:Name="PanelCompress" Style="{StaticResource FkCard}" Visibility="Collapsed">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="NÍVEL" Style="{StaticResource Label}"/>
@@ -130,7 +130,7 @@
             </ui:ChamferBorder>
 
             <!-- EXTRAIR TEXTO -->
-            <ui:ChamferBorder x:Name="PanelText" Style="{StaticResource Card}" Visibility="Collapsed">
+            <ui:ChamferBorder x:Name="PanelText" Style="{StaticResource FkCard}" Visibility="Collapsed">
                 <StackPanel>
                     <Button x:Name="PBtnExtract" Style="{StaticResource PrimaryButton}" Content="EXTRAIR TEXTO" Padding="22,8" HorizontalAlignment="Left" Margin="0,0,0,14" Click="PExtract_Click"/>
                     <TextBox x:Name="PText" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" FontFamily="{StaticResource Mono}" FontSize="12"

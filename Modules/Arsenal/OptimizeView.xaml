@@ -13,7 +13,7 @@
             </StackPanel>
 
             <!-- Botão principal -->
-            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14" Padding="24,20">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14" Padding="24,20">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -47,7 +47,7 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Programas -->
-                <ui:ChamferBorder Style="{StaticResource Card}" VerticalAlignment="Top">
+                <ui:ChamferBorder Style="{StaticResource FkCard}" VerticalAlignment="Top">
                     <StackPanel>
                         <Grid Margin="0,0,0,6">
                             <StackPanel Orientation="Horizontal">
@@ -83,7 +83,7 @@
                 </ui:ChamferBorder>
 
                 <!-- Ajustes do Windows -->
-                <ui:ChamferBorder Grid.Column="2" Style="{StaticResource Card}" VerticalAlignment="Top">
+                <ui:ChamferBorder Grid.Column="2" Style="{StaticResource FkCard}" VerticalAlignment="Top">
                     <StackPanel>
                         <Grid Margin="0,0,0,6">
                             <StackPanel Orientation="Horizontal">

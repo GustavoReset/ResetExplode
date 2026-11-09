@@ -11,7 +11,7 @@
                     <TextBlock Style="{StaticResource InfoTip}" ToolTip="Arduino, ESP32 e conversores seriais · remova dispositivos fantasmas e libere números COM presos"/>
                 </StackPanel>
             </StackPanel>
-            <ui:ChamferBorder Style="{StaticResource Card}">
+            <ui:ChamferBorder Style="{StaticResource FkCard}">
                 <StackPanel>
                     <Grid Margin="0,0,0,6">
                         <StackPanel Orientation="Horizontal">

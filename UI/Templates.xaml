@@ -40,7 +40,7 @@
         </Border>
     </DataTemplate>
     <DataTemplate x:Key="GpuSection">
-        <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14" Padding="20,16,20,8">
+        <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14" Padding="20,16,20,8">
             <StackPanel>
                 <TextBlock Text="{Binding Header}" Style="{StaticResource Label}" Margin="0,0,0,2"/>
                 <ItemsControl ItemsSource="{Binding Children}" ItemTemplate="{StaticResource GpuTile}">

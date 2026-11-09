@@ -16,7 +16,7 @@
                         HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnLightConnect_Click"/>
             </Grid>
 
-            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                 <StackPanel>
                     <TextBlock Text="INTEGRAÇÕES" Style="{StaticResource Label}"/>
 
@@ -49,7 +49,7 @@
                 </StackPanel>
             </ui:ChamferBorder>
 
-            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                 <StackPanel>
                     <TextBlock Text="DISPOSITIVOS" Style="{StaticResource Label}"/>
                     <TextBlock x:Name="LightDevicesHint" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,8"/>
@@ -71,7 +71,7 @@
                 </StackPanel>
             </ui:ChamferBorder>
 
-            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="EFEITO" Style="{StaticResource Label}"/>
@@ -120,7 +120,7 @@
                 </StackPanel>
             </ui:ChamferBorder>
 
-            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="DIAGNÓSTICO" Style="{StaticResource Label}"/>

@@ -22,7 +22,7 @@
             </Grid>
             <ui:StatusLine x:Name="AppsStatus" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,16"/>
 
-            <ui:ChamferBorder Style="{StaticResource Card}">
+            <ui:ChamferBorder Style="{StaticResource FkCard}">
                 <StackPanel>
                     <Grid Margin="0,0,0,6">
                         <StackPanel Orientation="Horizontal">

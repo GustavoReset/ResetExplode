@@ -21,7 +21,7 @@
         </Grid>
 
         <!-- Configuração -->
-        <ui:ChamferBorder Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,14">
+        <ui:ChamferBorder Grid.Row="1" Style="{StaticResource FkCard}" Margin="0,0,0,14">
             <WrapPanel>
                 <StackPanel Margin="0,0,32,0">
                     <TextBlock Text="RESOLUÇÃO" Style="{StaticResource Label}"/>
@@ -52,7 +52,7 @@
         </ui:ChamferBorder>
 
         <!-- Fonte dos dados -->
-        <ui:ChamferBorder Grid.Row="2" Style="{StaticResource Card}" Margin="0,0,0,14" Padding="18,14">
+        <ui:ChamferBorder Grid.Row="2" Style="{StaticResource FkCard}" Margin="0,0,0,14" Padding="18,14">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -84,7 +84,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,10,10" Padding="16,14">
+                        <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,10,10" Padding="16,14">
                             <StackPanel>
                                 <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="14" TextTrimming="CharacterEllipsis"/>
                                 <TextBlock Text="{Binding Genre}" Foreground="{DynamicResource Faint}" FontSize="11" Margin="0,2,0,10"/>

@@ -18,7 +18,7 @@
             <ui:StatusLine x:Name="MakerStatus" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,16"/>
 
             <!-- Conectados agora -->
-            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                 <StackPanel>
                     <TextBlock Text="PLACAS E CONVERSORES CONECTADOS" Style="{StaticResource Label}" Margin="0,0,0,6"/>
                     <TextBlock x:Name="MakerNoDevices" Text="Nenhuma placa ou conversor serial conectado. Plugue a placa e clique em VERIFICAR."
@@ -61,7 +61,7 @@
             </ui:ChamferBorder>
 
             <!-- Drivers oficiais embutidos no app -->
-            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                 <StackPanel>
                     <Grid Margin="0,0,0,6">
                         <StackPanel Orientation="Horizontal">
@@ -99,7 +99,7 @@
             </ui:ChamferBorder>
 
             <!-- Pacotes de driver -->
-            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                 <StackPanel>
                     <Grid Margin="0,0,0,6">
                         <StackPanel Orientation="Horizontal">
@@ -135,7 +135,7 @@
             </ui:ChamferBorder>
 
             <!-- Arduino IDE -->
-            <ui:ChamferBorder Style="{StaticResource Card}">
+            <ui:ChamferBorder Style="{StaticResource FkCard}">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="ARDUINO IDE" Style="{StaticResource Label}" Margin="0,0,0,6"/>

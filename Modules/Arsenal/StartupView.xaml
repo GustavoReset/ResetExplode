@@ -16,7 +16,7 @@
                         HorizontalAlignment="Right" VerticalAlignment="Top" Click="BtnStartupScan_Click"/>
             </Grid>
 
-            <ui:ChamferBorder Style="{StaticResource Card}">
+            <ui:ChamferBorder Style="{StaticResource FkCard}">
                 <StackPanel>
                     <Grid Margin="0,0,0,6">
                         <StackPanel Orientation="Horizontal">

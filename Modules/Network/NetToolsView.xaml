@@ -15,7 +15,7 @@
 
     <StackPanel>
         <!-- ===== TRACEROUTE ===== -->
-        <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,16">
+        <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,16">
             <StackPanel>
                 <TextBlock Text="TRACEROUTE · O CAMINHO ATÉ UM SERVIDOR" Style="{StaticResource Label}"/>
                 <Grid Margin="0,0,0,8">
@@ -80,7 +80,7 @@
         </ui:ChamferBorder>
 
         <!-- ===== CONSUMO POR PROCESSO ===== -->
-        <ui:ChamferBorder Style="{StaticResource Card}">
+        <ui:ChamferBorder Style="{StaticResource FkCard}">
             <StackPanel>
                 <Grid Margin="0,0,0,6">
                     <StackPanel Orientation="Horizontal">

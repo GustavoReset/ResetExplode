@@ -23,7 +23,7 @@
             </Grid>
 
             <!-- Mandala de módulos: começa comprimida no logotipo; clique no centro abre os 12 módulos -->
-            <ui:ChamferBorder Style="{StaticResource Card}" Padding="0" Margin="0,0,0,16">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Padding="0" Margin="0,0,0,16">
                 <local:ModuleMandala x:Name="Mandala"/>
             </ui:ChamferBorder>
 
@@ -35,7 +35,7 @@
                     <ColumnDefinition Width="330"/>
                 </Grid.ColumnDefinitions>
 
-                <ui:ChamferBorder Style="{StaticResource Card}" Padding="24,20">
+                <ui:ChamferBorder Style="{StaticResource FkCard}" Padding="24,20">
                     <StackPanel>
                         <Grid>
                             <StackPanel>
@@ -72,7 +72,7 @@
                 </ui:ChamferBorder>
 
                 <!-- Desempenho (como o "Total Balance" da referência) -->
-                <ui:ChamferBorder Grid.Column="2" Style="{StaticResource Card}" Padding="22,20">
+                <ui:ChamferBorder Grid.Column="2" Style="{StaticResource FkCard}" Padding="22,20">
                     <DockPanel>
                         <Button DockPanel.Dock="Bottom" Style="{StaticResource PrimaryButton}" Content="RODAR BENCHMARK" Margin="0,14,0,0"
                                 Padding="20,13" Click="DashBench_Click"/>
@@ -107,7 +107,7 @@
             </Grid>
 
             <!-- Linha 2: tabela de componentes -->
-            <ui:ChamferBorder Style="{StaticResource Card}" Padding="22,14,22,8" Margin="0,0,0,16">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Padding="22,14,22,8" Margin="0,0,0,16">
                 <StackPanel>
                     <Grid Margin="0,4,0,10">
                         <Grid.ColumnDefinitions>
@@ -173,7 +173,7 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Anéis concêntricos (como o "Annual Profit" da referência) -->
-                <ui:ChamferBorder Style="{StaticResource Card}" Padding="22,20">
+                <ui:ChamferBorder Style="{StaticResource FkCard}" Padding="22,20">
                     <StackPanel>
                         <TextBlock Text="MEMÓRIA E DISCO" Style="{StaticResource Label}" Margin="0,0,0,4"/>
                         <TextBlock x:Name="DashMemHero" Text="—" Style="{StaticResource Hero}" FontFamily="{StaticResource Mono}" FontSize="28"/>
@@ -196,7 +196,7 @@
                 </ui:ChamferBorder>
 
                 <!-- Eventos recentes (como "Transactions") -->
-                <ui:ChamferBorder Grid.Column="2" Style="{StaticResource Card}" Padding="22,20">
+                <ui:ChamferBorder Grid.Column="2" Style="{StaticResource FkCard}" Padding="22,20">
                     <StackPanel>
                         <TextBlock Text="Eventos recentes" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,10"/>
                         <TextBlock x:Name="DashEventsEmpty" Text="Nada ainda. Benchmarks, testes e dispositivos conectados aparecem aqui."
@@ -232,7 +232,7 @@
                 </ui:ChamferBorder>
 
                 <!-- Saúde do PC (como "Rewards"): lista de verificação + ação -->
-                <ui:ChamferBorder Grid.Column="4" Style="{StaticResource Card}" Padding="22,20">
+                <ui:ChamferBorder Grid.Column="4" Style="{StaticResource FkCard}" Padding="22,20">
                     <DockPanel>
                         <Button DockPanel.Dock="Bottom" Style="{StaticResource PrimaryButton}" Content="OTIMIZAR AGORA" Padding="20,13"
                                 Margin="0,14,0,0" Click="DashOptimize_Click"/>

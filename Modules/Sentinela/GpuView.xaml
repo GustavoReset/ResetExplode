@@ -21,7 +21,7 @@
         </Grid>
 
         <!-- Destaque -->
-        <ui:ChamferBorder Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,14" Padding="24,20">
+        <ui:ChamferBorder Grid.Row="1" Style="{StaticResource FkCard}" Margin="0,0,0,14" Padding="24,20">
             <Grid>
                 <StackPanel>
                     <TextBlock x:Name="GpuName" FontSize="24" FontWeight="SemiBold"/>
@@ -44,7 +44,7 @@
             </ScrollViewer>
 
             <!-- Sensores (equivalente à aba Sensors do GPU-Z) -->
-            <ui:ChamferBorder Grid.Column="2" Style="{StaticResource Card}" Padding="20,16,12,12">
+            <ui:ChamferBorder Grid.Column="2" Style="{StaticResource FkCard}" Padding="20,16,12,12">
                 <DockPanel>
                     <TextBlock DockPanel.Dock="Top" Text="SENSORES AO VIVO" Style="{StaticResource Label}" Margin="0,0,0,6"/>
                     <ItemsControl x:Name="GpuExtras" DockPanel.Dock="Top" Margin="0,0,8,6">

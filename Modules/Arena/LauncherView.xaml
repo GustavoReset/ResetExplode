@@ -55,7 +55,7 @@
                 <ui:StatusLine x:Name="LStatus" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,16"/>
 
                 <!-- Desempenho -->
-                <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
+                <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="DESEMPENHO" Style="{StaticResource Label}"/>
@@ -79,7 +79,7 @@
                 </ui:ChamferBorder>
 
                 <!-- Gráficos -->
-                <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
+                <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                     <StackPanel>
                         <TextBlock Text="GRÁFICOS (ARGUMENTOS DE INICIALIZAÇÃO)" Style="{StaticResource Label}"/>
                         <TextBlock Text="Modo de janela" Foreground="{DynamicResource Muted}" FontSize="12" Margin="0,8,0,0"/>
@@ -127,7 +127,7 @@
                 </ui:ChamferBorder>
 
                 <!-- Programas auxiliares -->
-                <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
+                <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="PROGRAMAS AUXILIARES" Style="{StaticResource Label}"/>

@@ -20,7 +20,7 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Equilíbrio teórico -->
-                <ui:ChamferBorder Style="{StaticResource Card}">
+                <ui:ChamferBorder Style="{StaticResource FkCard}">
                     <StackPanel>
                         <TextBlock Text="EQUILÍBRIO DO HARDWARE" Style="{StaticResource Label}"/>
                         <Grid Margin="0,4,0,0">
@@ -46,7 +46,7 @@
                 </ui:ChamferBorder>
 
                 <!-- Veredito ao vivo -->
-                <ui:ChamferBorder x:Name="BnLiveCard" Grid.Column="2" Style="{StaticResource Card}">
+                <ui:ChamferBorder x:Name="BnLiveCard" Grid.Column="2" Style="{StaticResource FkCard}">
                     <StackPanel>
                         <TextBlock x:Name="BnLiveLabel" Text="AGORA" Style="{StaticResource Label}"/>
                         <TextBlock x:Name="BnLiveTitle" Text="—" FontSize="24" FontWeight="SemiBold"/>
@@ -57,7 +57,7 @@
             </Grid>
 
             <!-- Leituras ao vivo -->
-            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14" Padding="18,16,18,6">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14" Padding="18,16,18,6">
                 <StackPanel>
                     <TextBlock Text="LEITURAS AO VIVO" Style="{StaticResource Label}"/>
                     <ItemsControl x:Name="BnMeters" ItemTemplate="{StaticResource Meter}" Margin="0,4,0,0">
@@ -76,7 +76,7 @@
             </ui:ChamferBorder>
 
             <!-- Sessão -->
-            <ui:ChamferBorder Style="{StaticResource Card}">
+            <ui:ChamferBorder Style="{StaticResource FkCard}">
                 <StackPanel>
                     <Grid>
                         <StackPanel>

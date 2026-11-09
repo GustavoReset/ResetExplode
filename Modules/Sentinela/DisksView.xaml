@@ -17,7 +17,7 @@
             <ItemsControl x:Name="DiskCards">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
+                        <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                             <StackPanel>
                                 <Grid>
                                     <StackPanel Margin="0,0,130,0">

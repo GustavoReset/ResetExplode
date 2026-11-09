@@ -32,7 +32,7 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <ui:ChamferBorder Grid.Column="2" Style="{StaticResource Card}" Padding="26,8,26,22">
+            <ui:ChamferBorder Grid.Column="2" Style="{StaticResource FkCard}" Padding="26,8,26,22">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
                         <TextBlock x:Name="InfoTitle" FontSize="20" FontWeight="SemiBold" Margin="0,16,0,8"/>

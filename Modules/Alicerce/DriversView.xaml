@@ -22,7 +22,7 @@
             </Grid>
             <ui:StatusLine x:Name="DrvStatus" Text="Clique em VERIFICAR TUDO." Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,16"/>
 
-            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="PLACA DE VÍDEO" Style="{StaticResource Label}"/>
@@ -50,7 +50,7 @@
                 </StackPanel>
             </ui:ChamferBorder>
 
-            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="PLACA-MÃE / FABRICANTE" Style="{StaticResource Label}"/>
@@ -62,7 +62,7 @@
                 </StackPanel>
             </ui:ChamferBorder>
 
-            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                 <StackPanel>
                     <TextBlock Text="WINDOWS UPDATE (DRIVERS CERTIFICADOS)" Style="{StaticResource Label}"/>
                     <TextBlock x:Name="DrvWuList" Margin="0,10,0,0" TextWrapping="Wrap" Text="Ainda não pesquisado."/>
@@ -73,7 +73,7 @@
                 </StackPanel>
             </ui:ChamferBorder>
 
-            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="BACKUP DOS DRIVERS" Style="{StaticResource Label}"/>
@@ -84,7 +84,7 @@
                 </StackPanel>
             </ui:ChamferBorder>
 
-            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                 <StackPanel>
                     <TextBlock Text="DRIVERS INSTALADOS" Style="{StaticResource Label}"/>
                     <ItemsControl x:Name="DrvList" Margin="0,10,0,0">

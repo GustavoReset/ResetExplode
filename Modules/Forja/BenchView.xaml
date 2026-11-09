@@ -32,7 +32,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- Render -->
-            <ui:ChamferBorder Style="{StaticResource Card}" Padding="14" VerticalAlignment="Top">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Padding="14" VerticalAlignment="Top">
                 <StackPanel>
                     <Border Background="#050505">
                         <Viewbox Stretch="Uniform">
@@ -61,7 +61,7 @@
             <!-- Painel lateral -->
             <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,12">
+                    <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,12">
                         <StackPanel>
                             <TextBlock Text="TESTE" Style="{StaticResource Label}"/>
                             <WrapPanel x:Name="BenchModePanel">
@@ -79,7 +79,7 @@
                         </StackPanel>
                     </ui:ChamferBorder>
 
-                    <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,12">
+                    <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,12">
                         <StackPanel>
                             <TextBlock Text="RESULTADO" Style="{StaticResource Label}"/>
                             <Grid>
@@ -100,7 +100,7 @@
                         </StackPanel>
                     </ui:ChamferBorder>
 
-                    <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,12">
+                    <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,12">
                         <StackPanel>
                             <TextBlock Text="DURANTE O TESTE" Style="{StaticResource Label}"/>
                             <ItemsControl x:Name="BenchLive">
@@ -116,7 +116,7 @@
                         </StackPanel>
                     </ui:ChamferBorder>
 
-                    <ui:ChamferBorder Style="{StaticResource Card}">
+                    <ui:ChamferBorder Style="{StaticResource FkCard}">
                         <StackPanel>
                             <TextBlock Text="HISTÓRICO" Style="{StaticResource Label}"/>
                             <TextBlock x:Name="BenchHistoryEmpty" Text="Nenhum resultado ainda." Foreground="{DynamicResource Faint}"/>
@@ -134,7 +134,7 @@
                 <ColumnDefinition Width="16"/>
                 <ColumnDefinition Width="310"/>
             </Grid.ColumnDefinitions>
-            <ui:ChamferBorder Style="{StaticResource Card}" VerticalAlignment="Top" Padding="24,20">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" VerticalAlignment="Top" Padding="24,20">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="VALE · CENA DE JOGO" Style="{StaticResource Label}"/>
@@ -160,7 +160,7 @@
             </ui:ChamferBorder>
             <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,12">
+                    <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,12">
                         <StackPanel>
                             <TextBlock Text="RESOLUÇÃO" Style="{StaticResource Label}"/>
                             <WrapPanel x:Name="GbResPanel">
@@ -176,13 +176,13 @@
                             <Button x:Name="BtnGpuBench" Style="{StaticResource PrimaryButton}" Content="INICIAR" Margin="0,12,0,0" Click="BtnGpuBench_Click"/>
                         </StackPanel>
                     </ui:ChamferBorder>
-                    <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,12">
+                    <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,12">
                         <StackPanel>
                             <TextBlock Text="RESULTADO" Style="{StaticResource Label}"/>
                             <ItemsControl x:Name="GbResult" ItemTemplate="{StaticResource KeyValueRow}"/>
                         </StackPanel>
                     </ui:ChamferBorder>
-                    <ui:ChamferBorder Style="{StaticResource Card}">
+                    <ui:ChamferBorder Style="{StaticResource FkCard}">
                         <StackPanel>
                             <TextBlock Text="HISTÓRICO" Style="{StaticResource Label}"/>
                             <ItemsControl x:Name="GbHistory" ItemTemplate="{StaticResource Meter}"/>
@@ -201,7 +201,7 @@
             </Grid.ColumnDefinitions>
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <ui:ChamferBorder Style="{StaticResource Card}" VerticalAlignment="Top" Padding="24,20" Margin="0,0,0,12">
+                    <ui:ChamferBorder Style="{StaticResource FkCard}" VerticalAlignment="Top" Padding="24,20" Margin="0,0,0,12">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="CIDADE DE OBJETOS · RAY TRACING POR HARDWARE" Style="{StaticResource Label}"/>
@@ -225,7 +225,7 @@
                             <ui:StatusLine x:Name="RtStatus" Text="Pronto" Foreground="{DynamicResource Muted}" TextWrapping="Wrap"/>
                         </StackPanel>
                     </ui:ChamferBorder>
-                    <ui:ChamferBorder Style="{StaticResource Card}" Padding="24,20">
+                    <ui:ChamferBorder Style="{StaticResource FkCard}" Padding="24,20">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="COMO COMPARAR COM CONFIANÇA" Style="{StaticResource Label}"/>
@@ -241,7 +241,7 @@
             </ScrollViewer>
             <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,12">
+                    <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,12">
                         <StackPanel>
                             <TextBlock Text="RESOLUÇÃO" Style="{StaticResource Label}"/>
                             <WrapPanel x:Name="RtResPanel">
@@ -268,14 +268,14 @@
                             <Button x:Name="BtnRtBench" Style="{StaticResource PrimaryButton}" Content="INICIAR" Margin="0,12,0,0" Click="BtnRtBench_Click"/>
                         </StackPanel>
                     </ui:ChamferBorder>
-                    <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,12">
+                    <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,12">
                         <StackPanel>
                             <TextBlock Text="RESULTADO" Style="{StaticResource Label}"/>
                             <TextBlock x:Name="RtVerdict" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,0,0,6"/>
                             <ItemsControl x:Name="RtResult" ItemTemplate="{StaticResource KeyValueRow}"/>
                         </StackPanel>
                     </ui:ChamferBorder>
-                    <ui:ChamferBorder Style="{StaticResource Card}">
+                    <ui:ChamferBorder Style="{StaticResource FkCard}">
                         <StackPanel>
                             <TextBlock Text="HISTÓRICO" Style="{StaticResource Label}"/>
                             <ItemsControl x:Name="RtHistory" ItemTemplate="{StaticResource Meter}"/>
@@ -292,7 +292,7 @@
                 <ColumnDefinition Width="16"/>
                 <ColumnDefinition Width="310"/>
             </Grid.ColumnDefinitions>
-            <ui:ChamferBorder Style="{StaticResource Card}" Padding="14" VerticalAlignment="Top">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Padding="14" VerticalAlignment="Top">
                 <StackPanel>
                     <Grid>
                         <Border Background="#050505" HorizontalAlignment="Center">
@@ -314,7 +314,7 @@
             </ui:ChamferBorder>
             <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,12">
+                    <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,12">
                         <StackPanel>
                             <TextBlock Style="{StaticResource InfoTip}" HorizontalAlignment="Right" Margin="0,0,0,4" ToolTip="Simula o trabalho de CPU de um jogo: a thread principal monta a grade espacial, roda a lógica e prepara o desenho; as outras threads calculam física, colisão e IA de 30 mil unidades. A nota é quantos frames por segundo a CPU aguenta."/>
                             <TextBlock Text="DURAÇÃO" Style="{StaticResource Label}"/>
@@ -325,13 +325,13 @@
                             <Button x:Name="BtnSimBench" Style="{StaticResource PrimaryButton}" Content="INICIAR" Margin="0,12,0,0" Click="BtnSimBench_Click"/>
                         </StackPanel>
                     </ui:ChamferBorder>
-                    <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,12">
+                    <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,12">
                         <StackPanel>
                             <TextBlock Text="RESULTADO" Style="{StaticResource Label}"/>
                             <ItemsControl x:Name="SimResult" ItemTemplate="{StaticResource KeyValueRow}"/>
                         </StackPanel>
                     </ui:ChamferBorder>
-                    <ui:ChamferBorder Style="{StaticResource Card}">
+                    <ui:ChamferBorder Style="{StaticResource FkCard}">
                         <StackPanel>
                             <TextBlock Text="HISTÓRICO" Style="{StaticResource Label}"/>
                             <ItemsControl x:Name="SimHistory" ItemTemplate="{StaticResource Meter}"/>
@@ -348,7 +348,7 @@
                 <ColumnDefinition Width="16"/>
                 <ColumnDefinition Width="310"/>
             </Grid.ColumnDefinitions>
-            <ui:ChamferBorder Style="{StaticResource Card}" VerticalAlignment="Top" Padding="24,20">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" VerticalAlignment="Top" Padding="24,20">
                 <StackPanel>
                     <TextBlock Text="RESULTADOS" Style="{StaticResource Label}"/>
                     <ItemsControl x:Name="MemResult" Margin="0,4,0,0">
@@ -375,13 +375,13 @@
             </ui:ChamferBorder>
             <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,12">
+                    <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,12">
                         <StackPanel>
                             <TextBlock Style="{StaticResource InfoTip}" HorizontalAlignment="Right" Margin="0,0,0,4" ToolTip="Mede a latência e a banda da RAM e simula o carregamento de um mapa: um pacote de 512 MB e mil arquivos de 64 KB, lidos do disco sem o cache do Windows. Os arquivos de teste ficam na pasta temporária e são apagados no final."/>
                             <Button x:Name="BtnMemBench" Style="{StaticResource PrimaryButton}" Content="INICIAR" Click="BtnMemBench_Click"/>
                         </StackPanel>
                     </ui:ChamferBorder>
-                    <ui:ChamferBorder Style="{StaticResource Card}">
+                    <ui:ChamferBorder Style="{StaticResource FkCard}">
                         <StackPanel>
                             <TextBlock Text="HISTÓRICO" Style="{StaticResource Label}"/>
                             <ItemsControl x:Name="MemHistory" ItemTemplate="{StaticResource Meter}"/>
@@ -398,7 +398,7 @@
                 <ColumnDefinition Width="16"/>
                 <ColumnDefinition Width="310"/>
             </Grid.ColumnDefinitions>
-            <ui:ChamferBorder Style="{StaticResource Card}" VerticalAlignment="Top" Padding="24,20">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" VerticalAlignment="Top" Padding="24,20">
                 <StackPanel>
                     <TextBlock Text="RESULTADOS" Style="{StaticResource Label}"/>
                     <ItemsControl x:Name="DiskResult" Margin="0,4,0,0">
@@ -425,7 +425,7 @@
             </ui:ChamferBorder>
             <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,12">
+                    <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,12">
                         <StackPanel>
                             <TextBlock Text="UNIDADE" Style="{StaticResource Label}"/>
                             <WrapPanel x:Name="DiskDrivePanel"/>
@@ -441,7 +441,7 @@
                             <Button x:Name="BtnDiskBench" Style="{StaticResource PrimaryButton}" Content="INICIAR" Click="BtnDiskBench_Click"/>
                         </StackPanel>
                     </ui:ChamferBorder>
-                    <ui:ChamferBorder Style="{StaticResource Card}">
+                    <ui:ChamferBorder Style="{StaticResource FkCard}">
                         <StackPanel>
                             <TextBlock Text="HISTÓRICO" Style="{StaticResource Label}"/>
                             <ItemsControl x:Name="DiskHistory" ItemTemplate="{StaticResource Meter}"/>

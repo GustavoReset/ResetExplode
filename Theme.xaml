@@ -88,7 +88,7 @@
         <Setter Property="Padding" Value="20"/>
     </Style>
     <!-- Cartão da marca: canto chanfrado a 45° (Brandbook v3). Use com ui:ChamferBorder. -->
-    <Style x:Key="Card" TargetType="ui:ChamferBorder">
+    <Style x:Key="FkCard" TargetType="ui:ChamferBorder">
         <Setter Property="Background" Value="{DynamicResource CardFill}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource Line}"/>
         <Setter Property="BorderThickness" Value="1"/>
@@ -670,7 +670,7 @@
 
     <!-- Cartão com selo de veredito, motivos e métricas (Energia, Rede) -->
     <DataTemplate x:Key="CardTemplate">
-        <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
+        <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
             <StackPanel>
                 <Grid>
                     <StackPanel Margin="0,0,130,0">

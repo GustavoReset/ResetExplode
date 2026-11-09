@@ -13,7 +13,7 @@
             </StackPanel>
 
             <!-- GPU: limite de energia e teto de clock -->
-            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                 <StackPanel>
                     <TextBlock x:Name="OcGpuTitle" Style="{StaticResource Label}"/>
                     <TextBlock x:Name="OcGpuState" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,16"/>
@@ -43,7 +43,7 @@
             </ui:ChamferBorder>
 
             <!-- Verificador de estabilidade -->
-            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="VERIFICADOR DE ESTABILIDADE" Style="{StaticResource Label}"/>
@@ -115,7 +115,7 @@
             </ui:ChamferBorder>
 
             <!-- Guia de overclock na BIOS -->
-            <ui:ChamferBorder Style="{StaticResource Card}">
+            <ui:ChamferBorder Style="{StaticResource FkCard}">
                 <StackPanel>
                     <TextBlock x:Name="OcGuideTitle" Text="GUIA: OVERCLOCK NA BIOS" Style="{StaticResource Label}"/>
                     <TextBlock x:Name="OcGuideIntro" Foreground="{DynamicResource Muted}" TextWrapping="Wrap" Margin="0,0,0,10"/>

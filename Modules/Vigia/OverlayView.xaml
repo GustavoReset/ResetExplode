@@ -12,7 +12,7 @@
                 </StackPanel>
             </StackPanel>
 
-            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                 <Grid>
                     <StackPanel>
                         <CheckBox x:Name="ChkOverlay" Content="Mostrar overlay" FontSize="15" Checked="ChkOverlay_Changed" Unchecked="ChkOverlay_Changed"/>
@@ -23,7 +23,7 @@
                 </Grid>
             </ui:ChamferBorder>
 
-            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                 <WrapPanel>
                     <StackPanel Margin="0,0,36,0">
                         <TextBlock Text="POSIÇÃO" Style="{StaticResource Label}"/>
@@ -45,7 +45,7 @@
                 </WrapPanel>
             </ui:ChamferBorder>
 
-            <ui:ChamferBorder Style="{StaticResource Card}" Margin="0,0,0,14">
+            <ui:ChamferBorder Style="{StaticResource FkCard}" Margin="0,0,0,14">
                 <StackPanel>
                     <Grid>
                         <StackPanel Orientation="Horizontal">
@@ -62,7 +62,7 @@
                 </StackPanel>
             </ui:ChamferBorder>
 
-            <ui:ChamferBorder Style="{StaticResource Card}">
+            <ui:ChamferBorder Style="{StaticResource FkCard}">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="DETECÇÃO DE FPS" Style="{StaticResource Label}"/>

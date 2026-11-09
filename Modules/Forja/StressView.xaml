@@ -20,7 +20,7 @@
         </StackPanel>
 
         <!-- Configuração -->
-        <ui:ChamferBorder Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,14">
+        <ui:ChamferBorder Grid.Row="1" Style="{StaticResource FkCard}" Margin="0,0,0,14">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -177,7 +177,7 @@
         </UniformGrid>
 
         <!-- Gráfico -->
-        <ui:ChamferBorder Grid.Row="3" Style="{StaticResource Card}" Margin="0,0,0,14" Padding="18,14,18,12">
+        <ui:ChamferBorder Grid.Row="3" Style="{StaticResource FkCard}" Margin="0,0,0,14" Padding="18,14,18,12">
             <DockPanel>
                 <Grid DockPanel.Dock="Top" Margin="0,0,0,8">
                     <TextBlock Text="TEMPERATURAS — ÚLTIMOS 5 MIN" Style="{StaticResource Label}" Margin="0"/>
@@ -195,7 +195,7 @@
         </ui:ChamferBorder>
 
         <!-- Log -->
-        <ui:ChamferBorder Grid.Row="4" Style="{StaticResource Card}" Padding="18,14,10,10">
+        <ui:ChamferBorder Grid.Row="4" Style="{StaticResource FkCard}" Padding="18,14,10,10">
             <DockPanel>
                 <TextBlock DockPanel.Dock="Top" Text="REGISTRO" Style="{StaticResource Label}"/>
                 <ListBox x:Name="StressLog" FontFamily="{StaticResource Mono}" FontSize="12"
