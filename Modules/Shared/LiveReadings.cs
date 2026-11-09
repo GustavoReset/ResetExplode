@@ -39,6 +39,14 @@ public sealed class LiveReadings(SensorMonitor monitor, Func<GpuInfo?> mainGpu)
         return monitor.Rows.FirstOrDefault(r => r.Hardware == g.Name && r.Type == SensorType.Power)?.RawValue;
     }
 
+    /// <summary>Temperatura do núcleo da GPU principal (dedicada).</summary>
+    public float? MainGpuTemp()
+    {
+        if (mainGpu() is not { } g) return null;
+        var temps = monitor.Rows.Where(r => r.Hardware == g.Name && r.Type == SensorType.Temperature).ToList();
+        return (temps.FirstOrDefault(r => r.Name == "GPU Core") ?? temps.FirstOrDefault())?.RawValue;
+    }
+
     public string MainGpuPerfCap()
         => mainGpu()?.LiveExtras().FirstOrDefault(kv => kv.Key.StartsWith("PerfCap")).Value ?? "";
 

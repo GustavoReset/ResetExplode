@@ -251,7 +251,7 @@ public partial class MainWindow
             _ocCts?.Cancel();
             return;
         }
-        if (TestRunning || AnyBenchRunning)
+        if (PageStress.IsRunning || AnyBenchRunning)
         {
             OcStatus.Text = "Termine o outro teste antes.";
             return;
