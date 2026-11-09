@@ -269,12 +269,10 @@
                                     <TextBlock Text="Prensa" VerticalAlignment="Center"/>
                                 </DockPanel>
                             </RadioButton>
-                            <RadioButton x:Name="NavShield" Style="{StaticResource NavItem}" IsEnabled="False" ToolTip="Antivírus offline: em breve">
+                            <RadioButton x:Name="NavShield" Style="{StaticResource NavItem}" Tag="PageShield" Checked="Nav_Checked">
                                 <DockPanel>
                                     <TextBlock Text="&#xEA18;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <Border DockPanel.Dock="Right" BorderBrush="{DynamicResource Danger}" BorderThickness="1" CornerRadius="3" Padding="5,0" Margin="6,0,4,0" VerticalAlignment="Center">
-                                        <TextBlock Text="EM BREVE" Foreground="{DynamicResource Danger}" FontFamily="{StaticResource Mono}" FontSize="9"/>
-                                    </Border>
+                                    <TextBlock DockPanel.Dock="Right" Text="antivírus" Foreground="{DynamicResource Faint}" FontSize="11" VerticalAlignment="Center" Margin="6,0,4,0"/>
                                     <TextBlock Text="Muralha" VerticalAlignment="Center"/>
                                 </DockPanel>
                             </RadioButton>
@@ -349,6 +347,7 @@
 
                 <!-- ===== PDF (UserControl em Modules\Pdf) ===== -->
                 <local:PdfView x:Name="PagePdf" Visibility="Collapsed"/>
+                <local:MuralhaView x:Name="PageShield" Visibility="Collapsed"/>
 
                 <!-- ===== OFICINA · Portas COM (fantasmas e números COM presos) ===== -->
                 <local:PortsView x:Name="PageMakerPorts" Visibility="Collapsed"/>

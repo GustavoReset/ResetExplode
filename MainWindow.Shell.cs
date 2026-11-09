@@ -14,6 +14,7 @@ public partial class MainWindow
         ["PageDash"] = PainelModule.RouteVisao,
         ["PageVault"] = CofreModule.RouteSenhas,
         ["PagePdf"] = PrensaModule.RoutePdf,
+        ["PageShield"] = MuralhaModule.RouteScan,
         ["PageNet"] = RadarModule.RouteConexao,
         ["PageOptimize"] = ArsenalModule.RouteOptimize,
         ["PageCleanup"] = ArsenalModule.RouteCleanup,
@@ -147,6 +148,7 @@ public partial class MainWindow
         Core.Modules.Add(_sentinela = new SentinelaModule(PageDisks, PageEnergy, _monitor));
         Core.Modules.Add(new CofreModule(PageVault, this));
         Core.Modules.Add(new PrensaModule(PagePdf));
+        Core.Modules.Add(new MuralhaModule(PageShield, AddEvent));
         Core.Modules.Add(new RadarModule(PageNet));
         Core.Modules.Add(new ArsenalModule(PageOptimize, PageCleanup, PageUninstall, PageStartup, PageApps, PageUpdates, () => _settings, () => { try { _settings.Save(); } catch (System.IO.IOException) { } }));
         Core.Modules.Add(new OficinaModule(PageMakerPorts, PageMakerDrv, () => _settings.ComDbBackup, () => { _settings.ComDbBackup = null; try { _settings.Save(); } catch (System.IO.IOException) { } }));
