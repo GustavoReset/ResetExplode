@@ -470,3 +470,7 @@ Testes: `tests/FortKnox.Core.Tests` (27 testes: barramento, estado concorrente, 
 - Comportamento preservado: sair do COFRE tira as senhas da memória (tolerância do Windows Hello de 60 s), sair da Rede para o ETW, fechar o app limpa a área de transferência e cancela o PDF em andamento.
 - `ModuleRegistry.ShutdownAsync` roda uma vez só (a janela chama na thread da interface; o host chama de novo no fim sem efeito).
 - **Trava do COFRE configurável:** Configurações (engrenagem na barra de título, `SettingsWindow`) tem o interruptor "Usar o Windows Hello", ativo só quando o Windows informa que o Hello está configurado; senão fica cinza. Sem Hello (ou desligado), o COFRE pede a **senha mestra** (`MasterPasswordWindow`, 5 tentativas e pausa de 30 s). A preferência fica na seção `cofre` do `modules.json`. A senha de teste é provisória: ver `docs/PRODUCAO-PENDENCIAS.md`.
+
+### Fase 3.3 · Migração das demais páginas (em fatias, um PR por fatia)
+
+- **3.3a · ARSENAL (Inicialização e Instalar apps):** XAML das duas páginas saiu do `MainWindow.xaml` para `Modules/Arsenal/StartupView.xaml` e `AppsView.xaml`, a lógica de `MainWindow.Startup.cs`/`MainWindow.Apps.cs` foi para os code-behind e o `ArsenalModule` cuida do ciclo de vida. "Restaurar removidos" passou do `settings.json` antigo para a seção `arsenal` do `modules.json` (migração automática, uma vez). Confirmações usam o `FkDialog` do Design System. Otimização fica para a fatia da SENTINELA (depende do ciclo de 1 s dos sensores).
