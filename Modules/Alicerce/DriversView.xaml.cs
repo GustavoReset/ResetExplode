@@ -1,10 +1,12 @@
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Controls;
+using FortKnox.UI;
 
 namespace FortKnox;
 
-/// <summary>Aba ALICERCE: inventário, NVIDIA (verifica e instala), AMD/placa-mãe (página oficial), Windows Update e backup.</summary>
-public partial class MainWindow
+/// <summary>ALICERCE como View (Fase 3.3c, antigo MainWindow.Driver.cs): inventário, NVIDIA (verifica e instala), AMD/placa-mãe (página oficial), Windows Update e backup.</summary>
+public partial class DriversView : UserControl
 {
     private bool _drvInit, _drvBusy;
     private List<GpuDriverStatus> _drvGpus = new();
@@ -12,7 +14,12 @@ public partial class MainWindow
     private List<WuDriver> _drvWu = new();
     private CancellationTokenSource? _drvCts;
 
-    private void InitDriver()
+    public DriversView() => InitializeComponent();
+
+    /// <summary>Ao fechar o app: cancela consulta, download ou backup em andamento.</summary>
+    public void CancelAll() { try { _drvCts?.Cancel(); } catch (ObjectDisposedException) { } }
+
+    public void Activate()
     {
         if (_drvInit) return;
         _drvInit = true;
@@ -100,7 +107,7 @@ public partial class MainWindow
             : g.UpdateAvailable
             ? $"Instalar o driver NVIDIA {g.Latest} ({g.SizeText})?\nO instalador oficial será baixado e aberto."
             : $"Você já está com a versão {g.Installed}. Baixar e abrir o instalador {g.Latest} mesmo assim (reinstalação)?";
-        if (MessageBox.Show(this, msg, "ALICERCE", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+        if (!FkDialog.Confirm(Window.GetWindow(this), "Instalar o driver de vídeo?", msg, "Baixar e abrir")) return;
 
         DrvBusy(true);
         _drvCts = new CancellationTokenSource();
@@ -133,8 +140,7 @@ public partial class MainWindow
     private async void BtnDrvWuInstall_Click(object sender, RoutedEventArgs e)
     {
         if (_drvBusy || _drvWu.Count == 0) return;
-        if (MessageBox.Show(this, $"Instalar {_drvWu.Count} driver(s) do Windows Update? Pode ser preciso reiniciar.", "ALICERCE",
-                MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
+        if (!FkDialog.Confirm(Window.GetWindow(this), $"Instalar {_drvWu.Count} driver(s) do Windows Update?", "Pode ser preciso reiniciar o PC.", "Instalar")) return;
         DrvBusy(true);
         try
         {
