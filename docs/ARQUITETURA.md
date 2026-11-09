@@ -426,16 +426,20 @@ Nenhum desses entra sem o seu "sim" explícito.
 | **D3** | Serviço Guarda | (a) criar já na fase da MURALHA; (b) não ter serviço, tempo real só com o app aberto (bandeja) | **(a)**, instalado só quando a pessoa liga o tempo real ou alertas; desinstala junto ao desligar. |
 | **D4** | Motor de detecção da MURALHA | (a) próprio: hashes + heurística + regras em formato próprio, mais segunda opinião do Defender; (b) (a) + YARA (pacote de terceiros) | **(b)**, sujeito à sua aprovação de licença do YARA e de cada conjunto de regras. |
 
-## 13. Roteiro proposto (para depois da aprovação, uma fase por vez)
+## 13. Roteiro (as três fases pedidas, uma por vez, cada uma com sua aprovação)
 
 | Fase | Entrega | Pronto quando |
 |---|---|---|
 | **1** · Arquitetura | este documento | você aprovar (com ou sem ajustes) |
-| **2** · Núcleo | `FortKnox.Core` (barramento, store, jobs, config com migração, Diário de Ferrolhos, log, SQLite) + Shell com Navegador e registro de módulos, **sem mudar o que a pessoa vê** | app abre igual, testes do Core passando, migração do `settings.json` testada |
-| **3** · Migração dos módulos prontos | COFRE, PRENSA, RADAR viram módulos `IModule` (já têm serviço separado) | mesmos testes de antes + navegação nova |
-| **4** · Migração do restante | SENTINELA, FORJA, ARENA, VIGIA, ARSENAL, ALICERCE, OFICINA, PRISMA, PAINEL; o `MainWindow.xaml` gigante é dividido em Views | `MainWindow` vira só o Shell |
-| **5** · Lastro + ARSENAL novo | indicadores de saúde, Limpeza, Desinstalar com restos, Atualizar apps | cada ação com prévia e desfazer |
-| **6** · MURALHA | motor, quarentena, varredura sob demanda | testes com amostras inofensivas (arquivo EICAR) |
-| **7** · Guarda | serviço, pipe, tempo real ETW, agendamentos, alertas | instala/desinstala limpo, sobrevive a reinício |
+| **2** · Design System e UI/UX | componentes base em `FortKnox.UI` a partir do Brandbook v3 e dos tokens (`fortknox-tokens.json`): botões, modais/confirmação destrutiva, grids de dados, cartão de status Bom/Atenção/Ruim, anel/medidor, **Scanner** (progresso, item atual, achados ao vivo, cancelar), toasts, estados vazio/carregando/erro; estrutura de pastas final e tecnologias recomendadas; página de catálogo dos componentes nos dois temas | catálogo aprovado por você visualmente, claro e escuro |
+| **3** · Implementação dos módulos | em sub-etapas, cada uma com PR próprio: | |
+| 3.1 · Núcleo | `FortKnox.Core` (barramento, store, jobs, config com migração, Diário de Ferrolhos, log, SQLite) + Shell com Navegador e registro de módulos, sem mudar o que você vê | app abre igual, testes do Core passando, migração do `settings.json` testada |
+| 3.2 · Módulos prontos | COFRE, PRENSA, RADAR viram `IModule` (já têm serviço separado) | mesmos testes de antes + navegação nova |
+| 3.3 · Migração do restante | SENTINELA, FORJA, ARENA, VIGIA, ARSENAL, ALICERCE, OFICINA, PRISMA, PAINEL; o `MainWindow.xaml` gigante é dividido em Views com os componentes da Fase 2 | `MainWindow` vira só o Shell |
+| 3.4 · Lastro + ARSENAL novo | indicadores de saúde, Limpeza, Desinstalar com restos, Atualizar apps (equivalentes funcionais de Uninstaller, Software Updater e da limpeza do SystemCare) | cada ação com prévia e desfazer |
+| 3.5 · MURALHA | motor, quarentena, varredura sob demanda (equivalente funcional do Malware Fighter) | testes com amostra inofensiva (arquivo EICAR) |
+| 3.6 · Guarda | serviço, pipe, tempo real ETW, agendamentos, alertas | instala/desinstala limpo, sobrevive a reinício |
 
-Cada fase termina com revisão de assincronia, segurança e memória (como nas etapas do Vault, PDF e Rede) e um PR próprio.
+Equivalência com as ferramentas de referência: **Driver Booster** → ALICERCE; **Smart Defrag** → SENTINELA · Discos (saúde) + otimização de unidade pela API do Windows (`defrag /O`, que faz TRIM em SSD), sem motor próprio de desfragmentação; **Advanced SystemCare / Ultimate** → PAINEL (Lastro) + ARSENAL + MURALHA.
+
+Cada sub-etapa termina com revisão de assincronia, segurança e memória (como nas etapas do Vault, PDF e Rede) e um PR próprio.
