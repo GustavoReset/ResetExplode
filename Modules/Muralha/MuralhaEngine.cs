@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -10,6 +10,43 @@ public enum Verdict { Limpo, Suspeito, Malicioso }
 
 /// <summary>Resultado de um arquivo: veredito, a camada que decidiu e o motivo em linguagem clara.</summary>
 public sealed record ScanResult(string Path, Verdict Verdict, string Layer, string Reason, string Sha256, long Size);
+
+/// <summary>Uma regra YARA que bateu, já traduzida para o veredito e o texto da MURALHA (ver YaraLayer).</summary>
+public sealed record YaraHit(string Rule, Verdict Verdict, string Description);
+
+/// <summary>
+/// Lista de confiança por SHA-256 (Fase 3.5b): os binários do próprio Fort Knox e o que a pessoa marcou como "confiar sempre".
+/// É por hash, não por pasta: uma cópia alterada do mesmo arquivo deixa de ser confiável.
+/// </summary>
+public sealed class TrustList
+{
+    private readonly Dictionary<string, string> _hashes = new(StringComparer.OrdinalIgnoreCase);
+    private readonly object _lock = new();
+
+    public int Count { get { lock (_lock) return _hashes.Count; } }
+
+    public void Add(string sha256, string reason) { if (sha256.Length == 64) lock (_lock) _hashes[sha256] = reason; }
+    public void Remove(string sha256) { lock (_lock) _hashes.Remove(sha256); }
+    public bool TryGet(string sha256, out string reason) { lock (_lock) return _hashes.TryGetValue(sha256, out reason!); }
+
+    public const string FortKnoxReason = "Componente do próprio Fort Knox.";
+
+    /// <summary>Executáveis e bibliotecas da pasta do app (com subpastas), para cópias deles em qualquer lugar não serem acusadas.</summary>
+    public void AddFortKnoxFiles(string appDir)
+    {
+        if (!Directory.Exists(appDir)) return;
+        foreach (var f in Directory.EnumerateFiles(appDir, "*", new EnumerationOptions { RecurseSubdirectories = true, IgnoreInaccessible = true }))
+        {
+            if (!MuralhaEngine.RiskyExtensions.Contains(Path.GetExtension(f))) continue;
+            try
+            {
+                using var fs = new FileStream(f, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+                Add(Convert.ToHexString(SHA256.HashData(fs)).ToLowerInvariant(), FortKnoxReason);
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException) { }
+        }
+    }
+}
 
 /// <summary>Regra de conteúdo: todos os grupos precisam bater; dentro de um grupo, basta uma alternativa.</summary>
 public sealed record ContentRule(string Name, Verdict Verdict, IReadOnlySet<string>? Extensions, IReadOnlyList<IReadOnlyList<string>> AllOf);
@@ -87,9 +124,10 @@ public sealed class SignatureBase
 }
 
 /// <summary>
-/// Motor de varredura da MURALHA (Fase 3.5a). Sem WPF: roda no app agora e no serviço Guarda depois.
-/// Camadas, da mais barata à mais cara: 1 assinatura digital válida → limpo; 2 hash conhecido; 3 regras de conteúdo;
-/// 4 heurística de executável sem assinatura; 5 segunda opinião do Microsoft Defender para o que ficou suspeito.
+/// Motor de varredura da MURALHA (Fases 3.5a e 3.5b). Sem WPF: roda no app agora e no serviço Guarda depois.
+/// Camadas, da mais barata à mais cara: 1 assinatura digital válida (no arquivo ou no catálogo do Windows) → limpo;
+/// 2 lista de confiança (Fort Knox e "confiar sempre"); 3 hash conhecido; 4 regras de conteúdo próprias; 5 regras YARA;
+/// 6 heurística de executável sem assinatura; 7 segunda opinião do Microsoft Defender para o que ficou suspeito.
 /// Nunca apaga nada: só diz o veredito e o motivo. Complementa o Defender, não o substitui.
 /// </summary>
 public sealed class MuralhaEngine(SignatureBase signatures)
@@ -115,6 +153,12 @@ public sealed class MuralhaEngine(SignatureBase signatures)
     /// <summary>Usa o Defender como segunda opinião (desligável para testes).</summary>
     public bool UseDefender { get; init; } = true;
 
+    /// <summary>Lista de confiança por hash (binários do Fort Knox e "confiar sempre").</summary>
+    public TrustList Trusted { get; init; } = new();
+
+    /// <summary>Camada YARA: recebe o caminho do arquivo e devolve as regras que bateram (null = sem YARA).</summary>
+    public Func<string, IReadOnlyList<YaraHit>>? Yara { get; init; }
+
     /// <summary>Verifica um arquivo do disco.</summary>
     public async Task<ScanResult> ScanFileAsync(string path, CancellationToken ct = default)
     {
@@ -123,8 +167,12 @@ public sealed class MuralhaEngine(SignatureBase signatures)
         if (info.Length > MaxFileSize) return new(path, Verdict.Limpo, "tamanho", "Arquivo grande demais para esta varredura (pulado).", "", info.Length);
 
         // 1. Assinatura digital válida: o editor se responsabiliza pelo arquivo.
-        if (SignableExtensions.Contains(ext) && Trust.IsSignedAndValid(path))
+        bool pe = PeExtensions.Contains(ext);
+        bool embedded = SignableExtensions.Contains(ext) && (!pe || Trust.HasEmbeddedSignature(path));
+        if (embedded && Trust.IsSignedAndValid(path))
             return new(path, Verdict.Limpo, "assinatura", "Assinatura digital válida.", "", info.Length);
+        if (pe && Trust.IsCatalogSigned(path))
+            return new(path, Verdict.Limpo, "assinatura", "Arquivo do sistema assinado no catálogo do Windows.", "", info.Length);
 
         string sha;
         byte[] head;
@@ -142,7 +190,18 @@ public sealed class MuralhaEngine(SignatureBase signatures)
             }
         }
 
-        var r = Evaluate(path, ext, sha, head, info.Length);
+        if (Trusted.TryGet(sha, out var trustReason))
+            return new(path, Verdict.Limpo, "confiança", trustReason, sha, info.Length);
+
+        IReadOnlyList<YaraHit>? yaraHits = null;
+        if (Yara != null && !Signatures.Hashes.ContainsKey(sha))
+        {
+            ct.ThrowIfCancellationRequested();
+            try { yaraHits = Yara(path); }
+            catch (Exception e) when (e is not OperationCanceledException) { yaraHits = null; } // arquivo trancado ou erro no libyara: segue sem YARA
+        }
+
+        var r = Evaluate(path, ext, sha, head, info.Length, yaraHits);
         if (r.Verdict == Verdict.Suspeito && UseDefender && Defender.Available)
         {
             bool? threat = await Defender.ScanFileAsync(path, ct);
@@ -153,10 +212,12 @@ public sealed class MuralhaEngine(SignatureBase signatures)
         return r;
     }
 
-    /// <summary>Camadas 2 a 4 sobre o conteúdo já lido (testável sem disco).</summary>
-    public ScanResult Evaluate(string path, string ext, string sha256, ReadOnlySpan<byte> head, long size)
+    /// <summary>Camadas de hash, regras, YARA (resultado já calculado) e heurística sobre o conteúdo lido (testável sem disco).</summary>
+    public ScanResult Evaluate(string path, string ext, string sha256, ReadOnlySpan<byte> head, long size, IReadOnlyList<YaraHit>? yaraHits = null)
     {
-        // 2. Hash conhecido.
+        if (Trusted.TryGet(sha256, out var trustReason)) return new(path, Verdict.Limpo, "confiança", trustReason, sha256, size);
+
+        // Hash conhecido.
         if (signatures.Hashes.TryGetValue(sha256, out var hashName))
             return new(path, Verdict.Malicioso, "hash", $"{hashName}: o arquivo é idêntico a um item da base.", sha256, size);
 
@@ -172,9 +233,16 @@ public sealed class MuralhaEngine(SignatureBase signatures)
                 if (hit.Verdict == Verdict.Malicioso) break;
             }
         }
+        // YARA: vale a regra de veredito mais grave; as outras entram no motivo.
+        if (yaraHits is { Count: > 0 } && (hit == null || hit.Verdict < Verdict.Malicioso))
+        {
+            var ordered = yaraHits.OrderByDescending(h => h.Verdict).ToList();
+            if (hit == null || ordered[0].Verdict > hit.Verdict)
+                return new(path, ordered[0].Verdict, "yara", string.Join(". ", ordered.Select(h => h.Description).Distinct()) + ".", sha256, size);
+        }
         if (hit != null) return new(path, hit.Verdict, "regra", $"{hit.Name}.", sha256, size);
 
-        // 4. Heurística de executável sem assinatura (precisa de dois sinais para não acusar à toa).
+        // Heurística de executável sem assinatura (precisa de dois sinais para não acusar à toa).
         if (PeExtensions.Contains(ext) || (head.Length > 2 && head[0] == 'M' && head[1] == 'Z'))
         {
             var signs = PeHeuristics.Signs(head, path);
@@ -199,11 +267,33 @@ public sealed class MuralhaEngine(SignatureBase signatures)
         }.Where(Directory.Exists).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
     }
 
+    /// <summary>Varredura completa: todos os discos fixos prontos (não entra em pendrive, rede nem CD).</summary>
+    public static IReadOnlyList<string> FullRoots() =>
+        DriveInfo.GetDrives().Where(d => d.DriveType == DriveType.Fixed && d.IsReady).Select(d => d.RootDirectory.FullName).ToList();
+
+    /// <summary>
+    /// Pastas que a varredura completa pula: a lixeira, os pontos de restauração (sem permissão de qualquer jeito), o
+    /// repositório de componentes do Windows (WinSxS, cópias dos mesmos arquivos do sistema) e as pastas do próprio Fort Knox.
+    /// </summary>
+    public static IReadOnlySet<string> FullScanSkips(params string[] extra)
+    {
+        var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var root in FullRoots())
+        {
+            set.Add(Path.Combine(root, "$Recycle.Bin"));
+            set.Add(Path.Combine(root, "System Volume Information"));
+        }
+        string win = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+        if (win.Length > 0) { set.Add(Path.Combine(win, "WinSxS")); set.Add(Path.Combine(win, "servicing")); set.Add(Path.Combine(win, "SoftwareDistribution")); }
+        foreach (var e in extra) if (!string.IsNullOrEmpty(e)) set.Add(e.TrimEnd('\\'));
+        return set;
+    }
+
     /// <summary>
     /// Arquivos dos tipos de risco nas pastas, sem atravessar junctions/symlinks e sem baixar arquivos que estão só na nuvem
-    /// (OneDrive). maxDepth limita a descida (AppData é enorme).
+    /// (OneDrive). maxDepth limita a descida (AppData é enorme). skip = pastas (caminho completo) para não descer.
     /// </summary>
-    public static IEnumerable<string> Enumerate(IEnumerable<string> roots, int maxDepth, CancellationToken ct)
+    public static IEnumerable<string> Enumerate(IEnumerable<string> roots, int maxDepth, CancellationToken ct, IReadOnlySet<string>? skip = null)
     {
         const FileAttributes CloudOnly = (FileAttributes)0x400000 | FileAttributes.Offline; // RECALL_ON_DATA_ACCESS
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -216,6 +306,7 @@ public sealed class MuralhaEngine(SignatureBase signatures)
                 ct.ThrowIfCancellationRequested();
                 var (dir, depth) = stack.Pop();
                 if (!seen.Add(dir)) continue;
+                if (skip != null && skip.Contains(dir.TrimEnd('\\'))) continue;
                 IEnumerable<FileSystemInfo> entries;
                 try { entries = new DirectoryInfo(dir).EnumerateFileSystemInfos().ToList(); }
                 catch (Exception e) when (e is IOException or UnauthorizedAccessException) { continue; }
@@ -322,6 +413,99 @@ public static class Trust
         {
             Marshal.DestroyStructure<WINTRUST_FILE_INFO>(pFile);
             Marshal.FreeHGlobal(pFile);
+        }
+    }
+
+    // ---- assinatura por catálogo: a maior parte dos arquivos do Windows não traz assinatura dentro, ela fica num .cat do sistema
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    private struct CATALOG_INFO { public uint cbStruct; [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)] public string wszCatalogFile; }
+
+    [DllImport("wintrust.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern bool CryptCATAdminAcquireContext2(out IntPtr hCatAdmin, IntPtr pgSubsystem, string? pwszHashAlgorithm, IntPtr pStrongHashPolicy, uint dwFlags);
+    [DllImport("wintrust.dll", SetLastError = true)]
+    private static extern bool CryptCATAdminCalcHashFromFileHandle2(IntPtr hCatAdmin, Microsoft.Win32.SafeHandles.SafeFileHandle hFile, ref uint pcbHash, byte[]? pbHash, uint dwFlags);
+    [DllImport("wintrust.dll", SetLastError = true)]
+    private static extern IntPtr CryptCATAdminEnumCatalogFromHash(IntPtr hCatAdmin, byte[] pbHash, uint cbHash, uint dwFlags, IntPtr phPrevCatInfo);
+    [DllImport("wintrust.dll", SetLastError = true)]
+    private static extern bool CryptCATCatalogInfoFromContext(IntPtr hCatInfo, ref CATALOG_INFO psCatInfo, uint dwFlags);
+    [DllImport("wintrust.dll")]
+    private static extern bool CryptCATAdminReleaseCatalogContext(IntPtr hCatAdmin, IntPtr hCatInfo, uint dwFlags);
+    [DllImport("wintrust.dll")]
+    private static extern bool CryptCATAdminReleaseContext(IntPtr hCatAdmin, uint dwFlags);
+
+    /// <summary>
+    /// O executável traz assinatura dentro dele? (diretório de segurança do cabeçalho PE). Barato: evita chamar o
+    /// WinVerifyTrust à toa nos arquivos do Windows, que quase sempre são assinados só no catálogo.
+    /// </summary>
+    public static bool HasEmbeddedSignature(string path)
+    {
+        try
+        {
+            Span<byte> h = stackalloc byte[1024];
+            using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete, 1);
+            int n = fs.Read(h);
+            if (n < 0x40 || h[0] != 'M' || h[1] != 'Z') return false;
+            int pe = BitConverter.ToInt32(h[0x3C..]);
+            if (pe <= 0 || pe + 24 > n || h[pe] != 'P' || h[pe + 1] != 'E') return true; // cabeçalho estranho: deixa o WinVerifyTrust decidir
+            int opt = pe + 24;
+            if (opt + 2 > n) return true;
+            ushort magic = BitConverter.ToUInt16(h[opt..]);
+            int dirs = opt + (magic == 0x20B ? 112 : 96); // PE32+ ou PE32
+            int sec = dirs + 4 * 8;                        // IMAGE_DIRECTORY_ENTRY_SECURITY
+            if (sec + 8 > n) return true;
+            return BitConverter.ToUInt32(h[sec..]) != 0 && BitConverter.ToUInt32(h[(sec + 4)..]) != 0;
+        }
+        catch { return true; }
+    }
+
+    // Abrir o contexto de catálogo é caro (carrega o banco de catálogos); cada thread guarda o seu.
+    [ThreadStatic] private static IntPtr _admin256, _admin1;
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, bool> CatalogValid = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>O arquivo consta num catálogo assinado do Windows (SHA-256, depois SHA-1) e o catálogo é válido.</summary>
+    public static bool IsCatalogSigned(string path)
+    {
+        foreach (bool sha256 in new[] { true, false })
+        {
+            try
+            {
+                ref IntPtr admin = ref sha256 ? ref _admin256 : ref _admin1;
+                if (admin == IntPtr.Zero && !CryptCATAdminAcquireContext2(out admin, IntPtr.Zero, sha256 ? "SHA256" : null, IntPtr.Zero, 0))
+                { admin = IntPtr.Zero; continue; }
+                if (CatalogCheck(path, admin)) return true;
+            }
+            catch { }
+        }
+        return false;
+    }
+
+    private static bool CatalogCheck(string path, IntPtr admin)
+    {
+        IntPtr catInfo = IntPtr.Zero;
+        try
+        {
+            byte[] hash;
+            using (var h = File.OpenHandle(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete))
+            {
+                uint size = 0;
+                CryptCATAdminCalcHashFromFileHandle2(admin, h, ref size, null, 0);
+                if (size == 0 || size > 128) return false;
+                hash = new byte[size];
+                if (!CryptCATAdminCalcHashFromFileHandle2(admin, h, ref size, hash, 0)) return false;
+            }
+            catInfo = CryptCATAdminEnumCatalogFromHash(admin, hash, (uint)hash.Length, 0, IntPtr.Zero);
+            if (catInfo == IntPtr.Zero) return false;
+            var info = new CATALOG_INFO { cbStruct = (uint)Marshal.SizeOf<CATALOG_INFO>() };
+            if (!CryptCATCatalogInfoFromContext(catInfo, ref info, 0)) return false;
+
+            // O hash do arquivo está no catálogo (o banco de catálogos do Windows confirmou). Falta o catálogo em si ser
+            // válido; isso é verificado uma vez por catálogo, porque refazer a cada arquivo custa ~0,1 s.
+            return CatalogValid.GetOrAdd(info.wszCatalogFile, IsSignedAndValid);
+        }
+        finally
+        {
+            if (catInfo != IntPtr.Zero) CryptCATAdminReleaseCatalogContext(admin, catInfo, 0);
         }
     }
 }
