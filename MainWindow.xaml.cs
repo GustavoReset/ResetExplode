@@ -35,11 +35,6 @@ public partial class MainWindow : Window
     private const int HotkeyId = 0x5245; // "RE"
 
 
-    // ARSENAL · OTIMIZAÇÃO
-    private List<BackgroundApp> _apps = new();
-    private readonly List<Tweak> _tweaks = WindowsTweaks.All(); // só as definições; o estado é lido ao abrir a página
-    private bool _optInit;
-
     private Brush Fg => (Brush)FindResource("Fg");
     private Brush Ink => (Brush)FindResource("Ink");
     private Brush Muted => (Brush)FindResource("Muted");
@@ -85,7 +80,7 @@ public partial class MainWindow : Window
             CollectDashSample();
             PageBottleneck.Tick();
             PageBench.Tick();
-            if (PageOptimize.IsVisible) UpdateRamStatus();
+            PageOptimize.Tick();
         };
         _timer.Start();
 
@@ -238,7 +233,6 @@ public partial class MainWindow : Window
             case "PageDash": UpdateDashboard(); break;
             case "PageDisks": RefreshDiskHealth(); break;
             case "PageEnergy": RefreshEnergy(); break;
-            case "PageOptimize": InitOptimize(); break;
         }
     }
 
@@ -432,115 +426,6 @@ public partial class MainWindow : Window
 
         // VIGIA: o overlay fica pronto já agora (o atalho Ctrl+Shift+O funciona sem visitar a página)
         if (App.Core != null) VigiaModule.Prepare(PageOverlay, App.Core, _live, _frames, _settings, SaveSettings);
-    }
-
-    // ---------------- ARSENAL · OTIMIZAÇÃO ----------------
-
-    /// <summary>Carrega a página ARSENAL · OTIMIZAÇÃO quando ela é aberta (os ajustes do Windows só na primeira vez).</summary>
-    private void InitOptimize()
-    {
-        if (!_optInit)
-        {
-            _optInit = true;
-            foreach (var t in _tweaks)
-                try { t.Refresh(); } catch (Exception ex) { t.Status = $"Não foi possível ler: {ex.Message}"; }
-            OptTweaks.ItemsSource = _tweaks;
-        }
-        RefreshApps();
-        UpdateRamStatus();
-    }
-
-    private void UpdateRamStatus()
-    {
-        var (total, avail) = Optimizer.MemoryStatus();
-        if (total == 0) return;
-        double used = total - avail;
-        OptRamText.Text = $"{used / 1073741824.0:0.0} de {total / 1073741824.0:0.0} GB · {used / total:P0}";
-        OptRamBar.ScaleX = used / total;
-    }
-
-    private void RefreshApps()
-    {
-        _apps = Optimizer.ListApps();
-        OptApps.ItemsSource = _apps;
-    }
-
-    private void BtnRefreshApps_Click(object sender, RoutedEventArgs e) => RefreshApps();
-
-    private async void BtnOptimize_Click(object sender, RoutedEventArgs e)
-    {
-        var toClose = _apps.Where(a => a.Selected).ToList();
-        string list = toClose.Count == 0 ? "nenhum programa marcado"
-                                         : string.Join("\n", toClose.Select(a => $"  • {a.Title}"));
-        var r = MessageBox.Show("O ARSENAL vai:\n\n" +
-                                "1. Limpar a memória em espera e enxugar a RAM dos programas.\n" +
-                                $"2. Fechar os programas marcados:\n{list}\n\n" +
-                                "Salve o que estiver aberto nesses programas antes. Continuar?",
-                                "Arsenal · Otimização", MessageBoxButton.YesNo, MessageBoxImage.Question);
-        if (r != MessageBoxResult.Yes) return;
-
-        BtnOptimize.IsEnabled = false;
-        BtnOptimize.Content = "OTIMIZANDO…";
-        OptResult.Text = "";
-        var closeResult = await Task.Run(() => Optimizer.CloseApps(toClose));
-        var mem = await Task.Run(Optimizer.CleanMemory); // depois de fechar, para contar a memória liberada por eles também
-        BtnOptimize.IsEnabled = true;
-        BtnOptimize.Content = "OTIMIZAR AGORA";
-
-        var parts = new List<string> { $"Memória liberada: {mem.FreedBytes / 1048576.0:N0} MB" };
-        parts.Add(mem.StandbyPurged ? "memória em espera limpa" : $"memória em espera não limpa ({mem.StandbyError})");
-        if (closeResult.Closed.Count > 0) parts.Add($"fechados: {string.Join(", ", closeResult.Closed)}");
-        if (closeResult.NotClosed.Count > 0)
-            parts.Add($"não fecharam (podem ter algo não salvo ou pedir confirmação): {string.Join(", ", closeResult.NotClosed)}");
-        OptResult.Text = string.Join(" · ", parts) + ".";
-        RefreshApps();
-        UpdateRamStatus();
-    }
-
-    private void Tweak_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is not CheckBox { Tag: Tweak t } box) return;
-        bool turnOn = box.IsChecked == true;
-        try
-        {
-            t.Write(turnOn, _settings);
-            _settings.Save();
-            t.Refresh();
-            t.Status = t.IsOn == turnOn
-                ? (turnOn ? "Aplicado." : "Desligado.") + (t.NeedsRestart ? " Reinicie o PC para valer." : "")
-                : "O Windows não aceitou a mudança (pode exigir administrador).";
-        }
-        catch (Exception ex)
-        {
-            t.Refresh();
-            t.Status = $"Falhou: {ex.Message}";
-        }
-        box.IsChecked = t.IsOn; // o binding é só leitura: volta ao estado real
-    }
-
-    private bool RequireAdmin()
-    {
-        if (SensorMonitor.IsElevated) return true;
-        MessageBox.Show("Esta ação precisa do Fort Knox aberto como administrador.", "Fort Knox",
-                        MessageBoxButton.OK, MessageBoxImage.Warning);
-        return false;
-    }
-
-    private void BtnRestoreTweaks_Click(object sender, RoutedEventArgs e)
-    {
-        if (_settings.TweakBackup.Count == 0)
-        {
-            MessageBox.Show("Nenhum ajuste foi alterado pelo Fort Knox ainda.", "Arsenal · Otimização",
-                            MessageBoxButton.OK, MessageBoxImage.Information);
-            return;
-        }
-        var r = MessageBox.Show("Voltar todos os ajustes do Windows para como estavam antes do Fort Knox alterá-los?",
-                                "Arsenal · Otimização", MessageBoxButton.YesNo, MessageBoxImage.Question);
-        if (r != MessageBoxResult.Yes) return;
-        bool restart = _tweaks.Any(t => t.NeedsRestart && _settings.TweakBackup.ContainsKey(t.Id));
-        WindowsTweaks.RestoreAll(_tweaks, _settings);
-        foreach (var t in _tweaks) { t.Refresh(); t.Status = "Restaurado."; }
-        if (restart) MessageBox.Show("Alguns ajustes só voltam ao original depois de reiniciar o PC.", "Arsenal · Otimização");
     }
 
     // ---------------- Overlay ----------------
