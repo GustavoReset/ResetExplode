@@ -21,12 +21,18 @@ public partial class MainWindow
         ["PageInteg"] = PrismaModule.RouteLuzes,
         ["PageLauncher"] = ArenaModule.RouteBiblioteca,
         ["PageOverlay"] = VigiaModule.RouteOverlay,
+        ["PageStress"] = ForjaModule.RouteStress,
     };
 
     private FortKnoxHost? Core => App.Core;
 
     private void RegisterModules()
     {
+        // FORJA · Stress test: ligado já na abertura (o ciclo de 1 s alimenta o gráfico mesmo com a página fechada)
+        PageStress.Attach(_live);
+        PageStress.RunningChanged += running => SideStress.Text = running ? "rodando" : "parado";
+        PageStress.Finished += (title, detail, state) => AddEvent("", title, detail, state);
+
         if (Core == null) return;
         Core.Modules.Add(new CofreModule(PageVault, this));
         Core.Modules.Add(new PrensaModule(PagePdf));
@@ -37,6 +43,8 @@ public partial class MainWindow
         Core.Modules.Add(new PrismaModule(PageInteg, _monitor));
         Core.Modules.Add(new ArenaModule(PageLauncher, () => _settings, () => { try { _settings.Save(); } catch (System.IO.IOException) { } }));
         Core.Modules.Add(new VigiaModule(PageOverlay));
+
+        Core.Modules.Add(new ForjaModule(PageStress));
     }
 
     /// <summary>Chamado por Nav_Checked. Erros do módulo vão para o log e para a barra de status, sem derrubar o app.</summary>

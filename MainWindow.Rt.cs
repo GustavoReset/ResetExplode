@@ -21,7 +21,7 @@ public partial class MainWindow
     private async void BtnRtBench_Click(object sender, RoutedEventArgs e)
     {
         if (_gameBenchRunning) { _rtBench?.Cancel(); return; }
-        if (AnyBenchRunning || TestRunning) { RtStatus.Text = "Termine o outro teste antes."; return; }
+        if (AnyBenchRunning || PageStress.IsRunning) { RtStatus.Text = "Termine o outro teste antes."; return; }
 
         string adapterName = _gpus.Count > 0 ? _gpus[0].Name : "";
         RtStatus.Text = "Verificando suporte a ray tracing…";

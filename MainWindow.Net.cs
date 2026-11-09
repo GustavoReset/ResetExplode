@@ -43,7 +43,7 @@ public partial class MainWindow
     private async void BtnNetTest_Click(object sender, RoutedEventArgs e)
     {
         if (_netRunning) { _netCts?.Cancel(); return; }
-        if (AnyBenchRunning || TestRunning) { NetStatus.Text = "Termine o outro teste antes."; return; }
+        if (AnyBenchRunning || PageStress.IsRunning) { NetStatus.Text = "Termine o outro teste antes."; return; }
 
         _netRunning = true;
         _netCts = new CancellationTokenSource();

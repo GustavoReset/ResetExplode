@@ -71,7 +71,7 @@ public partial class MainWindow
     private async void BtnDiskBench_Click(object sender, RoutedEventArgs e)
     {
         if (_gameBenchRunning) { _gameBenchCts?.Cancel(); return; }
-        if (AnyBenchRunning || TestRunning) { DiskStatus.Text = "Termine o outro teste antes."; return; }
+        if (AnyBenchRunning || PageStress.IsRunning) { DiskStatus.Text = "Termine o outro teste antes."; return; }
 
         string root = CheckedTag(DiskDrivePanel) ?? "";
         if (root.Length == 0) { DiskStatus.Text = "Escolha uma unidade."; return; }
