@@ -4,11 +4,12 @@ using FortKnox.Core.Modules;
 namespace FortKnox;
 
 /// <summary>
-/// ARSENAL como módulo do núcleo (Fase 3.3). Nesta etapa: Inicialização e Instalar apps.
-/// Otimização continua em MainWindow (depende do ciclo de 1 s dos sensores) e migra junto com a SENTINELA.
+/// ARSENAL como módulo do núcleo (Fase 3.3). Otimização, Inicialização e Instalar apps (Fases 3.3a e 3.3k).
+/// A Otimização recebe o ciclo de 1 s (uso da RAM) e guarda o backup dos ajustes em AppSettings.TweakBackup.
 /// </summary>
-public sealed class ArsenalModule(StartupView startup, AppsView apps, Func<List<StartupBackup>> legacyRemoved, Action saveLegacy) : ModuleBase
+public sealed class ArsenalModule(OptimizeView optimize, StartupView startup, AppsView apps, Func<List<StartupBackup>> legacyRemoved, Action saveLegacy) : ModuleBase
 {
+    public const string RouteOptimize = "arsenal/otimizacao";
     public const string RouteStartup = "arsenal/inicializacao";
     public const string RouteApps = "arsenal/apps";
     public const string SettingsId = "arsenal";
@@ -17,8 +18,9 @@ public sealed class ArsenalModule(StartupView startup, AppsView apps, Func<List<
     public override string DisplayName => "ARSENAL";
     public override IReadOnlyList<NavEntry> Pages { get; } = new[]
     {
-        new NavEntry(RouteStartup, "Inicialização", "", 510, "ARSENAL"),
-        new NavEntry(RouteApps, "Instalar apps", "", 520, "ARSENAL"),
+        new NavEntry(RouteOptimize, "Otimização", "\uE945", 500, "ARSENAL"),
+        new NavEntry(RouteStartup, "Inicialização", "\uE7E8", 510, "ARSENAL"),
+        new NavEntry(RouteApps, "Instalar apps", "\uE896", 520, "ARSENAL"),
     };
     public override ModuleCapabilities Capabilities => ModuleCapabilities.NeedsAdmin | ModuleCapabilities.UsesNetwork;
 
@@ -38,7 +40,8 @@ public sealed class ArsenalModule(StartupView startup, AppsView apps, Func<List<
 
     public override Task OnPageActivatedAsync(string route, CancellationToken ct)
     {
-        if (route == RouteStartup) startup.Scan();
+        if (route == RouteOptimize) optimize.Activate();
+        else if (route == RouteStartup) startup.Scan();
         else apps.Activate();
         return Task.CompletedTask;
     }

@@ -356,8 +356,8 @@ public partial class MainWindow
                       errs.Error != null ? "Não foi possível ler o registro do Windows."
                                          : $"{errs.Whea} WHEA · {errs.GpuResets} reinícios do driver em 7 dias."));
 
-        var gm = _tweaks.FirstOrDefault(t => t.Id == "gamemode");
-        var dvr = _tweaks.FirstOrDefault(t => t.Id == "gamedvr");
+        var gm = PageOptimize.Tweaks.FirstOrDefault(t => t.Id == "gamemode");
+        var dvr = PageOptimize.Tweaks.FirstOrDefault(t => t.Id == "gamedvr");
         try { gm?.Refresh(); dvr?.Refresh(); } catch { }
         if (gm != null) list.Add(Item(gm.IsOn, "Modo de Jogo ligado", "O Windows prioriza o jogo.", "Desligado: ligue em Arsenal › Otimização."));
         if (dvr != null) list.Add(Item(dvr.IsOn, "Gravação em segundo plano desligada", "O Game Bar não grava o tempo todo.",
