@@ -128,7 +128,7 @@ public sealed class ModuleMandala : UserControl
         logo.Children.Add(sym);
         logo.Children.Add(word);
         _core = new Button { Width = CoreR * 2, Height = CoreR * 2, Tag = 26.0, Content = logo, ToolTip = "Abrir módulos" };
-        _core.SetResourceReference(StyleProperty, "MandalaNode");
+        _core.SetResourceReference(StyleProperty, "MandalaCore");
         AutomationProperties.SetName(_core, "Abrir módulos do Fort Knox");
         _core.Click += (_, _) => { if (_open) Collapse(); else Expand(); };
         Place(_core, CX - CoreR, CY - CoreR);
@@ -275,14 +275,14 @@ public sealed class ModuleMandala : UserControl
             // Rótulo da ferramenta, para fora da órbita
             var label = (TextBlock)b.Resources["label"];
             b.Resources.Remove("label");
-            label.MaxWidth = 140;
-            label.Margin = new Thickness(0);
-            var (lx, ly) = Polar(R2 + 44, a);
-            label.Width = 140;
-            label.TextAlignment = TextAlignment.Center;
+            // Rótulo para fora da órbita: à direita dos nós do lado direito, à esquerda dos do lado esquerdo
+            label.MaxWidth = 150; label.Width = 150; label.Margin = new Thickness(0);
             label.SetResourceReference(TextBlock.ForegroundProperty, "Muted");
+            double dx = x - CX;
+            if (dx > 40) { label.TextAlignment = TextAlignment.Left; Place(label, x + 32, y - 8); }
+            else if (dx < -40) { label.TextAlignment = TextAlignment.Right; Place(label, x - 32 - 150, y - 8); }
+            else { label.TextAlignment = TextAlignment.Center; Place(label, x - 75, y < CY ? y - 46 : y + 30); }
             label.IsHitTestVisible = false;
-            Place(label, lx - 70, ly - 8);
             _tools.Children.Add(label);
             b.MouseEnter += (_, _) => label.SetResourceReference(TextBlock.ForegroundProperty, "AccentText");
             b.MouseLeave += (_, _) => label.SetResourceReference(TextBlock.ForegroundProperty, "Muted");

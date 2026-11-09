@@ -464,4 +464,26 @@
             </Setter.Value>
         </Setter>
     </Style>
+    <!-- Núcleo da mandala: octógono (chanfro nos quatro cantos), logotipo fixo -->
+    <Style x:Key="MandalaCore" TargetType="Button" BasedOn="{StaticResource MandalaNode}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <ui:ChamferBorder x:Name="b" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                      BorderThickness="1" Cut="52" AllCorners="True">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </ui:ChamferBorder>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                            <Setter Property="Background" Value="{DynamicResource AccentSoft}"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>
