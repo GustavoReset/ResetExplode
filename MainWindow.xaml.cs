@@ -277,7 +277,6 @@ public partial class MainWindow : Window
             case "PageOc": UpdateOcGpuState(); UpdateRecentErrors(); break;
             case "PageInteg": InitInteg(); break;
             case "PageLauncher": InitLauncher(); break;
-            case "PageDriver": InitDriver(); break;
             case "PageOptimize": InitOptimize(); break;
         }
     }
