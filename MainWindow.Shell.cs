@@ -17,6 +17,7 @@ public partial class MainWindow
         ["PageNet"] = RadarModule.RouteConexao,
         ["PageOptimize"] = ArsenalModule.RouteOptimize,
         ["PageCleanup"] = ArsenalModule.RouteCleanup,
+        ["PageUninstall"] = ArsenalModule.RouteUninstall,
         ["PageStartup"] = ArsenalModule.RouteStartup,
         ["PageApps"] = ArsenalModule.RouteApps,
         ["PageMakerPorts"] = OficinaModule.RoutePorts,
@@ -127,6 +128,7 @@ public partial class MainWindow
         // ARSENAL · Otimização: backup dos ajustes do Windows em AppSettings.TweakBackup
         PageOptimize.Attach(_settings, SaveSettings);
         PageCleanup.Attach(AddEvent);
+        PageUninstall.Attach(AddEvent, AppSettings.Folder);
 
         // SENTINELA · Placa de vídeo, Discos e Energia (Sensores é ligado no construtor, junto com o SensorMonitor)
         PageGpu.Attach(_monitor);
@@ -146,7 +148,7 @@ public partial class MainWindow
         Core.Modules.Add(new CofreModule(PageVault, this));
         Core.Modules.Add(new PrensaModule(PagePdf));
         Core.Modules.Add(new RadarModule(PageNet));
-        Core.Modules.Add(new ArsenalModule(PageOptimize, PageCleanup, PageStartup, PageApps, () => _settings.StartupRemoved, () => { try { _settings.Save(); } catch (System.IO.IOException) { } }));
+        Core.Modules.Add(new ArsenalModule(PageOptimize, PageCleanup, PageUninstall, PageStartup, PageApps, () => _settings.StartupRemoved, () => { try { _settings.Save(); } catch (System.IO.IOException) { } }));
         Core.Modules.Add(new OficinaModule(PageMakerPorts, PageMakerDrv, () => _settings.ComDbBackup, () => { _settings.ComDbBackup = null; try { _settings.Save(); } catch (System.IO.IOException) { } }));
         Core.Modules.Add(new AlicerceModule(PageDriver));
         Core.Modules.Add(new PrismaModule(PageInteg, _monitor));

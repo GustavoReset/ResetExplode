@@ -4,13 +4,14 @@ using FortKnox.Core.Modules;
 namespace FortKnox;
 
 /// <summary>
-/// ARSENAL como módulo do núcleo (Fase 3.3). Otimização, Limpeza, Inicialização e Instalar apps (Fases 3.3a, 3.3k e 3.4b).
+/// ARSENAL como módulo do núcleo (Fase 3.3). Otimização, Limpeza, Desinstalar, Inicialização e Instalar apps (Fases 3.3a, 3.3k, 3.4b e 3.4c).
 /// A Otimização recebe o ciclo de 1 s (uso da RAM) e guarda o backup dos ajustes em AppSettings.TweakBackup.
 /// </summary>
-public sealed class ArsenalModule(OptimizeView optimize, CleanupView cleanup, StartupView startup, AppsView apps, Func<List<StartupBackup>> legacyRemoved, Action saveLegacy) : ModuleBase
+public sealed class ArsenalModule(OptimizeView optimize, CleanupView cleanup, UninstallView uninstall, StartupView startup, AppsView apps, Func<List<StartupBackup>> legacyRemoved, Action saveLegacy) : ModuleBase
 {
     public const string RouteOptimize = "arsenal/otimizacao";
     public const string RouteCleanup = "arsenal/limpeza";
+    public const string RouteUninstall = "arsenal/desinstalar";
     public const string RouteStartup = "arsenal/inicializacao";
     public const string RouteApps = "arsenal/apps";
     public const string SettingsId = "arsenal";
@@ -21,6 +22,7 @@ public sealed class ArsenalModule(OptimizeView optimize, CleanupView cleanup, St
     {
         new NavEntry(RouteOptimize, "Otimização", "\uE945", 500, "ARSENAL"),
         new NavEntry(RouteCleanup, "Limpeza", "\uE74D", 505, "ARSENAL"),
+        new NavEntry(RouteUninstall, "Desinstalar", "\uE7A6", 507, "ARSENAL"),
         new NavEntry(RouteStartup, "Inicialização", "\uE7E8", 510, "ARSENAL"),
         new NavEntry(RouteApps, "Instalar apps", "\uE896", 520, "ARSENAL"),
     };
@@ -74,6 +76,7 @@ public sealed class ArsenalModule(OptimizeView optimize, CleanupView cleanup, St
     {
         if (route == RouteOptimize) optimize.Activate();
         else if (route == RouteCleanup) cleanup.Activate();
+        else if (route == RouteUninstall) uninstall.Activate();
         else if (route == RouteStartup) startup.Scan();
         else apps.Activate();
         return Task.CompletedTask;
