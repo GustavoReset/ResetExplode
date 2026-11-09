@@ -46,9 +46,7 @@ public partial class MainWindow : Window
     private readonly FrameMonitor _frames = new();
     private BottleneckSession? _bnSession;
     private double _balanceRatio = 1;
-    private OverlayWindow? _overlay;
-    private DispatcherTimer? _overlayTimer;
-    private bool _overlayReady;
+    private LiveReadings _live = null!; // leituras de GPU/CPU compartilhadas com os módulos (Modules/Shared)
     private const int HotkeyId = 0x5245; // "RE"
 
     // FORJA
@@ -86,6 +84,7 @@ public partial class MainWindow : Window
 
         // Sensores: a lista começa vazia e é preenchida quando a detecção do hardware termina (LoadHardwareAsync).
         _monitor = new SensorMonitor();
+        _live = new LiveReadings(_monitor, () => _gpus.FirstOrDefault());
         _view = CollectionViewSource.GetDefaultView(_monitor.Rows);
         _view.GroupDescriptions.Add(new PropertyGroupDescription(nameof(SensorRow.Hardware)));
         SensorGrid.ItemsSource = _view;
@@ -129,9 +128,8 @@ public partial class MainWindow : Window
         };
         Closed += (_, _) =>
         {
-            _timer.Stop(); _overlayTimer?.Stop();
+            _timer.Stop();
             _stress.Stop(); _burn.Stop(); _benchCts?.Cancel();
-            _overlay?.Close();
             _toast?.Close();
             _frames.Dispose();
             UnregisterHotKey(new System.Windows.Interop.WindowInteropHelper(this).Handle, HotkeyId);
@@ -569,14 +567,9 @@ public partial class MainWindow : Window
         BnGpuName.Text = $"GPU · {GameCatalog.ShortGpuName(_gpuName)}";
         BnBalanceText.Text = text;
 
-        // Preferências do overlay
-        foreach (var rb in OvCornerPanel.Children.OfType<RadioButton>())
-            rb.IsChecked = (string)rb.Tag == _settings.OverlayCorner;
-        foreach (var rb in OvScalePanel.Children.OfType<RadioButton>())
-            rb.IsChecked = Math.Abs(double.Parse((string)rb.Tag, CultureInfo.InvariantCulture) - _settings.OverlayScale) < 0.01;
-        BuildOverlayPicker();
-        _overlayReady = true;
-        UpdateOverlayStatus(null);
+        // VIGIA: o overlay fica pronto já agora (o atalho Ctrl+Shift+O funciona sem visitar a página)
+        if (App.Core != null)
+            VigiaModule.Prepare(PageOverlay, App.Core, _live, _frames, _settings, () => { try { _settings.Save(); } catch (System.IO.IOException) { } });
     }
 
     /// <summary>Posição do marcador: escala logarítmica da razão GPU/CPU (0,4× … 2,5×), centro = equilibrado.</summary>
@@ -1021,14 +1014,14 @@ public partial class MainWindow : Window
         timer.Start();
         _gpuBenchActive = true;
         GbGpuNow.Text = "sensores pausados";
-        bool overlayWasOn = ChkOverlay.IsChecked == true;
-        if (overlayWasOn) ChkOverlay.IsChecked = false; // o overlay também consulta a GPU
+        bool overlayWasOn = PageOverlay.IsOn;
+        if (overlayWasOn) PageOverlay.IsOn = false; // o overlay também consulta a GPU
 
         // Thread dedicada: a cena roda num loop próprio com prioridade alta.
         var r = await Task.Factory.StartNew(bench.Run, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         timer.Stop();
         _gpuBenchActive = false;
-        if (overlayWasOn) ChkOverlay.IsChecked = true;
+        if (overlayWasOn) PageOverlay.IsOn = true;
         GbGpuNow.Text = "—";
         SetGameBenchRunning(BtnGpuBench, false);
         GbProgress.ScaleX = 0;
@@ -1186,67 +1179,12 @@ public partial class MainWindow : Window
     {
         if (msg == 0x0312 && wParam.ToInt32() == HotkeyId) // WM_HOTKEY
         {
-            ChkOverlay.IsChecked = ChkOverlay.IsChecked != true;
+            PageOverlay.IsOn = !PageOverlay.IsOn;
             handled = true;
         }
         else if (msg == 0x0219) // WM_DEVICECHANGE
             OnDeviceChange(wParam.ToInt32(), lParam);
         return IntPtr.Zero;
-    }
-
-    private void ChkOverlay_Changed(object sender, RoutedEventArgs e)
-    {
-        if (ChkOverlay.IsChecked == true)
-        {
-            _overlay ??= new OverlayWindow();
-            ApplyOverlayOptions();
-            _overlay.Show();
-            _overlayTimer ??= new DispatcherTimer(TimeSpan.FromMilliseconds(500), DispatcherPriority.Normal,
-                                                  (_, _) => UpdateOverlay(), Dispatcher);
-            _overlayTimer.Start();
-            UpdateOverlay();
-        }
-        else
-        {
-            _overlayTimer?.Stop();
-            _overlay?.Hide();
-        }
-    }
-
-    private void OvOption_Changed(object sender, RoutedEventArgs e)
-    {
-        if (!_overlayReady) return;
-        _settings.OverlayCorner = CheckedTag(OvCornerPanel) ?? "TL";
-        _settings.OverlayScale = double.Parse(CheckedTag(OvScalePanel) ?? "1", CultureInfo.InvariantCulture);
-        _settings.Save();
-        ApplyOverlayOptions();
-    }
-
-    private void ApplyOverlayOptions()
-    {
-        if (_overlay == null) return;
-        _overlay.Corner = _settings.OverlayCorner;
-        _overlay.SetScale(_settings.OverlayScale);
-        _overlay.Reposition();
-    }
-
-    private void UpdateOverlay()
-    {
-        var f = _frames.GetForegroundStats();
-        if (_overlay != null && _overlay.IsVisible)
-        {
-            _overlay.Update(f, BuildOverlayLines(f), OvShow, OvShow.Contains("clock") ? DateTime.Now.ToString("HH:mm") : null);
-            _overlay.KeepOnTop(); // o jogo pode ter passado na frente (janela sem borda "sempre no topo")
-        }
-        UpdateOverlayStatus(f);
-    }
-
-
-    private void UpdateOverlayStatus(FrameStats? f)
-    {
-        if (_frames.Error != null) OvStatus.Text = $"Detecção de FPS indisponível: {_frames.Error}";
-        else if (f != null) OvStatus.Text = $"Ativa · {f.ProcessName}: {f.Fps:0} FPS ({f.FrameTimeMs:0.0} ms) · 1% low {f.Low1Fps:0}";
-        else OvStatus.Text = "Ativa · aguardando um jogo em primeiro plano";
     }
 
     [System.Runtime.InteropServices.DllImport("user32.dll")]
@@ -1447,19 +1385,9 @@ public partial class MainWindow : Window
     }
 
     /// <summary>Consumo da GPU principal: NVML quando disponível, senão LibreHardwareMonitor.</summary>
-    private float? MainGpuPower()
-    {
-        if (_gpus.Count == 0) return null;
-        var g = _gpus[0];
-        if (g.NvmlHandle != IntPtr.Zero && Nvml.PowerUsageMw(g.NvmlHandle) is uint mw) return mw / 1000f;
-        return _monitor.Rows.FirstOrDefault(r => r.Hardware == g.Name && r.Type == SensorType.Power)?.RawValue;
-    }
+    private float? MainGpuPower() => _live.MainGpuPower();
 
-    private string MainGpuPerfCap()
-    {
-        if (_gpus.Count == 0) return "";
-        return _gpus[0].LiveExtras().FirstOrDefault(kv => kv.Key.StartsWith("PerfCap")).Value ?? "";
-    }
+    private string MainGpuPerfCap() => _live.MainGpuPerfCap();
 
     private void UpdateStressPanel()
     {
