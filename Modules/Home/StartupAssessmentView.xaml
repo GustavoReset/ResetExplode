@@ -1,0 +1,142 @@
+<UserControl x:Class="FortKnox.StartupAssessmentView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="clr-namespace:FortKnox.UI"
+             Background="{DynamicResource WindowBg}">
+    <Grid Margin="36,24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <DockPanel LastChildFill="False">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Image Source="{StaticResource BrandSymbol}" Width="29" Height="30" Margin="0,0,12,0"/>
+                <Image Source="{StaticResource BrandWordmark}" Width="154" Height="13" VerticalAlignment="Center"/>
+            </StackPanel>
+            <TextBlock DockPanel.Dock="Right" Text="CONFIGURAÇÃO INICIAL"
+                       Style="{StaticResource Label}" Margin="0" VerticalAlignment="Center"/>
+        </DockPanel>
+
+        <ui:ChamferBorder Grid.Row="1" Style="{StaticResource FkCard}" Padding="38,32"
+                          MaxWidth="800" MaxHeight="560" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel x:Name="QuestionPanel">
+                    <DockPanel Margin="0,0,0,12">
+                        <TextBlock x:Name="SectionText" Style="{StaticResource Label}" Margin="0"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock x:Name="QuestionCountText" DockPanel.Dock="Right" FontFamily="{StaticResource Mono}"
+                                   FontSize="11" Foreground="{DynamicResource Muted}" VerticalAlignment="Center"/>
+                    </DockPanel>
+                    <ProgressBar x:Name="QuestionProgress" Minimum="0" Maximum="6" Height="3"
+                                 BorderThickness="0" Background="{DynamicResource Line}"
+                                 Foreground="{DynamicResource Accent}" Margin="0,0,0,25"/>
+                    <TextBlock Text="Autoavaliação de proficiência" Style="{StaticResource H1}" FontSize="20"/>
+                </StackPanel>
+
+                <Grid x:Name="QuestionContent" Grid.Row="1" Margin="0,22,0,18">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock x:Name="QuestionText" FontSize="21" LineHeight="31" TextWrapping="Wrap"
+                                   Foreground="{DynamicResource Fg}" MaxWidth="700"/>
+                        <TextBlock Text="Arraste a bolinha e solte-a sobre a sua resposta."
+                                   Foreground="{DynamicResource Muted}" Margin="0,13,0,24"/>
+
+                        <Slider x:Name="AnswerSlider" Minimum="1" Maximum="5" TickFrequency="1"
+                                IsSnapToTickEnabled="True" IsMoveToPointEnabled="True" Value="3"
+                                Height="42" Margin="12,0" ValueChanged="AnswerSlider_ValueChanged"
+                                AutomationProperties.Name="Escala de proficiência de 1 a 5">
+                            <Slider.Template>
+                                <ControlTemplate TargetType="Slider">
+                                    <Grid Height="42" VerticalAlignment="Center">
+                                        <Track x:Name="PART_Track" Minimum="{TemplateBinding Minimum}"
+                                               Maximum="{TemplateBinding Maximum}" Value="{TemplateBinding Value}"
+                                               Orientation="Horizontal">
+                                            <Track.DecreaseRepeatButton>
+                                                <RepeatButton Command="Slider.DecreaseLarge" IsTabStop="False"
+                                                              Height="4" Background="{DynamicResource Accent}"/>
+                                            </Track.DecreaseRepeatButton>
+                                            <Track.IncreaseRepeatButton>
+                                                <RepeatButton Command="Slider.IncreaseLarge" IsTabStop="False"
+                                                              Height="4" Background="{DynamicResource LineStrong}"/>
+                                            </Track.IncreaseRepeatButton>
+                                            <Track.Thumb>
+                                                <Thumb Width="22" Height="22" Cursor="Hand">
+                                                    <Thumb.Template>
+                                                        <ControlTemplate TargetType="Thumb">
+                                                            <Ellipse Fill="{DynamicResource GoldButton}"
+                                                                     Stroke="{DynamicResource AccentText}" StrokeThickness="2"/>
+                                                        </ControlTemplate>
+                                                    </Thumb.Template>
+                                                </Thumb>
+                                            </Track.Thumb>
+                                        </Track>
+                                    </Grid>
+                                </ControlTemplate>
+                            </Slider.Template>
+                        </Slider>
+                        <UniformGrid Columns="5" Margin="23,4,23,0">
+                            <TextBlock Text="1" HorizontalAlignment="Center" FontFamily="{StaticResource Mono}" Foreground="{DynamicResource Muted}"/>
+                            <TextBlock Text="2" HorizontalAlignment="Center" FontFamily="{StaticResource Mono}" Foreground="{DynamicResource Muted}"/>
+                            <TextBlock Text="3" HorizontalAlignment="Center" FontFamily="{StaticResource Mono}" Foreground="{DynamicResource Muted}"/>
+                            <TextBlock Text="4" HorizontalAlignment="Center" FontFamily="{StaticResource Mono}" Foreground="{DynamicResource Muted}"/>
+                            <TextBlock Text="5" HorizontalAlignment="Center" FontFamily="{StaticResource Mono}" Foreground="{DynamicResource Muted}"/>
+                        </UniformGrid>
+                        <TextBlock x:Name="SelectionText" Text="Escolha uma opção para continuar"
+                                   Foreground="{DynamicResource AccentText}" FontSize="12"
+                                   HorizontalAlignment="Center" Margin="0,14,0,0"/>
+                    </StackPanel>
+
+                    <TextBlock x:Name="SaveErrorText" Grid.Row="1" Visibility="Collapsed"
+                               Foreground="{DynamicResource Danger}" TextWrapping="Wrap" Margin="0,16,0,0"/>
+                </Grid>
+
+                <Grid x:Name="ResultPanel" Grid.Row="1" Margin="0,22,0,18" Visibility="Collapsed">
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="RESULTADO DA AVALIAÇÃO" Style="{StaticResource Label}"/>
+                        <TextBlock x:Name="ResultLevel" Style="{StaticResource H1}" TextWrapping="Wrap" Margin="0,7,0,12"/>
+                        <TextBlock x:Name="ResultProfile" FontSize="14" LineHeight="22" TextWrapping="Wrap"
+                                   Foreground="{DynamicResource Muted}" MaxWidth="680"/>
+                        <Border Height="1" Background="{DynamicResource Line}" Margin="0,24"/>
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel Margin="0,0,42,0">
+                                <TextBlock Text="PONTUAÇÃO" Style="{StaticResource Label}" Margin="0,0,0,7"/>
+                                <TextBlock x:Name="ResultScore" Style="{StaticResource Big}"/>
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="PROFICIÊNCIA" Style="{StaticResource Label}" Margin="0,0,0,7"/>
+                                <TextBlock x:Name="ResultPercentage" Style="{StaticResource Big}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+
+                <DockPanel Grid.Row="2" LastChildFill="False">
+                    <Button x:Name="BackButton" DockPanel.Dock="Left" Content="Voltar"
+                            Style="{StaticResource OutlineButton}" Padding="20,9"
+                            Click="BackButton_Click" Visibility="Collapsed"/>
+                    <Button x:Name="NextButton" DockPanel.Dock="Right" Content="Próximo"
+                            Style="{StaticResource PrimaryButton}" Padding="28,10"
+                            Click="NextButton_Click" IsEnabled="False"/>
+                    <Button x:Name="ContinueButton" DockPanel.Dock="Right" Content="Ir para a página inicial"
+                            Style="{StaticResource PrimaryButton}" Padding="22,10"
+                            Click="ContinueButton_Click" Visibility="Collapsed"/>
+                </DockPanel>
+            </Grid>
+        </ui:ChamferBorder>
+
+        <TextBlock Grid.Row="2" Text="FORT KNOX  ·  AVALIAÇÃO DE PROFICIÊNCIA EM PC"
+                   FontFamily="{StaticResource Mono}" FontSize="9" Foreground="{DynamicResource Faint}"
+                   HorizontalAlignment="Center" Margin="0,20,0,0"/>
+    </Grid>
+</UserControl>

@@ -70,6 +70,14 @@ public sealed class AppSettings
     // Aparência
     public bool LightTheme { get; set; }
 
+    // Avaliação inicial de proficiência
+    public bool ProficiencyAssessmentCompleted { get; set; }
+    public List<int> ProficiencyAssessmentAnswers { get; set; } = new();
+    public int ProficiencyAssessmentScore { get; set; }
+    public double ProficiencyAssessmentPercentage { get; set; }
+    public string ProficiencyAssessmentLevel { get; set; } = "";
+    public string ProficiencyAssessmentProfile { get; set; } = "";
+
     // Overlay
     public string OverlayCorner { get; set; } = "TL";
     public double OverlayScale { get; set; } = 1.0;
@@ -103,7 +111,14 @@ public sealed class AppSettings
         try
         {
             if (File.Exists(FilePath))
-                return JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(FilePath)) ?? new AppSettings();
+            {
+                string json = File.ReadAllText(FilePath);
+                var settings = JsonSerializer.Deserialize<AppSettings>(json) ?? new AppSettings();
+                using var document = JsonDocument.Parse(json);
+                if (!document.RootElement.TryGetProperty(nameof(ProficiencyAssessmentCompleted), out _))
+                    settings.ProficiencyAssessmentCompleted = true;
+                return settings;
+            }
         }
         catch { }
         return new AppSettings();

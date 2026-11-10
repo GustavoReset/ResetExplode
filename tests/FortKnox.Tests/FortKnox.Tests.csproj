@@ -15,6 +15,7 @@
     <Compile Include="..\..\Modules\Vault\PasswordVault.cs" Link="PasswordVault.cs" />
     <Compile Include="..\..\Modules\Pdf\PdfService.cs" Link="PdfService.cs" />
     <Compile Include="..\..\LegacyMigration.cs" Link="LegacyMigration.cs" />
+    <Compile Include="..\..\ProficiencyAssessment.cs" Link="ProficiencyAssessment.cs" />
     <Compile Include="..\..\Modules\Network\BandwidthTest.cs" Link="BandwidthTest.cs" />
     <Compile Include="..\..\Modules\Network\TraceRoute.cs" Link="TraceRoute.cs" />
     <Compile Include="..\..\Modules\Network\ProcessBandwidthMonitor.cs" Link="ProcessBandwidthMonitor.cs" />
