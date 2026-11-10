@@ -60,13 +60,7 @@ public partial class DashView : UserControl
 
     public DashView() => InitializeComponent();
 
-    public void Attach(Host host)
-    {
-        _host = host;
-        // Mandala: a ferramenta escolhida abre pela mesma navegação do menu lateral
-        Mandala.Navigate += page => host.Navigate(page);
-        IsVisibleChanged += (_, e) => { if (!(bool)e.NewValue) Mandala.ResetClosed(); };
-    }
+    public void Attach(Host host) => _host = host;
 
     private static string? CheckedTag(Panel panel)
         => panel.Children.OfType<RadioButton>().FirstOrDefault(r => r.IsChecked == true)?.Tag as string;

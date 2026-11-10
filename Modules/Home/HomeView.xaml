@@ -1,0 +1,11 @@
+<UserControl x:Class="FortKnox.HomeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="clr-namespace:FortKnox.UI">
+    <!-- INÍCIO: só a mandala de categorias — a porta de entrada de todas as ferramentas. -->
+    <Grid Margin="16,10,18,16">
+        <ui:ChamferBorder Style="{StaticResource FkCard}" Padding="0">
+            <ui:CategoryMandala x:Name="Mandala"/>
+        </ui:ChamferBorder>
+    </Grid>
+</UserControl>

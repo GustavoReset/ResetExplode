@@ -486,4 +486,89 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <!-- ===== Mandala de categorias (INÍCIO) ===== -->
+    <!-- Nó chanfrado pequeno de categoria/ferramenta. O halo é uma segunda moldura ouro que só acende no hover/foco. -->
+    <Style x:Key="Mandala2Node" TargetType="Button">
+        <Setter Property="Foreground" Value="{DynamicResource Muted}"/>
+        <Setter Property="Background" Value="{DynamicResource CardFill}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource LineStrong}"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid Background="Transparent" SnapsToDevicePixels="True">
+                        <ui:ChamferBorder x:Name="halo" Margin="-4" Background="Transparent"
+                                          BorderBrush="{DynamicResource Accent}" BorderThickness="1"
+                                          Cut="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" Opacity="0"/>
+                        <ui:ChamferBorder x:Name="body" Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1"
+                                          Cut="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </ui:ChamferBorder>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="{DynamicResource AccentText}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                            <Setter Property="Background" Value="{DynamicResource AccentSoft}"/>
+                            <Setter TargetName="halo" Property="Opacity" Value="0.45"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter Property="Foreground" Value="{DynamicResource AccentText}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                            <Setter TargetName="halo" Property="Opacity" Value="0.55"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="body" Property="Opacity" Value="0.85"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="body" Property="Opacity" Value="0.3"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Núcleo circular fixo: disco escuro, anel de aço, aro ouro discreto e logotipo vertical no centro. -->
+    <Style x:Key="Mandala2Core" TargetType="Button">
+        <Setter Property="Foreground" Value="{DynamicResource Muted}"/>
+        <Setter Property="Background" Value="{DynamicResource CardFill}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource LineStrong}"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid Background="Transparent" SnapsToDevicePixels="True">
+                        <Ellipse Fill="{TemplateBinding Background}"/>
+                        <Ellipse Margin="24" Fill="{DynamicResource AccentSoft}" Opacity="0.5"/>
+                        <Ellipse Margin="1" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="1"/>
+                        <Ellipse Margin="7" Stroke="{DynamicResource Line}" StrokeThickness="1" Opacity="0.8"/>
+                        <Ellipse Margin="11" Stroke="{DynamicResource Accent}" StrokeThickness="1" Opacity="0.35"/>
+                        <Ellipse x:Name="halo" Margin="-5" Stroke="{DynamicResource Accent}" StrokeThickness="1.4" Opacity="0"/>
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                            <Setter TargetName="halo" Property="Opacity" Value="0.55"/>
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter Property="BorderBrush" Value="{DynamicResource Accent}"/>
+                            <Setter TargetName="halo" Property="Opacity" Value="0.60"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="halo" Property="Opacity" Value="0.35"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.35"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

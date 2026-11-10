@@ -41,7 +41,8 @@ public partial class MainWindow : Window
         InitializeComponent();
         ThemeManager.Apply(_settings.LightTheme);
         UpdateThemeButton();
-        ShowPage("PageDash");
+        ShowPage("PageHome");
+        PreviewKeyDown += CloseSidebarOnEscape;
 
         // Sensores: a lista começa vazia e é preenchida quando a detecção do hardware termina (LoadHardwareAsync).
         _monitor = new SensorMonitor();
@@ -51,9 +52,10 @@ public partial class MainWindow : Window
         PageSensors.Status = "Detectando o hardware…";
 
         RegisterModules();
+        BuildNavigation();
         SnapshotUsb();
         PageSystem.RefreshDrives();
-        TitlePage.Text = "Painel";
+        TitlePage.Text = "INÍCIO";
         PageDash.Refresh();
 
         // A janela aparece já; as coletas pesadas (WMI, sensores, GPU) rodam em paralelo fora da thread da janela.
@@ -179,29 +181,85 @@ public partial class MainWindow : Window
     private void Nav_Checked(object sender, RoutedEventArgs e)
     {
         if (PageSystem == null) return; // disparado durante InitializeComponent
-        var item = (FrameworkElement)sender;
-        string page = (string)item.Tag;
+        if (sender is not FrameworkElement item || item.Tag is not string page) return;
         ShowPage(page);
         NavigateModules(page); // módulos do núcleo: o COFRE sai da memória, o RADAR para o ETW etc.
 
-        // Abre a categoria da página (ex.: quando o painel pula direto para o Benchmark)
-        // e mostra "CATEGORIA · página" na barra de título.
-        string name = item is ContentControl { Content: Panel panel }
-            ? panel.Children.OfType<TextBlock>().LastOrDefault()?.Text ?? "" : "";
-        if (item.Parent is FrameworkElement { Name: var items } && items.EndsWith("Items")
-            && FindName(items[..^5]) is System.Windows.Controls.Primitives.ToggleButton group)
+        string toolLabel = ((sender as ContentControl)?.Content as Panel)?.Children.OfType<TextBlock>().LastOrDefault()?.Text
+                           ?? AppCatalog.Find(page)?.Name ?? "";
+        TitlePage.Text = page switch
         {
-            group.IsChecked = true;
-            name = $"{group.Content} · {name}";
-        }
-        TitlePage.Text = name;
+            "PageHome" => "INÍCIO",
+            "PageDash" => "DASHBOARD",
+            _ => AppCatalog.CategoryOf(page) is { } area ? $"{area.Name} · {toolLabel}" : toolLabel,
+        };
 
+        // Abre a categoria da ferramenta (ex.: ao pular direto para o Benchmark) e recolhe o menu.
+        if (AppCatalog.CategoryOf(page)?.Name is { } category && _categoryGroups.TryGetValue(category, out var group))
+            group.IsChecked = true;
+        if (_navReady) SetSidebar(false);
+    }
+
+    /// <summary>Todas as páginas do app (Home, Dashboard e as ferramentas do catálogo).</summary>
+    private IEnumerable<FrameworkElement> AllPages()
+    {
+        yield return PageHome;
+        yield return PageDash;
+        foreach (var tool in AppCatalog.AllTools)
+            if (FindName(tool.Page) is FrameworkElement page) yield return page;
     }
 
     private void ShowPage(string name)
     {
-        foreach (var p in new FrameworkElement[] { PageDash, PageSystem, PageSensors, PageGpu, PageGames, PageBottleneck, PageOverlay, PageBench, PageOptimize, PageOc, PageInteg, PageLauncher, PageDriver, PageCleanup, PageUninstall, PageStartup, PageApps, PageUpdates, PageMakerPorts, PageMakerDrv, PageDisks, PageEnergy, PageNet, PageStress, PageVault, PagePdf, PageShield })
+        foreach (var p in AllPages())
             p.Visibility = p.Name == name ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    // ---------------- Menu lateral (drawer) ----------------
+
+    private bool _sidebarOpen;
+
+    private void Menu_Click(object sender, RoutedEventArgs e) => SetSidebar(!_sidebarOpen);
+
+    /// <summary>Expande/recolhe o menu lateral. Oculto por padrão; o hambúrguer abre.</summary>
+    private void SetSidebar(bool open)
+    {
+        if (_sidebarOpen == open) return;
+        _sidebarOpen = open;
+        BtnMenu.ToolTip = open ? "Fechar menu" : "Menu";
+
+        if (open)
+        {
+            SideCol.Width = new GridLength(256);
+            Sidebar.Visibility = Visibility.Visible;
+            if (SystemParameters.ClientAreaAnimation)
+            {
+                Sidebar.BeginAnimation(OpacityProperty, new System.Windows.Media.Animation.DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(160)));
+                SidebarSlide.BeginAnimation(System.Windows.Media.TranslateTransform.XProperty,
+                    new System.Windows.Media.Animation.DoubleAnimation(-18, 0, TimeSpan.FromMilliseconds(220))
+                    { EasingFunction = new System.Windows.Media.Animation.CubicEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut } });
+            }
+            else { Sidebar.Opacity = 1; SidebarSlide.X = 0; }
+        }
+        else
+        {
+            void Done()
+            {
+                if (_sidebarOpen) return;
+                Sidebar.Visibility = Visibility.Collapsed;
+                SideCol.Width = new GridLength(0);
+            }
+
+            if (SystemParameters.ClientAreaAnimation)
+            {
+                var fade = new System.Windows.Media.Animation.DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(130));
+                fade.Completed += (_, _) => Done();
+                Sidebar.BeginAnimation(OpacityProperty, fade);
+                SidebarSlide.BeginAnimation(System.Windows.Media.TranslateTransform.XProperty,
+                    new System.Windows.Media.Animation.DoubleAnimation(0, -18, TimeSpan.FromMilliseconds(180)));
+            }
+            else { Sidebar.Opacity = 0; SidebarSlide.X = -18; Done(); }
+        }
     }
 
     // ---------------- Unidades e dispositivos conectados ----------------

@@ -1,5 +1,11 @@
 using FortKnox.Core;
 using FortKnox.Core.Events;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace FortKnox;
 
@@ -11,6 +17,7 @@ public partial class MainWindow
 {
     private static readonly Dictionary<string, string> ModuleRoutes = new()
     {
+        ["PageHome"] = HomeModule.RouteHome,
         ["PageDash"] = PainelModule.RouteVisao,
         ["PageVault"] = CofreModule.RouteSenhas,
         ["PagePdf"] = PrensaModule.RoutePdf,
@@ -77,32 +84,110 @@ public partial class MainWindow
             await using var fs = System.IO.File.Create(System.IO.Path.Combine(dir, name + ".png"));
             enc.Save(fs);
         }
+        NavigateTo("PageHome");
+        PageHome.Open();
+        await Shot("00-inicio");
+        PageHome.SelectCategoryForCapture(1);
+        await Shot("01-inicio-software");
         NavigateTo("PageDash");
-        await Shot("00-painel");
-        PageDash.Mandala.Expand();
-        await Shot("01-painel-mandala");
-        PageDash.Mandala.SelectForCapture(3);
-        await Shot("02-painel-mandala-arsenal");
-        PageDash.Mandala.ResetClosed();
-        foreach (var page in ModuleRoutes.Keys.Where(p => p != "PageDash"))
+        await Shot("02-dashboard");
+        SetSidebar(true);
+        await Shot("03-menu");
+        if (_categoryGroups.TryGetValue("Software", out var softwareGroup)) softwareGroup.IsChecked = true;
+        await Shot("04-menu-software");
+        SetSidebar(false);
+        foreach (var page in ModuleRoutes.Keys.Where(p => p is not ("PageHome" or "PageDash" or "PageVault")))
         {
             NavigateTo(page);
             await Shot(page);
         }
     }
 
-    /// <summary>Abre uma página do menu pelo nome da página (Tag do item), como se a pessoa tivesse clicado.</summary>
+    /// <summary>Abre uma página do menu lateral pelo Tag (ex.: "PageBench"), como se a pessoa tivesse clicado.</summary>
     private void NavigateTo(string page)
     {
-        static IEnumerable<System.Windows.Controls.RadioButton> Items(System.Windows.DependencyObject root)
+        if (_navByPage.TryGetValue(page, out var nav)) { nav.IsChecked = true; return; }
+        static IEnumerable<RadioButton> Items(DependencyObject root)
         {
-            foreach (var child in System.Windows.LogicalTreeHelper.GetChildren(root).OfType<System.Windows.DependencyObject>())
+            foreach (var child in LogicalTreeHelper.GetChildren(root).OfType<DependencyObject>())
             {
-                if (child is System.Windows.Controls.RadioButton rb) yield return rb;
+                if (child is RadioButton rb) yield return rb;
                 foreach (var inner in Items(child)) yield return inner;
             }
         }
-        if (Items(Sidebar).FirstOrDefault(r => r.Tag as string == page) is { } nav) nav.IsChecked = true;
+        if (Items(NavRoot).FirstOrDefault(r => r.Tag as string == page) is { } fallback) fallback.IsChecked = true;
+    }
+
+    // ---------------- Menu lateral gerado do catálogo ----------------
+
+    private readonly Dictionary<string, RadioButton> _navByPage = new();
+    private readonly Dictionary<string, ToggleButton> _categoryGroups = new();
+    private bool _navReady;
+
+    /// <summary>
+    /// Monta o menu: Início, Dashboard e as quatro categorias (Office, Software, Redes, Defesa).
+    /// Cada categoria expande as ferramentas (nível 2). A mesma estrutura alimenta a mandala (HomeView).
+    /// </summary>
+    private void BuildNavigation()
+    {
+        NavRoot.Children.Clear();
+        _navByPage.Clear();
+        _categoryGroups.Clear();
+
+        NavRoot.Children.Add(NavItem("PageHome", "\uE80F", "Início", true));
+        NavRoot.Children.Add(NavItem("PageDash", "\uE7C4", "Dashboard", false));
+        NavRoot.Children.Add(new Border { Height = 1, Background = (Brush)FindResource("Line"), Margin = new Thickness(22, 10, 22, 6) });
+
+        foreach (var category in AppCatalog.Categories)
+        {
+            var content = new StackPanel { Orientation = Orientation.Horizontal };
+            content.Children.Add(new TextBlock
+            {
+                Text = category.Glyph,
+                FontFamily = (FontFamily)FindResource("Icons"),
+                FontSize = 14,
+                Width = 26,
+                VerticalAlignment = VerticalAlignment.Center,
+            });
+            content.Children.Add(new TextBlock { Text = category.Name, VerticalAlignment = VerticalAlignment.Center });
+
+            var group = new ToggleButton { Style = (Style)FindResource("NavGroup"), Content = content };
+            var items = new StackPanel { Margin = new Thickness(10, 0, 0, 4), Visibility = Visibility.Collapsed };
+            group.Checked += (_, _) => items.Visibility = Visibility.Visible;
+            group.Unchecked += (_, _) => items.Visibility = Visibility.Collapsed;
+
+            foreach (var tool in category.Tools) items.Children.Add(NavItem(tool.Page, tool.Glyph, tool.Name));
+            _categoryGroups[category.Name] = group;
+            NavRoot.Children.Add(group);
+            NavRoot.Children.Add(items);
+        }
+        _navReady = true;
+    }
+
+    private RadioButton NavItem(string page, string glyph, string label, bool @checked = false)
+    {
+        var content = new StackPanel { Orientation = Orientation.Horizontal };
+        content.Children.Add(new TextBlock
+        {
+            Text = glyph,
+            FontFamily = (FontFamily)FindResource("Icons"),
+            FontSize = 14,
+            Width = 28,
+            VerticalAlignment = VerticalAlignment.Center,
+        });
+        content.Children.Add(new TextBlock { Text = label, VerticalAlignment = VerticalAlignment.Center });
+
+        var item = new RadioButton { Style = (Style)FindResource("NavItem"), Content = content, Tag = page };
+        item.Checked += Nav_Checked;
+        _navByPage[page] = item;
+        if (@checked) item.IsChecked = true;
+        return item;
+    }
+
+    /// <summary>Fecha o menu lateral (Esc) quando ele está aberto.</summary>
+    private void CloseSidebarOnEscape(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape && _sidebarOpen) { SetSidebar(false); e.Handled = true; }
     }
 
     /// <summary>
@@ -129,6 +214,9 @@ public partial class MainWindow
 
     private void RegisterModules()
     {
+        // INÍCIO: a mandala de categorias (a mesma navegação do menu lateral)
+        PageHome.Attach(NavigateTo);
+
         // PAINEL: lê o resto do app; os botões levam às páginas
         PageDash.Attach(new DashView.Host
         {
@@ -179,6 +267,7 @@ public partial class MainWindow
         PageNet.Attach(() => AnyBenchRunning || PageStress.IsRunning || PageOc.IsRunning);
 
         if (Core == null) return;
+        Core.Modules.Add(new HomeModule(PageHome));
         Core.Modules.Add(new PainelModule(PageDash));
         Core.Modules.Add(_sentinela = new SentinelaModule(PageDisks, PageEnergy, _monitor));
         Core.Modules.Add(new CofreModule(PageVault, this));

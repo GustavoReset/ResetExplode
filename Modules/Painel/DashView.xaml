@@ -10,7 +10,7 @@
             <!-- Cabeçalho do Painel: nome do módulo + assinatura da marca -->
             <Grid Margin="4,2,0,18">
                 <StackPanel>
-                    <TextBlock Text="PAINEL" Style="{StaticResource H1}" ToolTip="Seu PC, blindado. Inviolável, offline e tudo em um só lugar."/>
+                    <TextBlock Text="DASHBOARD" Style="{StaticResource H1}" ToolTip="Seu PC, blindado. Inviolável, offline e tudo em um só lugar."/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                     <ui:ChamferBorder BorderBrush="{DynamicResource Line}" BorderThickness="1" Cut="4" Padding="10,4" Margin="0,0,8,0">
@@ -21,11 +21,6 @@
                     </ui:ChamferBorder>
                 </StackPanel>
             </Grid>
-
-            <!-- Mandala de módulos: começa comprimida no logotipo; clique no centro abre os 12 módulos -->
-            <ui:ChamferBorder Style="{StaticResource FkCard}" Padding="0" Margin="0,0,0,16">
-                <local:ModuleMandala x:Name="Mandala"/>
-            </ui:ChamferBorder>
 
             <!-- Linha 1: gráfico grande + desempenho -->
             <Grid Margin="0,0,0,16">

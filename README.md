@@ -121,16 +121,20 @@ App WPF (.NET 8) com:
   e logotipo **FORT ⬟ KNOX** em Michroma, ambos vetoriais em `Brand.xaml` (gerados da identidade; não dependem de fonte instalada).
 - Tipografia embutida no .exe (`Assets/Fonts`, SIL OFL 1.1): **Michroma** nos títulos e na marca, **Inter** no texto e
   **JetBrains Mono** em dados, rótulos e números de sensores. Paleta, degradês e estilos em `Theme.xaml` e `ThemeManager.cs`.
-- Menu lateral com o **Painel** no topo e os módulos com nomes de fortaleza (módulos com várias páginas são recolhíveis):
-  - **PAINEL** (`MainWindow.Dash.cs`): gráfico de área CPU × GPU (temperatura, carga ou consumo; 1/5/15 min),
-    nota da Forja, tabela de componentes, anéis de RAM/VRAM/disco, eventos recentes e saúde do PC.
-  - **SENTINELA** · Sistema, Sensores, Placa de vídeo, Discos, Energia.
-  - **FORJA** · Benchmark, Stress test, Overclock.
-  - **ARENA** · Biblioteca, FPS estimado, Gargalo.
-  - **ARSENAL** · Otimização, Inicialização, Instalar apps.
-  - **OFICINA** · Portas COM, Drivers seriais.
-  - **RADAR** (rede) · **VIGIA** (overlay) · **ALICERCE** (drivers) · **PRISMA** (iluminação RGB) · **COFRE** (senhas) · **PRENSA** (PDF)
-    · **MURALHA** (antivírus offline, em breve).
+- **Home e Dashboard:** o app abre na **Home**, que mostra só a **mandala** — quatro categorias (Office, Software, Redes e Defesa)
+  em órbita; clicar numa categoria abre as ferramentas no segundo anel, e clicar numa ferramenta abre a página.
+  O **Dashboard** (item seguinte do menu) tem o painel de blocos: gráfico de área CPU × GPU (temperatura, carga ou consumo;
+  1/5/15 min), nota da Forja, tabela de componentes, anéis de RAM/VRAM/disco, eventos recentes e saúde do PC.
+  Capturas em `docs/design/navegacao-inicio.png` e `docs/design/navegacao-categorias-software.png`.
+- **Menu lateral (drawer):** oculto por padrão; o **hambúrguer** da barra de título abre e recolhe. Dentro dele: Início,
+  Dashboard e as quatro categorias recolhíveis (`Modules/Shared/AppCatalog.cs`), cada uma com suas ferramentas (nível 2).
+  O menu se recolhe ao escolher uma ferramenta.
+  - **Office** · PDF, Senhas.
+  - **Software** · Sistema, Sensores, Placa de vídeo, Discos, Energia, Benchmark, Stress test, Overclock, Biblioteca,
+    FPS estimado, Gargalo, Overlay, Otimização, Limpeza, Desinstalar, Inicialização, Instalar apps, Atualizar apps,
+    Drivers, Portas COM, Drivers seriais, Iluminação.
+  - **Redes** · Teste de conexão, Traceroute, Consumo por programa.
+  - **Defesa** · Varredura, Quarentena.
 - Botão de **modo escuro/claro** no canto superior direito (`ThemeManager.cs`); a escolha fica salva. O overlay de jogos e os avisos de dispositivo ficam sempre escuros, com detalhes em ouro.
 - Leitura ao vivo de temperatura e carga da CPU e da GPU sempre visível no rodapé do menu.
 - Sensores com busca e filtros por tipo (chips); tema em `Theme.xaml`.

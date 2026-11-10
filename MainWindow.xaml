@@ -1,7 +1,7 @@
 <Window x:Class="FortKnox.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:ui="clr-namespace:FortKnox.UI"
+        xmlns:ui="clr-namespace:FortKnox.UI"
         xmlns:local="clr-namespace:FortKnox"
         Title="Fort Knox" Icon="Assets/app.ico" Width="1320" Height="840" MinWidth="1120" MinHeight="660"
         WindowStartupLocation="CenterScreen" WindowStyle="None" ResizeMode="CanResize"
@@ -14,7 +14,6 @@
                       CornerRadius="0" UseAeroCaptionButtons="False"/>
     </WindowChrome.WindowChrome>
 
-
     <Border x:Name="Root" BorderBrush="{DynamicResource Line}" BorderThickness="1">
         <Grid>
             <Grid.RowDefinitions>
@@ -22,13 +21,16 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition x:Name="SideCol" Width="256"/>
+                <!-- Menu lateral oculto por padrão (hambúrguer expande) -->
+                <ColumnDefinition x:Name="SideCol" Width="0"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- ===== Barra de título (marca + página atual + botões da janela) ===== -->
-            <StackPanel Grid.ColumnSpan="2" Orientation="Horizontal" Margin="30,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
-                <!-- Assinatura da marca: símbolo Bastião + logotipo FORT ⬟ KNOX (vetores de Brand.xaml) -->
+            <!-- ===== Barra de título (menu + marca + página atual + botões da janela) ===== -->
+            <StackPanel Grid.ColumnSpan="2" Orientation="Horizontal" Margin="18,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center">
+                <Button x:Name="BtnMenu" Style="{StaticResource CaptionButton}" Content="&#xE700;" Click="Menu_Click"
+                        ToolTip="Menu" AutomationProperties.Name="Abrir menu"
+                        WindowChrome.IsHitTestVisibleInChrome="True" Margin="0,0,8,0"/>
                 <Image x:Name="TitleLogo" Source="{StaticResource BrandSymbol}" Width="22" Height="23" Margin="0,0,12,0" VerticalAlignment="Center"/>
                 <Image Source="{StaticResource BrandWordmark}" Height="11" VerticalAlignment="Center" Margin="0,1,0,0"/>
                 <Border Width="1" Height="16" Background="{DynamicResource LineStrong}" Margin="18,0,16,0" VerticalAlignment="Center"/>
@@ -44,9 +46,12 @@
                 <Button Style="{StaticResource CloseButton}" Content="&#xE8BB;" Click="Close_Click" ToolTip="Fechar"/>
             </StackPanel>
 
-            <!-- ===== Menu lateral por categorias (painel arredondado, sempre visível) ===== -->
+            <!-- ===== Menu lateral (drawer): oculto por padrão, hambúrguer expande ===== -->
             <ui:ChamferBorder x:Name="Sidebar" Grid.Row="1" Margin="14,0,0,14" Background="{DynamicResource PanelFill}"
-                    BorderBrush="{DynamicResource Line}" BorderThickness="1">
+                    BorderBrush="{DynamicResource Line}" BorderThickness="1" Visibility="Collapsed" Opacity="0">
+                <ui:ChamferBorder.RenderTransform>
+                    <TranslateTransform x:Name="SidebarSlide" X="-18"/>
+                </ui:ChamferBorder.RenderTransform>
                 <DockPanel>
                     <!-- Rodapé: aviso de sensores + leitura ao vivo compacta -->
                     <StackPanel DockPanel.Dock="Bottom" Margin="16,6,16,16">
@@ -87,196 +92,9 @@
                         </DockPanel>
                     </StackPanel>
 
-                    <!-- Navegação por categorias -->
+                    <!-- Navegação gerada do AppCatalog: Início, Dashboard e as 4 categorias com as ferramentas -->
                     <ScrollViewer x:Name="NavScroll" VerticalScrollBarVisibility="Auto" Margin="0,2,0,0">
-                        <StackPanel Margin="0,0,0,10">
-                            <RadioButton x:Name="NavDash" Style="{StaticResource NavItem}" Tag="PageDash" Checked="Nav_Checked" IsChecked="True">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE80F;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Painel" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <Border Height="1" Background="{DynamicResource Line}" Margin="22,10,22,6"/>
-                            <ToggleButton x:Name="GrpExplode" Style="{StaticResource NavGroup}" Content="SENTINELA"/>
-                            <StackPanel x:Name="GrpExplodeItems" Margin="10,0,0,4" Visibility="{Binding IsChecked, ElementName=GrpExplode, Converter={StaticResource BoolVis}}">
-                            <RadioButton x:Name="NavSystem" Style="{StaticResource NavItem}" Tag="PageSystem" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE7F8;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Sistema" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavSensors" Style="{StaticResource NavItem}" Tag="PageSensors" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE9D9;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Sensores" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavGpu" Style="{StaticResource NavItem}" Tag="PageGpu" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE7F4;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Placa de vídeo" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavDisks" Style="{StaticResource NavItem}" Tag="PageDisks" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xEDA2;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Discos" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavEnergy" Style="{StaticResource NavItem}" Tag="PageEnergy" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE7E8;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Energia" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            </StackPanel>
-                            <ToggleButton x:Name="GrpPerf" Style="{StaticResource NavGroup}" Content="FORJA"/>
-                            <StackPanel x:Name="GrpPerfItems" Margin="10,0,0,4" Visibility="{Binding IsChecked, ElementName=GrpPerf, Converter={StaticResource BoolVis}}">
-                            <RadioButton x:Name="NavBench" Style="{StaticResource NavItem}" Tag="PageBench" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE8B9;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Benchmark" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavStress" Style="{StaticResource NavItem}" Tag="PageStress" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE945;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Stress test" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavOc" Style="{StaticResource NavItem}" Tag="PageOc" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xEC4A;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Overclock" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            </StackPanel>
-                            <ToggleButton x:Name="GrpGames" Style="{StaticResource NavGroup}" Content="ARENA"/>
-                            <StackPanel x:Name="GrpGamesItems" Margin="10,0,0,4" Visibility="{Binding IsChecked, ElementName=GrpGames, Converter={StaticResource BoolVis}}">
-                            <RadioButton x:Name="NavLauncher" Style="{StaticResource NavItem}" Tag="PageLauncher" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE8F1;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Biblioteca" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavGames" Style="{StaticResource NavItem}" Tag="PageGames" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xEC49;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="FPS estimado" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavBottleneck" Style="{StaticResource NavItem}" Tag="PageBottleneck" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE9D2;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Gargalo" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            </StackPanel>
-                            <ToggleButton x:Name="GrpTools" Style="{StaticResource NavGroup}" Content="ARSENAL"/>
-                            <StackPanel x:Name="GrpToolsItems" Margin="10,0,0,4" Visibility="{Binding IsChecked, ElementName=GrpTools, Converter={StaticResource BoolVis}}">
-                            <RadioButton x:Name="NavOptimize" Style="{StaticResource NavItem}" Tag="PageOptimize" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE9F3;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Otimização" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavCleanup" Style="{StaticResource NavItem}" Tag="PageCleanup" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE74D;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Limpeza" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavUninstall" Style="{StaticResource NavItem}" Tag="PageUninstall" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE7A6;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Desinstalar" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavStartup" Style="{StaticResource NavItem}" Tag="PageStartup" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE823;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Inicialização" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavApps" Style="{StaticResource NavItem}" Tag="PageApps" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE719;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Instalar apps" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavUpdates" Style="{StaticResource NavItem}" Tag="PageUpdates" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE895;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Atualizar apps" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            </StackPanel>
-                            <ToggleButton x:Name="GrpMaker" Style="{StaticResource NavGroup}" Content="OFICINA"/>
-                            <StackPanel x:Name="GrpMakerItems" Margin="10,0,0,4" Visibility="{Binding IsChecked, ElementName=GrpMaker, Converter={StaticResource BoolVis}}">
-                            <RadioButton x:Name="NavMakerPorts" Style="{StaticResource NavItem}" Tag="PageMakerPorts" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE88E;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Portas COM" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavMakerDrv" Style="{StaticResource NavItem}" Tag="PageMakerDrv" Checked="Nav_Checked">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE950;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock Text="Drivers seriais" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </RadioButton>
-                            </StackPanel>
-                            <Border Height="1" Background="{DynamicResource Line}" Margin="22,10,22,6"/>
-                            <RadioButton x:Name="NavNet" Style="{StaticResource NavItem}" Tag="PageNet" Checked="Nav_Checked">
-                                <DockPanel>
-                                    <TextBlock Text="&#xE839;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock DockPanel.Dock="Right" Text="rede" Foreground="{DynamicResource Faint}" FontSize="11" VerticalAlignment="Center" Margin="6,0,4,0"/>
-                                    <TextBlock Text="Radar" VerticalAlignment="Center"/>
-                                </DockPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavOverlay" Style="{StaticResource NavItem}" Tag="PageOverlay" Checked="Nav_Checked">
-                                <DockPanel>
-                                    <TextBlock Text="&#xE81E;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock DockPanel.Dock="Right" Text="overlay" Foreground="{DynamicResource Faint}" FontSize="11" VerticalAlignment="Center" Margin="6,0,4,0"/>
-                                    <TextBlock Text="Vigia" VerticalAlignment="Center"/>
-                                </DockPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavDriver" Style="{StaticResource NavItem}" Tag="PageDriver" Checked="Nav_Checked">
-                                <DockPanel>
-                                    <TextBlock Text="&#xE896;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock DockPanel.Dock="Right" Text="drivers" Foreground="{DynamicResource Faint}" FontSize="11" VerticalAlignment="Center" Margin="6,0,4,0"/>
-                                    <TextBlock Text="Alicerce" VerticalAlignment="Center"/>
-                                </DockPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavInteg" Style="{StaticResource NavItem}" Tag="PageInteg" Checked="Nav_Checked">
-                                <DockPanel>
-                                    <TextBlock Text="&#xE790;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock DockPanel.Dock="Right" Text="RGB" Foreground="{DynamicResource Faint}" FontSize="11" VerticalAlignment="Center" Margin="6,0,4,0"/>
-                                    <TextBlock Text="Prisma" VerticalAlignment="Center"/>
-                                </DockPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavVault" Style="{StaticResource NavItem}" Tag="PageVault" Checked="Nav_Checked">
-                                <DockPanel>
-                                    <TextBlock Text="&#xE72E;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock DockPanel.Dock="Right" Text="senhas" Foreground="{DynamicResource Faint}" FontSize="11" VerticalAlignment="Center" Margin="6,0,4,0"/>
-                                    <TextBlock Text="Cofre" VerticalAlignment="Center"/>
-                                </DockPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavPdf" Style="{StaticResource NavItem}" Tag="PagePdf" Checked="Nav_Checked">
-                                <DockPanel>
-                                    <TextBlock Text="&#xE8A5;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock DockPanel.Dock="Right" Text="PDF" Foreground="{DynamicResource Faint}" FontSize="11" VerticalAlignment="Center" Margin="6,0,4,0"/>
-                                    <TextBlock Text="Prensa" VerticalAlignment="Center"/>
-                                </DockPanel>
-                            </RadioButton>
-                            <RadioButton x:Name="NavShield" Style="{StaticResource NavItem}" Tag="PageShield" Checked="Nav_Checked">
-                                <DockPanel>
-                                    <TextBlock Text="&#xEA18;" FontFamily="{StaticResource Icons}" FontSize="14" Width="28" VerticalAlignment="Center"/>
-                                    <TextBlock DockPanel.Dock="Right" Text="antivírus" Foreground="{DynamicResource Faint}" FontSize="11" VerticalAlignment="Center" Margin="6,0,4,0"/>
-                                    <TextBlock Text="Muralha" VerticalAlignment="Center"/>
-                                </DockPanel>
-                            </RadioButton>
-                        </StackPanel>
+                        <StackPanel x:Name="NavRoot" Margin="0,0,0,10"/>
                     </ScrollViewer>
                 </DockPanel>
             </ui:ChamferBorder>
@@ -284,83 +102,40 @@
             <!-- ===== Conteúdo ===== -->
             <Grid Grid.Row="1" Grid.Column="1">
 
-                <!-- ===== VISÃO GERAL (painel) ===== -->
-                <local:DashView x:Name="PageDash"/>
+                <!-- ===== INÍCIO (Home): só a mandala de categorias ===== -->
+                <local:HomeView x:Name="PageHome"/>
 
-                <!-- ===== SISTEMA ===== -->
+                <!-- ===== DASHBOARD (o painel de blocos, sem a mandala) ===== -->
+                <local:DashView x:Name="PageDash" Visibility="Collapsed"/>
+
                 <local:SystemView x:Name="PageSystem" Visibility="Collapsed"/>
-
-                <!-- ===== DISCOS (saúde) ===== -->
                 <local:DisksView x:Name="PageDisks" Visibility="Collapsed"/>
-
-                <!-- ===== ENERGIA (bateria e fonte) ===== -->
                 <local:EnergyView x:Name="PageEnergy" Visibility="Collapsed"/>
-
-                <!-- ===== REDE (diagnóstico de lag) ===== -->
                 <local:RadarView x:Name="PageNet" Visibility="Collapsed"/>
-
-                <!-- ===== ALICERCE ===== -->
                 <local:DriversView x:Name="PageDriver" Visibility="Collapsed"/>
-
-                <!-- ===== PRISMA (iluminação) ===== -->
                 <local:PrismaView x:Name="PageInteg" Visibility="Collapsed"/>
-
-                <!-- ===== ARENA (inicializador) ===== -->
                 <local:LauncherView x:Name="PageLauncher" Visibility="Collapsed"/>
-
-                <!-- ===== SENSORES ===== -->
                 <local:SensorsView x:Name="PageSensors" Visibility="Collapsed"/>
-
-                <!-- ===== PLACA DE VÍDEO ===== -->
                 <local:GpuView x:Name="PageGpu" Visibility="Collapsed"/>
-
-                <!-- ===== JOGOS ===== -->
                 <local:GamesView x:Name="PageGames" Visibility="Collapsed"/>
-
-                <!-- ===== GARGALO ===== -->
                 <local:BottleneckView x:Name="PageBottleneck" Visibility="Collapsed"/>
-
-                <!-- ===== OVERLAY ===== -->
                 <local:OverlayView x:Name="PageOverlay" Visibility="Collapsed"/>
-
-                <!-- ===== FORJA ===== -->
                 <local:BenchView x:Name="PageBench" Visibility="Collapsed"/>
-
-                <!-- ===== ARSENAL · OTIMIZAÇÃO ===== -->
                 <local:OptimizeView x:Name="PageOptimize" Visibility="Collapsed"/>
-
-                <!-- ===== INICIALIZAÇÃO (programas que abrem com o Windows) ===== -->
-                <!-- ===== ARSENAL · LIMPEZA (Fase 3.4b) ===== -->
                 <local:CleanupView x:Name="PageCleanup" Visibility="Collapsed"/>
-
-                <!-- ===== ARSENAL · DESINSTALAR (Fase 3.4c) ===== -->
                 <local:UninstallView x:Name="PageUninstall" Visibility="Collapsed"/>
-
                 <local:StartupView x:Name="PageStartup" Visibility="Collapsed"/>
-
-                <!-- ===== INSTALAR APPS (pós-formatação, via winget) ===== -->
                 <local:AppsView x:Name="PageApps" Visibility="Collapsed"/>
                 <local:UpdatesView x:Name="PageUpdates" Visibility="Collapsed"/>
-
-                <!-- ===== VAULT DE SENHAS (UserControl em Modules\Vault) ===== -->
                 <local:VaultView x:Name="PageVault" Visibility="Collapsed"/>
-
-                <!-- ===== PDF (UserControl em Modules\Pdf) ===== -->
                 <local:PdfView x:Name="PagePdf" Visibility="Collapsed"/>
                 <local:MuralhaView x:Name="PageShield" Visibility="Collapsed"/>
-
-                <!-- ===== OFICINA · Portas COM (fantasmas e números COM presos) ===== -->
                 <local:PortsView x:Name="PageMakerPorts" Visibility="Collapsed"/>
-
-                <!-- ===== OFICINA · Drivers seriais (CH340, CP210x, FTDI, Prolific, Arduino) ===== -->
                 <local:SerialDriversView x:Name="PageMakerDrv" Visibility="Collapsed"/>
-
-                <!-- ===== FORJA · OVERCLOCK ===== -->
                 <local:OcView x:Name="PageOc" Visibility="Collapsed"/>
-
-                <!-- ===== STRESS TEST ===== -->
                 <local:StressView x:Name="PageStress" Visibility="Collapsed"/>
             </Grid>
+
         </Grid>
     </Border>
 </Window>
