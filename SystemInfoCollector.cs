@@ -53,12 +53,41 @@ public static class SystemInfoCollector
             n.Add("Versão", S(os, "Version"));
             n.Add("Build", S(os, "BuildNumber"));
             n.Add("Arquitetura", S(os, "OSArchitecture"));
+            n.Add("Data de instalação do Windows", WmiDate(os["InstallDate"]?.ToString()));
             n.Add("Nome do computador", Environment.MachineName);
         }
     }
 
+    private static string WmiDate(string? v)
+    {
+        try { if (!string.IsNullOrEmpty(v)) return ManagementDateTimeConverter.ToDateTime(v).ToString("dd/MM/yyyy"); } catch { }
+        return "—";
+    }
+
+    private static bool Useful(string? v)
+        => !string.IsNullOrWhiteSpace(v) && v != "—" &&
+           !v.Contains("To be filled", StringComparison.OrdinalIgnoreCase) && !v.Contains("Default string", StringComparison.OrdinalIgnoreCase) &&
+           !v.Contains("System Product Name", StringComparison.OrdinalIgnoreCase) && !v.Contains("System Version", StringComparison.OrdinalIgnoreCase) &&
+           !v.Equals("None", StringComparison.OrdinalIgnoreCase) && !v.Equals("O.E.M.", StringComparison.OrdinalIgnoreCase);
+
     private static void CollectBoard(InfoNode n)
     {
+        // Modelo do computador/notebook (ex.: Acer Nitro AN515-57). Alguns notebooks só trazem o nome comercial aqui
+        // ou no Win32_ComputerSystemProduct, e a placa-mãe mostra apenas um código interno.
+        var machine = n.Add("Computador / notebook");
+        string maker = "", model = "", family = "", sku = "", prodName = "", prodVersion = "";
+        foreach (var c in Query("SELECT Manufacturer, Model, SystemFamily, SystemSKUNumber FROM Win32_ComputerSystem"))
+        { maker = S(c, "Manufacturer"); model = S(c, "Model"); family = S(c, "SystemFamily"); sku = S(c, "SystemSKUNumber"); }
+        foreach (var c in Query("SELECT Name, Version FROM Win32_ComputerSystemProduct"))
+        { prodName = S(c, "Name"); prodVersion = S(c, "Version"); }
+        if (Useful(maker)) machine.Add("Fabricante", maker);
+        if (Useful(model)) machine.Add("Modelo", model);
+        if (Useful(prodName) && prodName != model) machine.Add("Nome do produto", prodName);
+        if (Useful(prodVersion)) machine.Add("Versão do produto", prodVersion);
+        if (Useful(family)) machine.Add("Família", family);
+        if (Useful(sku)) machine.Add("SKU", sku);
+        if (machine.Children.Count == 0) machine.Add("Modelo", "O fabricante não informa o modelo na BIOS");
+
         var board = n.Add("Placa-mãe");
         foreach (var b in Query("SELECT * FROM Win32_BaseBoard"))
         {

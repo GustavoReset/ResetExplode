@@ -121,9 +121,8 @@ public partial class MainWindow : Window
 
         StateChanged += (_, _) =>
         {
-            // Sem borda nativa, a janela maximizada vaza ~7 px para fora da tela.
             bool max = WindowState == WindowState.Maximized;
-            Root.Margin = max ? new Thickness(7) : new Thickness(0);
+            Root.Margin = new Thickness(0); // MaximizeHook limita a janela à área útil: não há mais sobra de 7 px
             BtnMax.Content = max ? "" : "";
         };
         Closed += (_, _) =>
@@ -252,6 +251,7 @@ public partial class MainWindow : Window
         var item = (FrameworkElement)sender;
         string page = (string)item.Tag;
         ShowPage(page);
+        if (page == "PageStress") UpdateStressHardware();
 
         // Abre a categoria da página (ex.: quando o painel pula direto para o Benchmark)
         // e mostra "CATEGORIA · página" na barra de título.
@@ -796,14 +796,13 @@ public partial class MainWindow : Window
     /// <summary>Temperatura, clock médio dos núcleos e consumo da CPU (atualizado junto com os sensores).</summary>
     private void UpdateBenchLive()
     {
-        var clocks = _monitor.Rows.Where(r => r.HardwareType == HardwareType.Cpu && r.Type == SensorType.Clock &&
-                                              r.Name.StartsWith("Core #") && r.RawValue > 0).Select(r => r.RawValue!.Value).ToList();
+        float? clockActive = CpuClockStats().Active;
         BenchLive.ItemsSource = new[]
         {
             new KeyValuePair<string, string>("CPU", GameCatalog.ShortCpuName(_cpuName)),
             new KeyValuePair<string, string>("Threads", $"{Environment.ProcessorCount}"),
             new KeyValuePair<string, string>("Temperatura", _monitor.CpuTemperature is float t ? $"{t:0.#} °C" : "—"),
-            new KeyValuePair<string, string>("Clock médio", clocks.Count > 0 ? $"{clocks.Average():0} MHz" : "—"),
+            new KeyValuePair<string, string>("Clock (núcleos ativos)", clockActive is float ca ? $"{ca:0} MHz" : "—"),
             new KeyValuePair<string, string>("Consumo", _monitor.CpuPower is float p ? $"{p:0.#} W" : "—"),
             new KeyValuePair<string, string>("Carga", _monitor.CpuLoad is float l ? $"{l:0} %" : "—"),
         };
@@ -1282,8 +1281,45 @@ public partial class MainWindow : Window
         base.OnSourceInitialized(e);
         var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
         System.Windows.Interop.HwndSource.FromHwnd(hwnd)?.AddHook(HotkeyHook);
+        System.Windows.Interop.HwndSource.FromHwnd(hwnd)?.AddHook(MaximizeHook);
         // Ctrl + Shift + O, sem repetição ao segurar
         RegisterHotKey(hwnd, HotkeyId, 0x0002 | 0x0004 | 0x4000, 0x4F);
+    }
+
+    // ---- Maximizar sem cobrir a barra de tarefas (em qualquer lado da tela e em qualquer monitor) ----
+
+    [StructLayout(LayoutKind.Sequential)] private struct NativePoint { public int X, Y; }
+    [StructLayout(LayoutKind.Sequential)] private struct NativeRect { public int Left, Top, Right, Bottom; }
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MinMaxInfo { public NativePoint Reserved, MaxSize, MaxPosition, MinTrackSize, MaxTrackSize; }
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MonitorInfo { public int Size; public NativeRect Monitor, Work; public int Flags; }
+
+    [DllImport("user32.dll")] private static extern IntPtr MonitorFromWindow(IntPtr hwnd, int flags);
+    [DllImport("user32.dll")] private static extern bool GetMonitorInfo(IntPtr monitor, ref MonitorInfo info);
+
+    /// <summary>
+    /// Sem borda nativa, o Windows maximiza a janela para a tela inteira e a barra de tarefas (principalmente em cima ou
+    /// nas laterais) cobre parte dela. Aqui a área máxima passa a ser a área útil do monitor onde a janela está.
+    /// </summary>
+    private IntPtr MaximizeHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        if (msg != 0x0024) return IntPtr.Zero; // WM_GETMINMAXINFO
+        try
+        {
+            var monitor = MonitorFromWindow(hwnd, 2); // MONITOR_DEFAULTTONEAREST
+            var mi = new MonitorInfo { Size = Marshal.SizeOf<MonitorInfo>() };
+            if (monitor != IntPtr.Zero && GetMonitorInfo(monitor, ref mi))
+            {
+                var info = Marshal.PtrToStructure<MinMaxInfo>(lParam);
+                info.MaxPosition = new NativePoint { X = mi.Work.Left - mi.Monitor.Left, Y = mi.Work.Top - mi.Monitor.Top };
+                info.MaxSize = new NativePoint { X = mi.Work.Right - mi.Work.Left, Y = mi.Work.Bottom - mi.Work.Top };
+                Marshal.StructureToPtr(info, lParam, true);
+                handled = true;
+            }
+        }
+        catch { }
+        return IntPtr.Zero;
     }
 
     private IntPtr HotkeyHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -1491,6 +1527,7 @@ public partial class MainWindow : Window
 
         SetStressControls(running: true);
         SetStatus("Rodando", alert: false);
+        UpdateStressHardware();
         Log($"Iniciado · CPU {(cpu ? $"sim (limite {_tempLimit:0} °C)" : "não")} · RAM {(ram ? $"sim ({fraction:P0} da livre)" : "não")} · " +
             $"GPU {gpuDesc} · {(minutes > 0 ? $"{minutes:0.##} min" : "sem limite de tempo")}");
     }
@@ -1622,6 +1659,15 @@ public partial class MainWindow : Window
         }
 
         if (PageStress.IsVisible) DrawChart();
+    }
+
+    /// <summary>Linha com CPU, GPU e RAM da máquina no topo do registro, para constar em capturas de tela.</summary>
+    private void UpdateStressHardware()
+    {
+        var (total, _) = Optimizer.MemoryStatus();
+        string gpus = _gpus.Count > 0 ? string.Join(" + ", _gpus.Select(g => g.Name)) : "—";
+        string ram = total > 0 ? $"{total / 1073741824.0:0.#} GB" : "—";
+        StressHw.Text = $"CPU: {(_cpuName.Length > 0 ? _cpuName : "—")}  ·  GPU: {gpus}  ·  RAM: {ram}";
     }
 
     private void Log(string msg)

@@ -78,13 +78,7 @@ public partial class MainWindow
         return null;
     }
 
-    private (float? Avg, float? Max) CpuClocks()
-    {
-        var cores = _monitor.Rows.Where(r => r.HardwareType == HardwareType.Cpu && r.Type == SensorType.Clock &&
-                                             r.Name.StartsWith("Core #") && !r.Name.Contains("Effective") && r.RawValue > 0)
-                                 .Select(r => r.RawValue!.Value).ToList();
-        return cores.Count > 0 ? (cores.Average(), cores.Max()) : (null, null);
-    }
+    private (float? Avg, float? Max) CpuClocks() => CpuClockStats();
 
     /// <summary>Monta as linhas GPU / VRAM / CPU / RAM só com o que foi escolhido; linha vazia não aparece.</summary>
     private List<OverlayLine> BuildOverlayLines(FrameStats? f)

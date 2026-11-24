@@ -41,6 +41,8 @@ public sealed class StressTester
         if (ram)
         {
             long bytes = (long)(FreePhysicalMemory() * Math.Clamp(ramFraction, 0.1, 0.9));
+            // Versão de 32 bits: o processo só enxerga ~2 GB de memória; passar disso derrubaria o programa.
+            if (!Environment.Is64BitProcess) bytes = Math.Min(bytes, 1L << 30);
             MemoryAllocatedBytes = bytes;
             StartThread(() => RamWorker(token, bytes), "Stress RAM");
         }

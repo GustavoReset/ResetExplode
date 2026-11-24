@@ -80,6 +80,7 @@ public partial class MainWindow
         _gameBenchCts = new CancellationTokenSource();
         var ct = _gameBenchCts.Token;
         SetGameBenchRunning(BtnDiskBench, true);
+        BtnDiskScan.IsEnabled = false;
         DiskDrivePanel.IsEnabled = DiskSizePanel.IsEnabled = false;
         DiskResult.ItemsSource = null;
         (string Phase, double Frac) progress = ("Preparando…", 0);
@@ -122,6 +123,7 @@ public partial class MainWindow
             timer.Stop();
             DiskProgress.ScaleX = 0;
             DiskDrivePanel.IsEnabled = DiskSizePanel.IsEnabled = true;
+            BtnDiskScan.IsEnabled = true;
             SetGameBenchRunning(BtnDiskBench, false);
         }
     }

@@ -33,7 +33,7 @@ public static class OverlayMetrics
         new("cpu_load", "CPU", "Uso total", true),
         new("cpu_maxcore", "CPU", "Núcleo mais ocupado", false),
         new("cpu_temp", "CPU", "Temperatura", true),
-        new("cpu_clock", "CPU", "Clock médio", true),
+        new("cpu_clock", "CPU", "Clock (núcleos ativos)", true),
         new("cpu_clockmax", "CPU", "Clock máximo (núcleo)", false),
         new("cpu_power", "CPU", "Consumo", true),
 
