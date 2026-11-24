@@ -1,3 +1,17 @@
+## Novidades da v0.17
+
+**Correções e melhorias pedidas pela comunidade**
+- **Clock da CPU (#13):** a Visão Geral, o overlay e o RESET BENCH agora mostram o clock dos núcleos que estão trabalhando
+  (carga a partir de 10%), como o Gerenciador de Tarefas, em vez da média de todos os núcleos, que caía por causa dos parados.
+- **Stress test (#7):** o registro agora é redimensionável (arraste a divisória entre o gráfico e o registro) e mostra CPU, GPU e RAM da máquina.
+- **Sistema (#7):** a data de instalação do Windows aparece em Sistema operacional, e Placa-mãe e BIOS ganhou o bloco
+  "Computador / notebook" com fabricante, modelo, família e SKU (útil em notebooks Acer Nitro e outros que só trazem um código na placa-mãe).
+- **Discos (#7):** novo teste de **setores defeituosos**, só leitura (modo rápido de 10% ou completo), com cancelamento.
+- **Janela maximizada (#7):** não fica mais atrás da barra de tarefas, em qualquer lado da tela.
+- **Segurança (#5):** `SECURITY.md` com canal privado para relatar vulnerabilidades, e `SHA256SUMS.txt` em cada release.
+- **Windows 32 bits (#6):** as releases trazem também `ResetExplode-x86.exe` (experimental: sensores de CPU, ray tracing e
+  iluminação Corsair podem não estar disponíveis em 32 bits).
+
 ## Novidades da v0.16
 
 **Nova página · RESET FERRAMENTAS › Inicialização**

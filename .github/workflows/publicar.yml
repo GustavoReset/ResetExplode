@@ -28,11 +28,19 @@ jobs:
       - name: Publicar (arquivo único, com o .NET embutido)
         run: dotnet publish ResetExplode.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -o dist -nologo
 
-      - name: Montar pacote
+      - name: Publicar versão de 32 bits (Windows x86)
+        run: dotnet publish ResetExplode.csproj -c Release -r win-x86 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -o dist32 -nologo
+
+      - name: Montar pacotes e hashes
         shell: pwsh
         run: |
           Copy-Item LEIA-ME.txt dist/LEIA-ME.txt
           Compress-Archive -Path dist/ResetExplode.exe, dist/LEIA-ME.txt -DestinationPath ResetExplode.zip
+          Copy-Item dist32/ResetExplode.exe dist32/ResetExplode-x86.exe
+          Compress-Archive -Path dist32/ResetExplode-x86.exe, dist/LEIA-ME.txt -DestinationPath ResetExplode-x86.zip
+          # SHA-256 de cada exe, para quem quiser conferir o arquivo baixado (veja SECURITY.md)
+          (Get-FileHash dist/ResetExplode.exe -Algorithm SHA256).Hash.ToLower() + "  ResetExplode.exe" | Out-File SHA256SUMS.txt -Encoding ascii
+          (Get-FileHash dist32/ResetExplode-x86.exe -Algorithm SHA256).Hash.ToLower() + "  ResetExplode-x86.exe" | Out-File SHA256SUMS.txt -Encoding ascii -Append
 
       - name: Atualizar release "latest"
         if: startsWith(github.ref, 'refs/heads/')
@@ -42,7 +50,7 @@ jobs:
         run: |
           $sha = "$env:GITHUB_SHA".Substring(0, 7)
           gh release delete latest --cleanup-tag --yes
-          gh release create latest ResetExplode.zip dist/ResetExplode.exe --target $env:GITHUB_SHA --latest --title "RESET EXPLODE (versão mais recente)" --notes-file NOVIDADES.md
+          gh release create latest ResetExplode.zip ResetExplode-x86.zip dist/ResetExplode.exe dist32/ResetExplode-x86.exe SHA256SUMS.txt --target $env:GITHUB_SHA --latest --title "RESET EXPLODE (versão mais recente)" --notes-file NOVIDADES.md
 
       - name: Release da versão (tag)
         if: startsWith(github.ref, 'refs/tags/')
@@ -50,4 +58,4 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create $env:GITHUB_REF_NAME ResetExplode.zip dist/ResetExplode.exe --title "RESET EXPLODE $env:GITHUB_REF_NAME" --generate-notes --latest=false
+          gh release create $env:GITHUB_REF_NAME ResetExplode.zip ResetExplode-x86.zip dist/ResetExplode.exe dist32/ResetExplode-x86.exe SHA256SUMS.txt --title "RESET EXPLODE $env:GITHUB_REF_NAME" --generate-notes --latest=false

@@ -2044,6 +2044,20 @@
                                         <Button x:Name="BtnDiskBench" Style="{StaticResource PrimaryButton}" Content="INICIAR" Click="BtnDiskBench_Click"/>
                                     </StackPanel>
                                 </Border>
+                                <Border Style="{StaticResource CardBorder}" Margin="0,0,0,12">
+                                    <StackPanel>
+                                        <TextBlock Text="SETORES DEFEITUOSOS" Style="{StaticResource Label}"/>
+                                        <WrapPanel x:Name="DiskScanPanel" Margin="0,0,0,0">
+                                            <RadioButton Style="{StaticResource Chip}" GroupName="DiskScan" Content="Rápido (10%)" Tag="quick" IsChecked="True"/>
+                                            <RadioButton Style="{StaticResource Chip}" GroupName="DiskScan" Content="Completo" Tag="full"/>
+                                        </WrapPanel>
+                                        <TextBlock Foreground="{DynamicResource Muted}" FontSize="12" TextWrapping="Wrap" Margin="0,12,0,12">
+                                            Só lê a unidade escolhida acima (não grava nada) e anota setores ilegíveis e leituras muito lentas.
+                                            O modo completo de um disco grande pode levar horas; dá para cancelar.
+                                        </TextBlock>
+                                        <Button x:Name="BtnDiskScan" Style="{StaticResource PrimaryButton}" Content="VERIFICAR" Click="BtnDiskScan_Click"/>
+                                    </StackPanel>
+                                </Border>
                                 <Border Style="{StaticResource CardBorder}">
                                     <StackPanel>
                                         <TextBlock Text="HISTÓRICO" Style="{StaticResource Label}"/>
@@ -2707,7 +2721,8 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*" MinHeight="140"/>
-                        <RowDefinition Height="110"/>
+                        <RowDefinition Height="10"/>
+                        <RowDefinition Height="170" MinHeight="90"/>
                     </Grid.RowDefinitions>
 
                     <StackPanel Margin="0,0,0,20">
@@ -2873,7 +2888,7 @@
                     </UniformGrid>
 
                     <!-- Gráfico -->
-                    <Border Grid.Row="3" Style="{StaticResource CardBorder}" Margin="0,0,0,14" Padding="18,14,18,12">
+                    <Border Grid.Row="3" Style="{StaticResource CardBorder}" Margin="0" Padding="18,14,18,12">
                         <DockPanel>
                             <Grid DockPanel.Dock="Top" Margin="0,0,0,8">
                                 <TextBlock Text="TEMPERATURAS — ÚLTIMOS 5 MIN" Style="{StaticResource Label}" Margin="0"/>
@@ -2890,10 +2905,17 @@
                         </DockPanel>
                     </Border>
 
+                    <!-- Divisória: arraste para aumentar ou diminuir o registro -->
+                    <GridSplitter Grid.Row="4" Height="10" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                                  ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" Background="Transparent" Cursor="SizeNS"
+                                  ToolTip="Arraste para redimensionar o registro"/>
+
                     <!-- Log -->
-                    <Border Grid.Row="4" Style="{StaticResource CardBorder}" Padding="18,14,10,10">
+                    <Border Grid.Row="5" Style="{StaticResource CardBorder}" Padding="18,14,10,10">
                         <DockPanel>
                             <TextBlock DockPanel.Dock="Top" Text="REGISTRO" Style="{StaticResource Label}"/>
+                            <TextBlock x:Name="StressHw" DockPanel.Dock="Top" Foreground="{DynamicResource Muted}" FontSize="12"
+                                       TextWrapping="Wrap" Margin="0,0,0,8"/>
                             <ListBox x:Name="StressLog" FontFamily="{StaticResource Mono}" FontSize="12"
                                      Foreground="{DynamicResource Muted}" ItemContainerStyle="{StaticResource PlainItem}"/>
                         </DockPanel>

@@ -33,12 +33,30 @@ public partial class MainWindow
     private float? MainGpuLoad() => _gpus.Count == 0 ? null :
         _monitor.Rows.FirstOrDefault(r => r.Hardware == _gpus[0].Name && r.Type == SensorType.Load && r.Name == "GPU Core")?.RawValue;
 
-    private float? CpuClockAvg()
+    /// <summary>
+    /// Clock da CPU para exibição: média só dos núcleos que estão trabalhando (carga ≥ 10%), como o Gerenciador de Tarefas.
+    /// Núcleos parados caem para ~800 MHz e derrubavam a média; se todos estiverem ociosos, usa o núcleo mais rápido.
+    /// </summary>
+    private (float? Active, float? Max) CpuClockStats()
     {
-        var c = _monitor.Rows.Where(r => r.HardwareType == HardwareType.Cpu && r.Type == SensorType.Clock &&
-                                         r.Name.StartsWith("Core #") && r.RawValue > 0).Select(r => r.RawValue!.Value).ToList();
-        return c.Count > 0 ? c.Average() : null;
+        // Clocks: "Core #3", e "P-Core #3" / "E-Core #3" nos Intel híbridos. Cargas: "CPU Core #3" (sem "Thread").
+        var clocks = new List<(int Index, float Mhz)>();
+        var loads = new Dictionary<int, float>();
+        foreach (var r in _monitor.Rows)
+        {
+            if (r.HardwareType != HardwareType.Cpu || r.RawValue is not float v) continue;
+            if (r.Type == SensorType.Clock && v > 0 && System.Text.RegularExpressions.Regex.Match(r.Name, @"^(?:[PE]-)?Core #(\d+)$") is { Success: true } mc)
+                clocks.Add((int.Parse(mc.Groups[1].Value), v));
+            else if (r.Type == SensorType.Load && System.Text.RegularExpressions.Regex.Match(r.Name, @"^CPU Core #(\d+)$") is { Success: true } ml)
+                loads[int.Parse(ml.Groups[1].Value)] = v;
+        }
+        if (clocks.Count == 0) return (null, null);
+        float max = clocks.Max(c => c.Mhz);
+        var busy = clocks.Where(c => loads.TryGetValue(c.Index, out var l) && l >= 10f).Select(c => c.Mhz).ToList();
+        return (busy.Count > 0 ? busy.Average() : max, max);
     }
+
+    private float? CpuClockAvg() => CpuClockStats().Active;
 
     private void CollectDashSample()
     {
